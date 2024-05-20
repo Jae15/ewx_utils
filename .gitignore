@@ -1,0 +1,6 @@
+database.ini/
+test_config.py/
+configfile/
+database/
+tests/venv
+venv/
