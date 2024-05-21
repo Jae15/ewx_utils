@@ -8,8 +8,7 @@ from .configfile import config_mawndbqc
 
 """ 
 This file contains functions used to connect to databases 
-The functions contain connection information.
-"""
+The functions contain connection information as stored in the configfile.
 
 logging.basicConfig(filename= 'log_file.log', level = logging.DEBUG,
                     format = '%(asctime)s, %(levelname)s, %(message)s')
@@ -18,6 +17,15 @@ logging.basicConfig(filename= 'log_file.log', level = logging.DEBUG,
 #logging.warning('This is a warning message')
 #logging.error('This is an error message')
 #logging.critical('This is a critical message')
+
+"""
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.FOrmatter('%(levelname)s - %(asctime)s - %(message)s')
+file_handler = logging.FileHandler('log_file.log')
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_handler)
 
 def connect_to_mawndb():
     db_info = config_mawndb()

@@ -3,3 +3,20 @@
 2024-05-15 12:33:14,753, WARNING, This is a warning message
 2024-05-15 12:33:14,753, ERROR, This is an error message
 2024-05-15 12:33:14,753, CRITICAL, This is a critical message
+2024-05-20 15:39:23,429, DEBUG, This is a debug message
+2024-05-20 15:39:23,429, INFO, This is an info message
+2024-05-20 15:39:23,429, WARNING, This is a warning message
+2024-05-20 15:39:23,429, ERROR, This is an error message
+2024-05-20 15:39:23,429, CRITICAL, This is a critical message
+2024-05-20 15:39:23,431, DEBUG, db_info returned successfully
+2024-05-20 15:43:55,300, DEBUG, This is a debug message
+2024-05-20 15:43:55,300, INFO, This is an info message
+2024-05-20 15:43:55,303, WARNING, This is a warning message
+2024-05-20 15:43:55,303, ERROR, This is an error message
+2024-05-20 15:43:55,303, CRITICAL, This is a critical message
+2024-05-20 15:43:55,304, DEBUG, db_info returned successfully
+2024-05-20 15:43:55,346, DEBUG, This is a debug message
+2024-05-20 15:43:55,346, INFO, This is an info message
+2024-05-20 15:43:55,346, WARNING, This is a warning message
+2024-05-20 15:43:55,346, ERROR, This is an error message
+2024-05-20 15:43:55,346, CRITICAL, This is a critical message

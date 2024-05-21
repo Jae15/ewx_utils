@@ -167,3 +167,40 @@ Exception: Section mawndb not found in the c:/Users/mwangija/data_file/mwangija_
 2024-05-17 12:20:55,196, INFO, Mawnqcl cursor connection successfully established
 2024-05-17 12:20:55,249, INFO, Successfully connected to mawndb_qc
 2024-05-17 12:20:55,249, INFO, Mawnqcl cursor connection successfully established
+2024-05-20 15:44:24,627, DEBUG, This is a debug message
+2024-05-20 15:44:24,628, INFO, This is an info message
+2024-05-20 15:44:24,628, WARNING, This is a warning message
+2024-05-20 15:44:24,628, ERROR, This is an error message
+2024-05-20 15:44:24,628, CRITICAL, This is a critical message
+2024-05-20 15:44:24,629, DEBUG, db_info returned successfully
+2024-05-20 15:44:24,655, DEBUG, This is a debug message
+2024-05-20 15:44:24,655, INFO, This is an info message
+2024-05-20 15:44:24,655, WARNING, This is a warning message
+2024-05-20 15:44:24,655, ERROR, This is an error message
+2024-05-20 15:44:24,656, CRITICAL, This is a critical message
+2024-05-20 16:07:43,243, DEBUG, This is a debug message
+2024-05-20 16:07:43,243, INFO, This is an info message
+2024-05-20 16:07:43,243, WARNING, This is a warning message
+2024-05-20 16:07:43,243, ERROR, This is an error message
+2024-05-20 16:07:43,243, CRITICAL, This is a critical message
+2024-05-20 16:07:43,243, DEBUG, db_info returned successfully
+2024-05-20 16:07:43,264, DEBUG, This is a debug message
+2024-05-20 16:07:43,264, INFO, This is an info message
+2024-05-20 16:07:43,264, WARNING, This is a warning message
+2024-05-20 16:07:43,265, ERROR, This is an error message
+2024-05-20 16:07:43,265, CRITICAL, This is a critical message
+2024-05-20 16:11:46,309, DEBUG, This is a debug message
+2024-05-20 16:11:46,309, INFO, This is an info message
+2024-05-20 16:11:46,309, WARNING, This is a warning message
+2024-05-20 16:11:46,309, ERROR, This is an error message
+2024-05-20 16:11:46,309, CRITICAL, This is a critical message
+2024-05-20 16:11:46,310, DEBUG, db_info returned successfully
+2024-05-20 16:11:46,310, DEBUG, db_info returned successfully
+2024-05-20 16:11:46,351, INFO, Successfully connected to mawndb
+2024-05-20 16:11:46,352, INFO, Mawndb cursor connection successfully established
+2024-05-20 16:24:51,471, DEBUG, This is a debug message
+2024-05-20 16:24:51,471, INFO, This is an info message
+2024-05-20 16:24:51,471, WARNING, This is a warning message
+2024-05-20 16:24:51,471, ERROR, This is an error message
+2024-05-20 16:24:51,471, CRITICAL, This is a critical message
+2024-05-20 16:24:51,473, DEBUG, db_info returned successfully

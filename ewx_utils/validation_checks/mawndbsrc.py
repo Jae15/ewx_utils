@@ -4,40 +4,34 @@ import sys
 import pprint
 import psycopg2.extras
 import datetime as datetime
-from dateutil.rrule import *
-from dateutil.parser import *
-from datetime import *
-sys.displayhook = pprint.pprint
-import dateutil
 import datetime
 from datetime import timezone
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
-from dateutil.rrule import rrule, MONTHLY
 import logging
 logging.debug('This is a debug message')
 logging.info('This is an info message')
 logging.warning('This is a warning message')
 logging.error('This is an error message')
 logging.critical('This is a critical message')
-from ewx_utils.validation_checks import relh_vars
-from ewx_utils.validation_checks import pcpn_vars
-from ewx_utils.validation_checks import rpet_vars
-from ewx_utils.validation_checks import temp_vars
-from ewx_utils.validation_checks import wspd_vars
-from ewx_utils.validation_checks import wdir_vars
-from ewx_utils.validation_checks import leafwt_vars
-from ewx_utils.db_files import connect_to_mawndb
-from ewx_utils.db_files import mawndb_cursor_connection
-from ewx_utils.mawndb_classes.humidity import humidity
-from ewx_utils.mawndb_classes.windspeed import windspeed
-from ewx_utils.mawndb_classes.leafwetness import leafwetness
-from ewx_utils.mawndb_classes.temperature import temperature
-from ewx_utils.mawndb_classes.precipitation import precipitation
-from ewx_utils.mawndb_classes.winddirection import winddirection
-from ewx_utils.mawndb_classes.evapotranspiration import evapotranspiration
+from validation_checks.variables_list import relh_vars
+from validation_checks.variables_list import pcpn_vars
+from validation_checks.variables_list import rpet_vars
+from validation_checks.variables_list import temp_vars
+from validation_checks.variables_list import wspd_vars
+from validation_checks.variables_list import wdir_vars
+from validation_checks.variables_list import leafwt_vars
+from db_files.dbconnection import connect_to_mawndb
+from db_files.dbconnection import mawndb_cursor_connection
+from mawndb_classes.humidity import humidity
+from mawndb_classes.windspeed import windspeed
+from mawndb_classes.leafwetness import leafwetness
+from mawndb_classes.temperature import temperature
+from mawndb_classes.precipitation import precipitation
+from mawndb_classes.winddirection import winddirection
+from mawndb_classes.evapotranspiration import evapotranspiration
 
-
+"""
 mawndb_connection = connect_to_mawndb()
 print(mawndb_connection)
 mawndb_cursor = mawndb_cursor_connection(mawndb_connection)
@@ -53,6 +47,7 @@ records = mawndb_cursor.fetchmany(2)
 #Commit the transaction for mawndb
 mawndb_connection.commit()
 
+"""
 
 """Defining the check value function below that takes in the variable key as a string, the value as a float and the date as datetime"""
 
@@ -162,8 +157,7 @@ def month_abbrv(record):
                 
 """
 After obtaining a clean record we use the above to insert it into mawndbqc
-"""
-
 mawndb_connection.close()
 mawndb_cursor.close()
 
+"""

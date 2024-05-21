@@ -13,6 +13,15 @@ from ewx_utils.db_files.dbconnection import connect_to_mawndbqc
 from ewx_utils.db_files.dbconnection import mawndb_cursor_connection
 from ewx_utils.db_files.dbconnection import mawnqc_cursor_connection
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(message)s')
+file_handler = logging.FileHandler('log_file')
+
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.info('')
+
 mawndb_connection = connect_to_mawndb()
 mawndb_cursor = mawndb_cursor_connection(mawndb_connection)
 mawndbqc_connection = connect_to_mawndbqc()

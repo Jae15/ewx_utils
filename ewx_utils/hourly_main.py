@@ -40,7 +40,6 @@ def main():
     parser.add_argument('-l', '--log', action = 'store_true', help ='Create a logfile for this run')
 
     group = parser.add_mutually_exclusive_group()
-    
     group.add_argument('-s', '--stations', nargs = '*', type = str, help = 'run this for a specific station(use station_name, not station_id). to run for multiple specific stations, list all after the flag')
     group.add_argument('-a', '--all', action = 'store_true', default = False, help = 'use this flag for all stations')
     
