@@ -4,8 +4,8 @@ from os import lseek
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(messages)s')
-file_handler = logging.FileHandler('log_file.log')
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+file_handler = logging.FileHandler('db_logs.log')
 file_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 
@@ -24,13 +24,10 @@ logging.critical('This is a critical message')
 #def config_mawndb(filename = "database.ini", section = "mawndb"):
 def config_mawndb(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb"):
     parser = ConfigParser()
-    
     #Use the parser to read the database.ini file
     parser.read(filename)
-    
     #Create an empty dictionary db_info to store the configuration credentials for mawndb
     db_info = {}
-    
     #Loop through the section and collect the conguration credentials for mawndb and store them in the dictionary db_info
     if parser.has_section(section):
         params = parser.items(section) #Use the .items() dictionary method to obtain the credentials since they're stored as (key,value) pairs
@@ -47,12 +44,9 @@ def config_mawndb(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/da
 def config_mawndbqc(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb_qcl"):
         # creating a parser
         parser = ConfigParser()
-        
         parser.read(filename)
-        
         # Create an empty dictionary db_info2 to store the configuration credentials for mawndb_qc
         db_info2 = {}
-
         # Loop through the section and collect the conguration credentials for mawndb_qc and store them in the dictionary db_info2
         if parser.has_section(section):
             params01 = parser.items(section) # Use the .items() dictionary method to obtain the credentials since they're stored as (key,value) pairs
@@ -61,10 +55,43 @@ def config_mawndbqc(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/
 
         else:
             raise Exception('Section {0} is not found in the {1} file.'.format(section, filename))
-        logging.DEBUG("Mawnqc login information returned successfully")
-        
+        logging.info("Mawnqcl login information returned successfully")
         return(db_info2)
         #print(db2)
+
+def config_mawndbrtma(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb_rtma"):
+     # Creating a parser
+     parser = ConfigParser()
+     parser.read(filename)
+     # Create an empty dictionary dbinfo3 to store the configuration credentials for mawndb_rtma
+     db_info3 = {}
+     # Loop though the section and collect the configuration credentials for mawndb_rtma and store them in the dictionary db_info3
+     if parser.has_section(section):
+          params02 = parser.items(section) # Use the .items() dictionary method to obtain the credentials since they're stored as (key, value) pairs
+          for param02 in params02:
+               db_info3[params02[0]] = param02[2] #index 0: key and index 1: value
+     else:
+        raise Exception('Section {0} is not found in the {1} file.'.format(section, filename))
+     logging.info("RTMA login credentials returned successfully")
+     return(db_info3)
+    
+def config_qctest(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawnqc_test"):
+          # Creating a parser
+          parser = ConfigParser()
+          # reading the configfile
+          parser.read(filename)
+          # creating an empty dictionary to store mawnqc_test configurations in
+          db_info4 = {}
+          if parser.has_section(section):
+               params03 = parser.items(section)
+               for param03 in params03:
+                    db_info4[param03[0]] = param03[1]
+          else:
+               raise Exception('Section {0} is not found in the {1} file'.format(section,filename))
+          logging.info("QCTEST login credentials returned successfully")
+          return(db_info4)
+
+
 
 
 """

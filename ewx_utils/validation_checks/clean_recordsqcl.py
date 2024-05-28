@@ -1,9 +1,9 @@
 import sys
-from ewx_utils.validation_checks.mawndbsrc import clean_records
-from ewx_utils.validation_checks.mawndbsrc import clean_record
-from ewx_utils.validation_checks.qcsrc_cols import qc_columns
-from ewx_utils.validation_checks.mawndbsrc import check_value
-from ewx_utils.validation_checks.timeloop import generate_list_of_hours
+from validation_checks.mawndbsrc import clean_records
+from validation_checks.mawndbsrc import clean_record
+from validation_checks.qcsrc_cols import qc_columns
+from validation_checks.mawndbsrc import check_value
+from validation_checks.timeloop import generate_list_of_hours
 
 for clean_record in clean_records: 
     key_clean = list(clean_record.keys()) 

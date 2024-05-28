@@ -1,13 +1,17 @@
 #import sys
 import logging
-logging.debug('This is a debug message')
-logging.info('This is an info message')
-logging.warning('This is a warning message')
-logging.error('This is an error message')
-logging.critical('This is a critical message')
 from datetime import datetime, timedelta
 import tz
 #from dateutil import tz
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s)")
+file_handler = logging.FileHandler("validation_logs.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_handler)
 
 def generate_list_of_hours(begin_date: str, end_date: str) -> list:
     

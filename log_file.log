@@ -20,3 +20,147 @@
 2024-05-20 15:43:55,346, WARNING, This is a warning message
 2024-05-20 15:43:55,346, ERROR, This is an error message
 2024-05-20 15:43:55,346, CRITICAL, This is a critical message
+2024-05-22 12:07:04,559, DEBUG, This is a debug message
+2024-05-22 12:07:04,559, INFO, This is an info message
+2024-05-22 12:07:04,559, WARNING, This is a warning message
+2024-05-22 12:07:04,559, ERROR, This is an error message
+2024-05-22 12:07:04,559, CRITICAL, This is a critical message
+2024-05-22 12:07:04,560, DEBUG, Mawndb login credentials returned successfully
+2024-05-22 12:07:04,615, INFO, Successfully connected to mawndb
+2024-05-22 12:07:04,615, INFO, Mawndb cursor connection successfully established
+2024-05-22 12:07:04,664, INFO, Successfully connected to mawndb_qc
+2024-05-22 12:07:04,664, INFO, Mawnqcl cursor connection successfully established
+2024-05-22 12:07:04,731, DEBUG, stations_list: ['aetna_hourly', 'albion_hourly', 'allegan_hourly', 'alpine_hourly', 'arlene_hourly', 'arlington_hourly', 'bainbridge_hourly', 'bath_hourly', 'bearlake_hourly', 'belding_hourly', 'benona_hourly', 'benzonia_hourly', 'berriensprings_hourly', 'casco_hourly', 'cassopolis_hourly', 'ceresco_hourly', 'charlevoix_hourly', 'charlotte_hourly', 'chatham_hourly', 'clarksville_hourly', 'coldwater_hourly', 'commercetwp_hourly', 'conklin_hourly', 'constantine_hourly', 'deerfield_hourly', 'demo_hourly', 'dowagiac_hourly', 'eastleland_hourly', 'eastport_hourly', 'eggharbor_hourly', 'elbridge_hourly', 'elkrapids_hourly', 'emmett_hourly', 'entrican_hourly', 'escanaba_hourly', 'fairgrove_hourly', 'fennville_hourly', 'flint_hourly', 'freeland_hourly', 'fremont_hourly', 'gaylord_hourly', 'goodells_hourly', 'grandjunction_hourly', 'grant_hourly', 'hancock_hourly', 'hart_hourly', 'hartford_hourly', 'haslett_hourly', 'hastings_hourly', 'hawks_hourly', 'hudson_hourly', 'hudsonville_hourly', 'ithaca_hourly', 'kalamazoo_hourly', 'kalkaska_hourly', 'keeler_hourly', 'kentcity_hourly', 'kewadin_hourly', 'kewaunee_hourly', 'kinde_hourly', 'lancaster_hourly', 'lapeer_hourly', 'lawrence_hourly', 'lawton_hourly', 'leslie_hourly', 'linwood_hourly', 'ludington_hourly', 'marshfield_hourly', 'mcbain_hourly', 'mcmillan_hourly', 'mears_hourly', 'mecosta_hourly', 'mendon_hourly', 'mountpleasant_hourly', 'msuhort_hourly', 'msuhtrc_hourly', 'msukbs_hourly', 'munger_hourly', 'nasewaupee_hourly', 'ncmc_hourly', 'newera_hourly', 'northport_hourly', 'nwmhrs_hourly', 'oldmission_hourly', 'onekama_hourly', 'oshtemo_hourly', 'petersburg_hourly', 'petoskey_hourly', 'pigeon_hourly', 'reeman_hourly', 'rhinelander_hourly', 'richville_hourly', 'romeo_hourly', 'saginaw_hourly', 'sandusky_hourly', 'scottdale_hourly', 'shelbyeast_hourly', 'sisterbay_hourly', 'southerndoor_hourly', 'southhaven_hourly', 'sparta20_hourly', 'sparta_hourly', 'spartanorth_hourly', 'spooner_hourly', 'standale_hourly', 'stephenson_hourly', 'sturgeonbay_hourly', 'swmrec_hourly', 'verona_hourly', 'westjacksonport_hourly', 'westolive_hourly', 'williamsburg20_hourly', 'wmich_hourly']
+2024-05-22 12:07:04,734, DEBUG, stations_not_in_qc: ['variables_hourly']
+2024-05-22 12:09:53,735, DEBUG, This is a debug message
+2024-05-22 12:09:53,735, INFO, This is an info message
+2024-05-22 12:09:53,735, WARNING, This is a warning message
+2024-05-22 12:09:53,736, ERROR, This is an error message
+2024-05-22 12:09:53,736, CRITICAL, This is a critical message
+2024-05-22 12:09:53,736, DEBUG, Mawndb login credentials returned successfully
+2024-05-22 12:09:53,772, INFO, Successfully connected to mawndb
+2024-05-22 12:09:53,772, INFO, Mawndb cursor connection successfully established
+2024-05-22 12:09:53,820, INFO, Successfully connected to mawndb_qc
+2024-05-22 12:09:53,820, INFO, Mawnqcl cursor connection successfully established
+2024-05-22 12:09:53,873, DEBUG, stations_list: ['aetna_hourly', 'albion_hourly', 'allegan_hourly', 'alpine_hourly', 'arlene_hourly', 'arlington_hourly', 'bainbridge_hourly', 'bath_hourly', 'bearlake_hourly', 'belding_hourly', 'benona_hourly', 'benzonia_hourly', 'berriensprings_hourly', 'casco_hourly', 'cassopolis_hourly', 'ceresco_hourly', 'charlevoix_hourly', 'charlotte_hourly', 'chatham_hourly', 'clarksville_hourly', 'coldwater_hourly', 'commercetwp_hourly', 'conklin_hourly', 'constantine_hourly', 'deerfield_hourly', 'demo_hourly', 'dowagiac_hourly', 'eastleland_hourly', 'eastport_hourly', 'eggharbor_hourly', 'elbridge_hourly', 'elkrapids_hourly', 'emmett_hourly', 'entrican_hourly', 'escanaba_hourly', 'fairgrove_hourly', 'fennville_hourly', 'flint_hourly', 'freeland_hourly', 'fremont_hourly', 'gaylord_hourly', 'goodells_hourly', 'grandjunction_hourly', 'grant_hourly', 'hancock_hourly', 'hart_hourly', 'hartford_hourly', 'haslett_hourly', 'hastings_hourly', 'hawks_hourly', 'hudson_hourly', 'hudsonville_hourly', 'ithaca_hourly', 'kalamazoo_hourly', 'kalkaska_hourly', 'keeler_hourly', 'kentcity_hourly', 'kewadin_hourly', 'kewaunee_hourly', 'kinde_hourly', 'lancaster_hourly', 'lapeer_hourly', 'lawrence_hourly', 'lawton_hourly', 'leslie_hourly', 'linwood_hourly', 'ludington_hourly', 'marshfield_hourly', 'mcbain_hourly', 'mcmillan_hourly', 'mears_hourly', 'mecosta_hourly', 'mendon_hourly', 'mountpleasant_hourly', 'msuhort_hourly', 'msuhtrc_hourly', 'msukbs_hourly', 'munger_hourly', 'nasewaupee_hourly', 'ncmc_hourly', 'newera_hourly', 'northport_hourly', 'nwmhrs_hourly', 'oldmission_hourly', 'onekama_hourly', 'oshtemo_hourly', 'petersburg_hourly', 'petoskey_hourly', 'pigeon_hourly', 'reeman_hourly', 'rhinelander_hourly', 'richville_hourly', 'romeo_hourly', 'saginaw_hourly', 'sandusky_hourly', 'scottdale_hourly', 'shelbyeast_hourly', 'sisterbay_hourly', 'southerndoor_hourly', 'southhaven_hourly', 'sparta20_hourly', 'sparta_hourly', 'spartanorth_hourly', 'spooner_hourly', 'standale_hourly', 'stephenson_hourly', 'sturgeonbay_hourly', 'swmrec_hourly', 'verona_hourly', 'westjacksonport_hourly', 'westolive_hourly', 'williamsburg20_hourly', 'wmich_hourly']
+2024-05-22 12:09:53,876, DEBUG, stations_not_in_qc: ['variables_hourly']
+2024-05-22 15:21:17,989, DEBUG, This is a debug message
+2024-05-22 15:21:17,990, INFO, This is an info message
+2024-05-22 15:21:17,990, WARNING, This is a warning message
+2024-05-22 15:21:17,990, ERROR, This is an error message
+2024-05-22 15:21:17,990, CRITICAL, This is a critical message
+2024-05-22 15:21:17,991, DEBUG, Mawndb login credentials returned successfully
+2024-05-22 15:21:20,035, ERROR, Error Connecting to Mawndb Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-05-22 15:21:20,035, ERROR, Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-05-22 15:51:17,686, DEBUG, This is a debug message
+2024-05-22 15:51:17,687, INFO, This is an info message
+2024-05-22 15:51:17,687, WARNING, This is a warning message
+2024-05-22 15:51:17,687, ERROR, This is an error message
+2024-05-22 15:51:17,687, CRITICAL, This is a critical message
+2024-05-22 15:51:17,687, DEBUG, Mawndb login credentials returned successfully
+2024-05-22 15:51:19,723, ERROR, Error Connecting to Mawndb Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-05-22 15:51:19,723, ERROR, Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-05-23 10:36:52,253, DEBUG, This is a debug message
+2024-05-23 10:36:52,255, INFO, This is an info message
+2024-05-23 10:36:52,255, WARNING, This is a warning message
+2024-05-23 10:36:52,255, ERROR, This is an error message
+2024-05-23 10:36:52,256, CRITICAL, This is a critical message
+2024-05-23 10:36:52,257, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:36:52,480, INFO, Successfully connected to mawndb
+2024-05-23 10:36:52,480, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:36:52,528, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:36:52,528, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:37:22,151, DEBUG, This is a debug message
+2024-05-23 10:37:22,151, INFO, This is an info message
+2024-05-23 10:37:22,151, WARNING, This is a warning message
+2024-05-23 10:37:22,151, ERROR, This is an error message
+2024-05-23 10:37:22,151, CRITICAL, This is a critical message
+2024-05-23 10:37:22,152, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:37:22,194, INFO, Successfully connected to mawndb
+2024-05-23 10:37:22,194, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:37:22,246, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:37:22,246, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:39:12,255, DEBUG, This is a debug message
+2024-05-23 10:39:12,255, INFO, This is an info message
+2024-05-23 10:39:12,255, WARNING, This is a warning message
+2024-05-23 10:39:12,255, ERROR, This is an error message
+2024-05-23 10:39:12,255, CRITICAL, This is a critical message
+2024-05-23 10:39:12,256, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:39:12,496, INFO, Successfully connected to mawndb
+2024-05-23 10:39:12,497, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:39:12,555, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:39:12,555, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:39:56,487, DEBUG, This is a debug message
+2024-05-23 10:39:56,487, INFO, This is an info message
+2024-05-23 10:39:56,487, WARNING, This is a warning message
+2024-05-23 10:39:56,487, ERROR, This is an error message
+2024-05-23 10:39:56,487, CRITICAL, This is a critical message
+2024-05-23 10:39:56,487, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:39:56,526, INFO, Successfully connected to mawndb
+2024-05-23 10:39:56,526, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:39:56,582, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:39:56,582, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:43:26,036, DEBUG, This is a debug message
+2024-05-23 10:43:26,036, INFO, This is an info message
+2024-05-23 10:43:26,036, WARNING, This is a warning message
+2024-05-23 10:43:26,036, ERROR, This is an error message
+2024-05-23 10:43:26,036, CRITICAL, This is a critical message
+2024-05-23 10:43:26,037, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:43:26,076, INFO, Successfully connected to mawndb
+2024-05-23 10:43:26,076, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:43:26,121, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:43:26,121, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:43:57,772, DEBUG, This is a debug message
+2024-05-23 10:43:57,772, INFO, This is an info message
+2024-05-23 10:43:57,772, WARNING, This is a warning message
+2024-05-23 10:43:57,772, ERROR, This is an error message
+2024-05-23 10:43:57,772, CRITICAL, This is a critical message
+2024-05-23 10:43:57,773, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:43:57,831, INFO, Successfully connected to mawndb
+2024-05-23 10:43:57,831, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:43:57,880, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:43:57,880, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:44:03,328, DEBUG, This is a debug message
+2024-05-23 10:44:03,329, INFO, This is an info message
+2024-05-23 10:44:03,329, WARNING, This is a warning message
+2024-05-23 10:44:03,329, ERROR, This is an error message
+2024-05-23 10:44:03,329, CRITICAL, This is a critical message
+2024-05-23 10:44:03,330, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:44:03,365, INFO, Successfully connected to mawndb
+2024-05-23 10:44:03,366, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:44:03,413, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:44:03,413, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:44:20,825, DEBUG, This is a debug message
+2024-05-23 10:44:20,825, INFO, This is an info message
+2024-05-23 10:44:20,826, WARNING, This is a warning message
+2024-05-23 10:44:20,826, ERROR, This is an error message
+2024-05-23 10:44:20,826, CRITICAL, This is a critical message
+2024-05-23 10:44:20,826, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:44:20,866, INFO, Successfully connected to mawndb
+2024-05-23 10:44:20,866, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:44:20,925, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:44:20,925, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:44:41,175, DEBUG, This is a debug message
+2024-05-23 10:44:41,175, INFO, This is an info message
+2024-05-23 10:44:41,175, WARNING, This is a warning message
+2024-05-23 10:44:41,175, ERROR, This is an error message
+2024-05-23 10:44:41,175, CRITICAL, This is a critical message
+2024-05-23 10:44:41,176, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:44:41,219, INFO, Successfully connected to mawndb
+2024-05-23 10:44:41,219, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:44:41,268, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:44:41,268, INFO, Mawnqcl cursor connection successfully established
+2024-05-23 10:46:06,465, DEBUG, This is a debug message
+2024-05-23 10:46:06,466, INFO, This is an info message
+2024-05-23 10:46:06,466, WARNING, This is a warning message
+2024-05-23 10:46:06,466, ERROR, This is an error message
+2024-05-23 10:46:06,466, CRITICAL, This is a critical message
+2024-05-23 10:46:06,466, DEBUG, Mawndb login credentials returned successfully
+2024-05-23 10:46:06,528, INFO, Successfully connected to mawndb
+2024-05-23 10:46:06,528, INFO, Mawndb cursor connection successfully established
+2024-05-23 10:46:06,569, INFO, Successfully connected to mawndb_qc
+2024-05-23 10:46:06,569, INFO, Mawnqcl cursor connection successfully established

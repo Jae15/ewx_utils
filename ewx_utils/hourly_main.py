@@ -10,21 +10,33 @@ from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from datetime import datetime
 from psycopg2 import OperationalError
+from db_files.dbconnection import connect_to_rtma
+from db_files.dbconnection import connect_to_qctest
 from db_files.dbconnection import connect_to_mawndb
 from db_files.dbconnection import connect_to_mawndbqc
 from db_files.dbconnection import mawndb_cursor_connection
 from db_files.dbconnection import mawnqc_cursor_connection
+from db_files.dbconnection import rtma_cursor_connection
+from db_files.dbconnection import qctest_cursor_connection
 from validation_checks.timeloop import generate_list_of_hours
+from validation_checks.station_file import db_stations 
+import logging_config
 #from validation_checks.stations_file import stations_list
 
-logging.basicConfig(filename = 'dbconnection', level = logging.DEBUG,
-                    format = '%(asctime)s, %(levelname)s, %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+file_handler = logging.FileHandler("mainlog_file.log")
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+#logger = logging.getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser(
                       prog = 'hourly_main', 
                       description = 'Checks data from hourly_main in mawndb_qc and adds estimates from fivemin data or RTMA as needed',
-                      epilog = 'Check missing data python scripts for help'
+                      epilog = 'Check missing data and ask python scripts for help'
                       )
     #parser.add_argument('start_date', help = 'start_date in YYYY-MM-DD', type= str)
     #parser.add_argument('end_date', help = 'end date in YYYY-MM-DD', type= str)
@@ -43,7 +55,7 @@ def main():
     group.add_argument('-s', '--stations', nargs = '*', type = str, help = 'run this for a specific station(use station_name, not station_id). to run for multiple specific stations, list all after the flag')
     group.add_argument('-a', '--all', action = 'store_true', default = False, help = 'use this flag for all stations')
     
-    parser.add_argument('-q', '--qcwrite', type = str, default = 'mawndb_qc:local', choices =['mawndb_qc:local', 'mawndb_qc:dbh11'],
+    parser.add_argument('-q', '--qcwrite', type = str, default = 'mawndb_qcl:local', choices =['mawndb_qcl:local', 'mawndb_qcl:dbh11'],
                         help = 'Use this flag to modify data in a specific database (note that if --writefile is selected, the commands will not actually execute/modify data, but this DB will serve as the source)')
         
     parser.add_argument("--mawn", type = str, choices = ['mawndb:dbh11'], default = 'mawndb:dbh11',
@@ -102,37 +114,54 @@ def main():
             qc_values = ', '.join(['%s'] * len(list(record.keys())))
             #print(f"qc_values: {qc_values}")
             
+            # Setting up mawndbqc connection and cursor
             mawndbqc_connection = connect_to_mawndbqc()
-            mawndbqc_cursor = mawnqc_cursor_connection(mawndbqc_connection)
+            mawnqc_cursor = mawnqc_cursor_connection(mawndbqc_connection)
+
             
-            #Creating the SQL query with placeholders for table name, columns, and value
+            # Creating the SQL query with placeholders for table name, columns, and value
             query = """ INSERT INTO %s(%s) VALUES(%s); """ % ('aetna_hourly', db_columns, qc_values)
-            print(mawndbqc_cursor.mogrify(query, record_vals))
-            mawndbqc_cursor.execute(query, record_vals)
+            #print(mawnqc_cursor.mogrify(query, record_vals))
+            #mawnqc_cursor.execute(query, record_vals)
             
-            #Commit the transaction for mawndbqc
-            mawndb_connection.commit()
+            # Commit the transaction for mawndbqc
+            mawndbqc_connection.commit()
+
+            # Setting up qctest connection and cursor
+            qctest_connection = connect_to_qctest()
+            qctest_cursor = qctest_cursor_connection(qctest_connection)
+
+            # Creating the SQL query with placeholders for table name, columns and value
+            print(qctest_cursor.mogrify(query, record_vals))
+            qctest_cursor.execute(query, record_vals)
+
+            # Commit the transaction for qctest
+            qctest_connection.commit()
 
     except OperationalError as e:
         logging.error(f"Error connecting to the database: {e}") # Log error connecting to the database
         #print("Error connecting to the database :/")
 
     finally:
-        if mawndbqc_cursor:
-            mawndbqc_cursor.close()
-        if mawndbqc_connection:
-            mawndbqc_connection.close()
-    
         if mawndb_cursor:
             mawndb_cursor.close()
         if mawndb_connection:
             mawndb_connection.close()
-
         
+        if qctest_cursor:
+            qctest_cursor.close()
+        if qctest_connection:
+            qctest_connection.close()
 
+        if mawnqc_cursor:
+            mawnqc_cursor.close()
+        if mawndbqc_connection:
+            mawndbqc_connection.close()
+            
 def time_defaults(user_begin_date: str, user_end_date: str):
     
-    """time_defaults
+    """
+    time_defaults
     :param user_begin_date: user input - should be less than user_end_date
     :type user_begin_date: str
     :param user_end_date: user input - should be greater than user_begin_date

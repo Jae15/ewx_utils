@@ -204,3 +204,28 @@ Exception: Section mawndb not found in the c:/Users/mwangija/data_file/mwangija_
 2024-05-20 16:24:51,471, ERROR, This is an error message
 2024-05-20 16:24:51,471, CRITICAL, This is a critical message
 2024-05-20 16:24:51,473, DEBUG, db_info returned successfully
+2024-05-28 09:39:19,274 - 'DEBUG - ewx_logger - debug message
+2024-05-28 09:39:19,275 - 'INFO - ewx_logger - info message
+2024-05-28 09:39:19,277 - 'WARNING - ewx_logger - warn message
+2024-05-28 09:39:19,277 - 'ERROR - ewx_logger - error message
+2024-05-28 09:39:19,277 - 'CRITICAL - ewx_logger - critical message
+2024-05-28 10:07:49,892 - 'DEBUG - ewx_logger - debug message
+2024-05-28 10:07:49,892 - 'INFO - ewx_logger - info message
+2024-05-28 10:07:49,894 - 'WARNING - ewx_logger - warn message
+2024-05-28 10:07:49,896 - 'ERROR - ewx_logger - error message
+2024-05-28 10:07:49,898 - 'CRITICAL - ewx_logger - critical message
+2024-05-28 10:12:16,319 - 'DEBUG - ewx_logger - debug message
+2024-05-28 10:12:16,320 - 'INFO - ewx_logger - info message
+2024-05-28 10:12:16,321 - 'WARNING - ewx_logger - warn message
+2024-05-28 10:12:16,321 - 'ERROR - ewx_logger - error message
+2024-05-28 10:12:16,322 - 'CRITICAL - ewx_logger - critical message
+2024-05-28 10:15:49,489 - 'DEBUG - ewx_logger - debug message
+2024-05-28 10:15:49,490 - 'INFO - ewx_logger - info message
+2024-05-28 10:15:49,491 - 'WARNING - ewx_logger - warn message
+2024-05-28 10:15:49,491 - 'ERROR - ewx_logger - error message
+2024-05-28 10:15:49,491 - 'CRITICAL - ewx_logger - critical message
+2024-05-28 10:18:15,966 - 'DEBUG - ewx_logger - debug message
+2024-05-28 10:18:15,967 - 'INFO - ewx_logger - info message
+2024-05-28 10:18:15,968 - 'WARNING - ewx_logger - warn message
+2024-05-28 10:18:15,968 - 'ERROR - ewx_logger - error message
+2024-05-28 10:18:15,968 - 'CRITICAL - ewx_logger - critical message

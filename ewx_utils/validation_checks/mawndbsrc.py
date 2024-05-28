@@ -8,12 +8,6 @@ import datetime
 from datetime import timezone
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
-import logging
-logging.debug('This is a debug message')
-logging.info('This is an info message')
-logging.warning('This is a warning message')
-logging.error('This is an error message')
-logging.critical('This is a critical message')
 from validation_checks.variables_list import relh_vars
 from validation_checks.variables_list import pcpn_vars
 from validation_checks.variables_list import rpet_vars
@@ -30,6 +24,17 @@ from mawndb_classes.temperature import temperature
 from mawndb_classes.precipitation import precipitation
 from mawndb_classes.winddirection import winddirection
 from mawndb_classes.evapotranspiration import evapotranspiration
+import logging
+#import ewx_utils.logging_config
+#from logging_config import ewx_logger
+#logger = logging.getLogger('ewx_logger')
+
+logger = logging.getLogger("__name__")
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+file_handler = logging.FileHandler("validation_logs.log")
+file_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_handler)
 
 """
 mawndb_connection = connect_to_mawndb()
@@ -137,7 +142,6 @@ def mawndb_srccols_torecord(record):
             clean_record[key] = record[key]
             clean_record[key + "_src"] = "MAWN"
     return clean_record
-    
     
 def month_abbrv(record):
     for key, value in record.items():

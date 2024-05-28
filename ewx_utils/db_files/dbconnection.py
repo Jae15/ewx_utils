@@ -5,6 +5,8 @@ from psycopg2 import OperationalError
 #import os, sys, time, shutil, getopt
 from .configfile import config_mawndb
 from .configfile import config_mawndbqc
+from .configfile import config_mawndbrtma
+from .configfile import config_qctest
 
 """ 
 This file contains functions used to connect to databases 
@@ -21,8 +23,8 @@ logging.basicConfig(filename= 'log_file.log', level = logging.DEBUG,
 """
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-formatter = logging.FOrmatter('%(levelname)s - %(asctime)s - %(message)s')
-file_handler = logging.FileHandler('log_file.log')
+formatter = logging.Formatter("%(levelname)s - %(asctime)s - %(message)s")
+file_handler = logging.FileHandler("db_logs.log")
 file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
@@ -51,9 +53,37 @@ def connect_to_mawndbqc():
         mawndbqc_connection.autocommit = False # Set autocommit to False
 
     except OperationalError as e:
-        logging.error(f"Error Connecting to Mawndb_qc Database: {e}") # Log error connecting to the database
+        logging.error("Error connecting to database", exc_info=True)
+        #logging.error(f"Error Connecting to Mawndb_qc Database: {e}") # Log error connecting to the database
 
     return mawndbqc_connection
+
+def connect_to_rtma():
+    db_info3 = config_mawndbrtma()
+    rtma_connection = None # Initializing connection to None
+
+    try:
+        rtma_connection = psycopg2.connect(**db_info3)
+        logging.info("Successfully connected to RTMA Database") # log successful connection
+        rtma_connection.autocommit = False # Set autocommit to False
+
+    except OperationalError as e:
+        logging.error(f"Error Connecting to RTMA Database: {e}")
+
+    return rtma_connection
+
+def connect_to_qctest():
+    db_info4 = config_qctest()
+    qctest_connection = None # Initializing connection to None
+    try: 
+        qctest_connection = psycopg2.connect(**db_info4)
+        logging.info("Successfully connected to QCTEST Database") # log successful connection
+        qctest_connection.autocommit = False # Set autocommit to False
+
+    except OperationalError as e:
+        logging.error(f"Error Connecting to QCTEST Database: {e}")
+
+    return qctest_connection
 
 
 # Functions to set up cursors for mawndb and mawndb_qcl connections
@@ -67,7 +97,6 @@ def mawndb_cursor_connection(mawndb_connection):
 
     return mawndb_cursor
 
-
 def mawnqc_cursor_connection(mawndbqc_connection):
     try:
         mawnqc_cursor = mawndbqc_connection.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
@@ -77,5 +106,25 @@ def mawnqc_cursor_connection(mawndbqc_connection):
         logging.error("Error establishing mawnqc cursor connection: %s", MawnqcCursorError) # Log cursor connection error
 
     return mawnqc_cursor
+
+def rtma_cursor_connection(rtma_connection):
+    try:
+        rtma_cursor = rtma_connection.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+        logging.info("RTMA cursor connection successfully established") # Log successful cursor connection
+
+    except(Exception, psycopg2.DatabaseError) as RtmaCursorError:
+        logging.error("Error establishing rtma cursor connection: %s", RtmaCursorError)
+    
+    return rtma_cursor
+
+def qctest_cursor_connection(qctest_connection):
+    try:
+        qctest_cursor = qctest_connection.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+        logging.info("QCTEST cursor connection successfully established") # log successful cursor connection
+
+    except(Exception, psycopg2.DatabaseError) as QctestCursorError:
+        logging.error("Error establishing qctest cursor connection: %s", QctestCursorError)
+    
+    return qctest_cursor
 
 
