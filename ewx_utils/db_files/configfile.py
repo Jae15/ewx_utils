@@ -1,15 +1,20 @@
 from configparser import ConfigParser
 import logging
 from os import lseek
+from db_files.dbfiles_logs_config import dbfiles_logger
 
+my_dbfiles_logger = dbfiles_logger()
+my_dbfiles_logger.error("Remember to log errors using my_logger")
+#logger = logging.getLogger(__name__)
+
+"""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 file_handler = logging.FileHandler('db_logs.log')
 file_handler.setLevel(logging.DEBUG)
-logger.addHandler(file_handler)
+my_validation_logger.addHandler(file_handler)
 
-"""
 logging.basicConfig(filename = 'log_file.log', level = logging.DEBUG,
                     format = '%(asctime)s, %(levelname)s, %(message)s')
 logging.debug('This is a debug message')
@@ -24,18 +29,18 @@ logging.critical('This is a critical message')
 #def config_mawndb(filename = "database.ini", section = "mawndb"):
 def config_mawndb(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb"):
     parser = ConfigParser()
-    #Use the parser to read the database.ini file
+    # Use the parser to read the database.ini file
     parser.read(filename)
-    #Create an empty dictionary db_info to store the configuration credentials for mawndb
+    # Create an empty dictionary db_info to store the configuration credentials for mawndb
     db_info = {}
-    #Loop through the section and collect the conguration credentials for mawndb and store them in the dictionary db_info
+    # Loop through the section and collect the conguration credentials for mawndb and store them in the dictionary db_info
     if parser.has_section(section):
         params = parser.items(section) #Use the .items() dictionary method to obtain the credentials since they're stored as (key,value) pairs
         for param in params:
             db_info[param[0]] = param[1] # index 0: key and index 1: value
     else:
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-    logging.debug("Mawndb login credentials returned successfully")
+    my_dbfiles_logger.debug("Mawndb login credentials returned successfully")
     
     return(db_info)
     
@@ -55,7 +60,7 @@ def config_mawndbqc(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/
 
         else:
             raise Exception('Section {0} is not found in the {1} file.'.format(section, filename))
-        logging.info("Mawnqcl login information returned successfully")
+        my_dbfiles_logger.info("Mawnqcl login information returned successfully")
         return(db_info2)
         #print(db2)
 
@@ -69,10 +74,10 @@ def config_mawndbrtma(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_util
      if parser.has_section(section):
           params02 = parser.items(section) # Use the .items() dictionary method to obtain the credentials since they're stored as (key, value) pairs
           for param02 in params02:
-               db_info3[params02[0]] = param02[2] #index 0: key and index 1: value
+               db_info3[param02[0]] = param02[1] #index 0: key and index 1: value
      else:
         raise Exception('Section {0} is not found in the {1} file.'.format(section, filename))
-     logging.info("RTMA login credentials returned successfully")
+     my_dbfiles_logger.info("RTMA login credentials returned successfully")
      return(db_info3)
     
 def config_qctest(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawnqc_test"):
@@ -88,7 +93,7 @@ def config_qctest(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/da
                     db_info4[param03[0]] = param03[1]
           else:
                raise Exception('Section {0} is not found in the {1} file'.format(section,filename))
-          logging.info("QCTEST login credentials returned successfully")
+          my_dbfiles_logger.info("QCTEST login credentials returned successfully")
           return(db_info4)
 
 

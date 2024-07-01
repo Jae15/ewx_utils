@@ -1,15 +1,18 @@
 import logging
-from db_files.dbconnection import connect_to_mawndb
-from db_files.dbconnection import connect_to_mawndbqc
-from db_files.dbconnection import connect_to_qctest
-from db_files.dbconnection import connect_to_rtma
-from db_files.dbconnection import mawndb_cursor_connection
-from db_files.dbconnection import mawnqc_cursor_connection
-from db_files.dbconnection import rtma_cursor_connection
-from db_files.dbconnection import qctest_cursor_connection
+import sys
+sys.path.append('c:/Users/mwangija/data_file/ewx_utils/ewx_utils/db_files')
+from ewx_utils.db_files.dbconnection import connect_to_mawndb
+from ewx_utils.db_files.dbconnection import connect_to_mawndbqc
+from ewx_utils.db_files.dbconnection import connect_to_qctest
+from ewx_utils.db_files.dbconnection import connect_to_rtma
+from ewx_utils.db_files.dbconnection import mawndb_cursor_connection
+from ewx_utils.db_files.dbconnection import mawnqc_cursor_connection
+from ewx_utils.db_files.dbconnection import rtma_cursor_connection
+from ewx_utils.db_files.dbconnection import qctest_cursor_connection
 #from validation_checks.mawndbsrc import mawndb_addingsrcto_cols
 #from validation_checks.mawndbbsrc import check_value
 #from validation_checks.mawndbsrc import mawndb_srccols_torecord
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -17,6 +20,9 @@ formatter = logging.Formatter("%(asctime)s - %(levelnames)s - %(message)s")
 file_handler = logging.FileHandler("log_file.log")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
+
+
 
 
 def validation(db_station, date_entry):
@@ -35,7 +41,9 @@ def validation(db_station, date_entry):
     records = mawndb_cursor.fetchall()
     print(records)
 
-    rtma_select = ()
+    #rtma_select = (f"SELECT * FROM {db_station} WHERE data = %s, {date_entry}")
+    rtma_select = ("SELECT* FROM aetna_houlry WHERE date = '2023-04-22'")
+
     # Commit the transaction for mawndb
     mawndb_connection.commit()
 

@@ -6,7 +6,10 @@ from db_files.dbconnection import mawndb_cursor_connection
 from db_files.dbconnection import mawnqc_cursor_connection
 from db_files.dbconnection import rtma_cursor_connection
 from db_files.dbconnection import qctest_cursor_connection
-
+from validation_checks.mawndbsrc import mawndb_addingsrcto_cols
+from validation_checks.mawndbsrc import mawndb_srccols_torecord
+from validation_checks.mawndbsrc import clean_records
+from validation_checks.mawndbsrc import clean_record
 
 # Creating connections and cursors
 mawndb_connection = connect_to_mawndb()
@@ -26,12 +29,19 @@ mawndb_select = ("SELECT * FROM aetna_hourly WHERE date = '2022-03-10'")
 mawndb_cursor.execute(mawndb_select)
 #mawndb_select = (""" SELECT * from aetna_hourly where ("date" >= '2023-10-10' and "date" <= '2023-10-14' ) order by 'date', 'time' """)
 #Fetch the records
-records = mawndb_cursor.fetchmany(2)
-print(records)
+mawn_records = mawndb_cursor.fetchmany(2)
+print(mawn_records)
 #Commit the transaction for mawndb
 mawndb_connection.commit()
 
-rtma_select = ("")
+rtma_select = ("SELECT * FROM aetna_hourly WHERE date = '2023-05-25")
+rtma_cursor.execute(rtma_select)
+
+rtma_records = rtma_cursor.fetchmany(2)
+print(rtma_records)
+
+rtma_connection.commit()
+
      
 record_keys = []
 record_keys: list
@@ -40,7 +50,7 @@ db_columns = []
 qc_values = []
 
 
-for record in records:
+for record in mawn_records:
     record_keys = list(record.keys())
     record_vals = list(record.values())
     clean_record = {}

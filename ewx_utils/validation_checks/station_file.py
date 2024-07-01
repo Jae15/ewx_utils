@@ -6,10 +6,18 @@ from db_files.dbconnection import connect_to_mawndb
 from db_files.dbconnection import connect_to_mawndbqc
 from db_files.dbconnection import mawndb_cursor_connection
 from db_files.dbconnection import mawnqc_cursor_connection
+from db_files.dbconnection import connect_to_rtma
+from db_files.dbconnection import rtma_cursor_connection
+from validation_logsconfig import validations_logger
 
-# def station(station_list(list -actual stations or None), all_stations, None) -> list:
+# Def station(station_list(list -actual stations or None), all_stations, None) -> list:
 # The function below
+my_validation_logger = validations_logger()
 
+my_validation_logger = validations_logger()
+my_validation_logger.error("Remember to log errors using my_logger")
+
+"""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -18,11 +26,15 @@ file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 
+"""
 
 mawndb_connection = connect_to_mawndb()
 mawndb_cursor = mawndb_cursor_connection(mawndb_connection)
 mawndbqc_connection = connect_to_mawndbqc()
 mawndbqc_cursor = mawnqc_cursor_connection(mawndbqc_connection)
+rtma_connection = connect_to_rtma()
+rtma_cursor = rtma_cursor_connection(rtma_connection)
+
 # creating a sql query to obtain a list of mawndb station names
 select_mawndb_stations = """ SELECT table_name FROM information_schema.tables
                     WHERE table_schema = 'public' AND table_name like '%hourly'
@@ -31,6 +43,9 @@ select_mawndb_stations = """ SELECT table_name FROM information_schema.tables
 select_mawndbqc_stations = """ SELECT table_name FROM information_schema.tables
                     WHERE table_schema = 'public' AND table_name like '%hourly'
                     ORDER BY table_name ASC """
+select_rtma_stations = """ SELECT table_name FROM information_schema.tables 
+                     WHERE table_schema = 'public' AND table_name like '%hourly'
+                     ORDER BY table_name ASC """
 # Using the cursor to execute the selecti_stations sql query above
 mawndb_cursor.execute(select_mawndb_stations)
 mawndb_stations = mawndb_cursor.fetchall()
@@ -40,28 +55,38 @@ mawndbqc_cursor.execute(select_mawndbqc_stations)
 mawndbqc_stations = mawndbqc_cursor.fetchall()
 #print(f"mawndbqc_stations: {mawndbqc_stations}")
 #print(type(mawndbqc_stations))
+rtma_cursor.execute(select_rtma_stations)
+rtma_stations = rtma_cursor.fetchall()
+
 mawndb_connection.commit()
 mawndbqc_connection.commit()
+rtma_connection.commit()
 
 mawndb_cursor.close()
 mawndbqc_cursor.close()
 mawndb_connection.close()
 mawndbqc_connection.close()
+rtma_cursor.close()
+rtma_connection.close()
 
 # Converting RealDictRow from psycopg2.extras into a normal python dictionary 
 mawn_stns = [dict(row) for row in mawndb_stations]
 # Converting RealDictRow from psycopg2.extras into a normal python dictionary 
 qc_stns = [dict(row) for row in mawndbqc_stations]
 #print(mawn_stns)
-
+# Convert RealDictRow from psycopg2.extras into a normal python dictionary
+rtma_stns = [dict(row) for row in rtma_stations]
 # Extracting the values from key, value items that have a common key column_name
 mawndb_station_list = [sub ['table_name'] for sub in mawn_stns ]
 #print(mawndb_station_list)
 #print(len(mawndb_station_list))
 
-mawndbqc_station_list =  [ sub['table_name'] for sub in qc_stns ]
+mawndbqc_station_list =  [sub['table_name'] for sub in qc_stns ]
 #print(mawndbqc_station_list)
 #print(len(mawndbqc_station_list))
+
+rtma_stations_list = [sub['table_name'] for sub in rtma_stns]
+print(rtma_stations_list)
 
 def db_stations():
     stations_list = []

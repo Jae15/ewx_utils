@@ -1,0 +1,142 @@
+import sys
+from mawndbsrc import clean_records
+from mawndbsrc import clean_record
+from mawndbsrc import mawndb_addingsrcto_cols
+from mawndbsrc import mawndb_srccols_torecord
+from qcsrc_cols import qc_columns
+from check_value import check_value
+from timeloop import generate_list_of_hours
+from validation_logsconfig import validations_logger
+import datetime
+
+validation_logger = validations_logger()
+validation_logger.error("Remember to log errors using my_logger")
+#logger = logging.getLogger(__name__)
+
+mawn_records_with_bad_data = [
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': 500, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606}, 
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 500, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': 500,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 500, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 500, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': 500, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 500, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 500, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 500, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 500, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 500, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 500,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 500, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 500, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 500, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 500, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 500, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 500, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 500, 'volt': 12.82, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 500, 'rpet': 0.0,
+             'id': 63606},
+{'year': 2022, 'day': 68, 'hour': 24, 'rpt_time': 2400, 'date': datetime.date(2022, 3, 10), 'time': datetime.time(0, 0), 'atmp': -4.945, 'relh': 79.65, 'dwpt': -7.921,
+             'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 0.11, 'wdir': 251.2, 'wstdv': 3.152, 'wspd_max': 1.95, 'wspd_maxt': 2331, 'srad': 0.0, 'stmp_05cm': 0.271,
+             'stmp_10cm': 0.456, 'stmp_20cm': 0.565, 'stmp_50cm': 1.17, 'smst_05cm': 0.343, 'smst_10cm': 0.341, 'smst_20cm': 0.321, 'smst_50cm': 0.307, 'volt': 12.82, 'rpet': 500,
+             'id': 63606}]
+
+
+
+for clean_record in clean_records: 
+    key_clean = list(clean_record.keys()) 
+    print(f"key_clean: {key_clean}") 
+    print(len(key_clean))
+    print(type(key_clean))
+    val_clean = list(clean_record.values()) 
+    print(f"val_clean: {val_clean}")
+    print(type(val_clean))
+    
+"""
+The above code loops through each clean_record in clean_records
+It then converts the clean_record keys named key_clean into a list of keys to be used to determine which values to insert into mawndbqc
+Further, it converts the clean_record values named val_clean into a list of values that will be inserted/transferred to mawndbqc
+
+"""
+
+qc_column_list = [item for sublist in qc_columns for item in sublist]
+print(qc_column_list)
+print(len(qc_column_list))
+
+
+qc_clean_columns = []
+
+for column in key_clean:
+    if column in qc_column_list:
+        qc_clean_columns.append(column)
+print(f"qc_clean_columns: {qc_clean_columns}") 
+print(len(qc_clean_columns))
+
+"""
+The code above creates a list of columns from qc_columns which are multiple tuples each tuple representing one column name.
+List comprehension is used to perform the conversion of the multiple tuples and store them in a single list.
+The list of columns is then put into a list called qc_column_list
+Then an empty list of qc_clean_columns is initialized to store columns that key_clean has in common with qc_column_list
+Then a loop is created to loop through the key_clean columns to find the columns that are also in qc_columns
+Another part of the loop cross checks the qc_column_list with the columns in key_clean to find commonality.
+Then each column that key_clean has in common with qc_column_list is appended into the qc_clean_columns list which was initialized in the beginning.
+
+"""
