@@ -229,3 +229,20 @@ Exception: Section mawndb not found in the c:/Users/mwangija/data_file/mwangija_
 2024-05-28 10:18:15,968 - 'WARNING - ewx_logger - warn message
 2024-05-28 10:18:15,968 - 'ERROR - ewx_logger - error message
 2024-05-28 10:18:15,968 - 'CRITICAL - ewx_logger - critical message
+2024-05-30 09:04:54,498 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 09:05:22,116 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 10:18:26,543 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 11:52:44,106 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 12:20:08,599 - ERROR - __main__ - error message
+2024-05-30 12:21:25,565 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 12:22:53,952 - ERROR - jaes_logger - error message
+2024-05-30 12:27:37,384 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 12:32:39,395 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 12:32:39,397 - ERROR - ewxutils_logsconfig - Tracy made me do this
+2024-05-30 13:21:26,696 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 13:22:13,888 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 13:22:13,889 - ERROR - ewxutils_logsconfig - fake warnings of things that 10/10 didn't happen eyeroll
+2024-05-30 13:22:13,889 - ERROR - ewxutils_logsconfig - pics or it didn't happen...eyeroll
+2024-05-30 13:22:49,454 - ERROR - ewxutils_logsconfig - error message
+2024-05-30 13:22:49,455 - ERROR - ewxutils_logsconfig - fake warnings of things that 10/10 didn't happen ... eyeroll
+2024-05-30 13:22:49,456 - ERROR - ewxutils_logsconfig - pics or it didn't happen...eyeroll

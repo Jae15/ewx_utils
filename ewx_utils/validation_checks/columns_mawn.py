@@ -11,6 +11,11 @@ from ewx_utils.db_files.configfile import config_mawndb
 from ewx_utils.db_files.configfile import config_mawndbqc
 from ewx_utils.db_files.dbconnection import connect_to_mawndb
 from ewx_utils.db_files.dbconnection import mawndb_cursor_connection
+from validation_logsconfig import validations_logger
+
+validation_logger = validations_logger()
+validation_logger.error("Remember to log errors using my_logger")
+#logger = logging.getLogger(__name__)
 
 
 def get_station_column_key(station_name, db_cursor):
@@ -41,8 +46,6 @@ def get_station_column_key(station_name, db_cursor):
     mawndb_cursor.execute(list_of_db_columns)
     
     mawndb_cursor.execute(select_list_of_columns, (station_name,))
-    
-    
     
     db_column_list = mawndb_cursor.fetchall()
     

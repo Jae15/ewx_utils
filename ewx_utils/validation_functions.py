@@ -1,6 +1,17 @@
+from db_files.dbconnection import connect_to_mawndb
 from db_files.dbconnection import connect_to_rtma
+from db_files.dbconnection import connect_to_mawndbqc
+from db_files.dbconnection import connect_to_qctest
+from db_files.dbconnection import mawndb_cursor_connection
 from db_files.dbconnection import rtma_cursor_connection
+from db_files.dbconnection import mawnqc_cursor_connection
+from db_files.dbconnection import qctest_cursor_connection
 import logging
+from validation_checks.validation_logsconfig import validations_logger
+
+my_validation_logger = validations_logger()
+my_validation_logger.error("Remember to log errors using my_logger")
+#logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -24,9 +35,12 @@ def record_returned():
     So essentially, we are checking if the record was returned successfully or not.
     Another function: record not in mawndb or rather if its null in mawndb + not null in mawndb_rtma + within range + valid 
     in mawndb_rtma, then retrieve it
-    
+
     """
-rtma_connection = connect_to_rtma
+qctest_connection = connect_to_qctest()
+qctest_cursor = qctest_cursor_connection(qctest_connection)
+
+rtma_connection = connect_to_rtma()
 rtma_cursor = rtma_cursor_connection(rtma_connection)
 def retrieve_rtma_records(station_name, db_column, date_entry):
     rtma_select = (f"SELECT {db_column} FROM {station_name}_hourly WHERE"

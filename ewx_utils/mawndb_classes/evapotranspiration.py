@@ -18,7 +18,7 @@ class evapotranspiration:
              self.rpetIN = float(rpet) / 25.4
          if unitsU == "IN":
              self.rpetMM = float(rpet) * 25.4
-             self.rpetIN =float (rpet)
+             self.rpetIN = float (rpet)
      def set_src(self,src):
          self.src = src
      def IsValid(self):

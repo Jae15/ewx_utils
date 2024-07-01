@@ -13,7 +13,14 @@ from db_files.dbconnection import connect_to_mawndb
 from db_files.dbconnection import connect_to_mawndbqc
 from db_files.dbconnection import mawndb_cursor_connection
 from db_files.dbconnection import mawnqc_cursor_connection
+from validation_logsconfig import validation_logger
 
+my_validation_logger = validation_logger()
+
+my_validation_logger = validation_logger()
+my_validation_logger.error("Remember to log errors using my_logger")
+
+"""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.formatter("%(asctime)% - %(levelname)s - %(message)s")
@@ -21,6 +28,7 @@ file_handler = logging.FileHandler("validation_logs.log")
 file_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 
+"""
 
 mawndb_connection = connect_to_mawndb()
 mawndb_cursor = mawndb_cursor_connection(mawndb_connection)

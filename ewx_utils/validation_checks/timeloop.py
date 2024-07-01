@@ -3,15 +3,12 @@ import logging
 from datetime import datetime, timedelta
 import tz
 #from dateutil import tz
+from validation_logsconfig import validations_logger
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s)")
-file_handler = logging.FileHandler("validation_logs.log")
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-file_handler.setLevel(logging.DEBUG)
-logger.addHandler(file_handler)
+validation_logger = validations_logger()
+validation_logger.error("Remember to log errors using my_logger")
+#logger = logging.getLogger(__name__)
+
 
 def generate_list_of_hours(begin_date: str, end_date: str) -> list:
     
@@ -34,7 +31,7 @@ def generate_list_of_hours(begin_date: str, end_date: str) -> list:
             int(begin_date[8:10]),
             tzinfo = tz.gettz("America/Detroit")
         )
-        
+
         end_date_time = datetime(
             int(end_date[0:4]),
             int(end_date[5:7]),
@@ -51,7 +48,6 @@ def generate_list_of_hours(begin_date: str, end_date: str) -> list:
                 datetime_list.append(this_date)
             this_date = this_date + timedelta(hours=1)
         return datetime_list
-
 
     
 """
