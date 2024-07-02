@@ -15,6 +15,7 @@ from mawndb_classes.temperature import temperature
 from mawndb_classes.precipitation import precipitation
 from mawndb_classes.winddirection import winddirection
 from mawndb_classes.evapotranspiration import evapotranspiration
+from typing import List, Dict, Tuple
 import logging
 from validation_logsconfig import validations_logger
 
@@ -163,10 +164,10 @@ def one_mawndb_record(mawndb_records: list) -> list:
     Converts a list of MAWN DB records into a list of dictionaries.
 
     Args:
-        mawndb_records (list): List of MAWN DB records.
+        mawndb_records (list): List of mawndb records.
 
     Returns:
-        list: List of dictionaries representing the MAWN DB records.
+        list: List of dictionaries representing the mawndb records.
     """
     return [dict(record) for record in mawndb_records]
 
@@ -216,29 +217,47 @@ def main():
         }
     ]
 
-    # Convert records to dictionaries
-    mawndb_records = one_mawndb_record(mawndb_records)
-    rtma_records = one_rtma_record(rtma_records)
-
     # Iterate over records and perform validation and cleaning
     for record in mawndb_records:
+        # Combine the date and time parts of the record to form a single datetime object
         combined_date = combined_datetime(record)
+
+        # Define the list of ID columns to be used for creating the MAWN source record
         id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
+
+        # Create the initial MAWN source record using the record data, combined datetime, and ID columns
         mawnsrc_record = creating_mawnsrc_record(record, combined_date, id_col_list)
+
+        # Apply relative humidity cap to the MAWN source record using the relative humidity variables
         mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
 
-        rtma_record = next((r for r in rtma_records if r['id'] == record['id']), None)
+        # Find the corresponding RTMA record by matching 'date', 'time', and 'hour'
+        rtma_record = None
+        for rt in rtma_records:
+            if rt['date'] == record['date'] and rt['time'] == record['time'] and rt['hour'] == record['hour']:
+                rtma_record = rt
+            break
+
+        # If a matching RTMA record is found, replace None values in the MAWN source record with valid values from the RTMA record
         if rtma_record:
             mawnsrc_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date)
-        
+
+        # Append the cleaned MAWN source record to the list of clean records
         clean_records.append(mawnsrc_record)
+
+        # Extract the keys of the cleaned record for further processing (e.g., inserting into a database)
         record_keys = list(mawnsrc_record.keys())
+
+        # Extract the values of the cleaned record for further processing
         record_vals.append(list(mawnsrc_record.values()))
+
+        # Set the database columns to match the keys of the cleaned record
         db_columns = record_keys
-    
-    # Example output
-    for clean_record in clean_records:
-        print(clean_record)
+
+        # Printingn for demonstration purposes
+        for clean_record in clean_records:
+            print(f"Clean Record: {clean_record}")
+
 
 if __name__ == "__main__":
     main()
