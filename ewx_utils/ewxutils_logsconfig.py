@@ -5,11 +5,10 @@ from logging.handlers import RotatingFileHandler
 def ewx_utils_logger():
     # Creating  a custom logger
     logger = logging.getLogger(__name__)
-    #print(__name__)
 
     # Creating handlers
     console_handler = logging.StreamHandler()
-    file_handler = logging.FileHandler(filename = 'ewxutils_logfile.log')
+    file_handler = RotatingFileHandler(filename='validation_logs.log', maxBytes=1024, backupCount=3) 
 
     # Setting levels for the handlers
     console_handler.setLevel(logging.DEBUG)
@@ -27,14 +26,6 @@ def ewx_utils_logger():
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
 
-    # 'application' code
-    logger.debug('debug message')
-    logger.error('error message')
 
     return logger
 
-    # 'application' code
-    #logger.info('info message')
-    #logger.warning('warning message')
-    #logger.error('error message')
-    #logger.critical('critical message')

@@ -24,18 +24,7 @@ from ewxutils_logsconfig import ewx_utils_logger
 #from validation_checks.stations_file import stations_list
 
 my_logger = ewx_utils_logger()
-my_logger.error("Remember to log errors using my_logger")
-#logger = logging.getLogger(__name__)
 
-"""
-logger = logging.getLogger('ewxutils_logsconfig')
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-file_handler = logging.FileHandler("ewxutils_logfile.log")
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-"""
 def main():
     parser = argparse.ArgumentParser(
                       prog = 'hourly_main', 

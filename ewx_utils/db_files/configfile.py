@@ -1,113 +1,169 @@
 from configparser import ConfigParser
 import logging
-from os import lseek
 from db_files.dbfiles_logs_config import dbfiles_logger
 
+# Initialize custom logger
 my_dbfiles_logger = dbfiles_logger()
-my_dbfiles_logger.error("Remember to log errors using my_logger")
-#logger = logging.getLogger(__name__)
 
-"""
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-file_handler = logging.FileHandler('db_logs.log')
-file_handler.setLevel(logging.DEBUG)
-my_validation_logger.addHandler(file_handler)
 
-logging.basicConfig(filename = 'log_file.log', level = logging.DEBUG,
-                    format = '%(asctime)s, %(levelname)s, %(message)s')
-logging.debug('This is a debug message')
-logging.info('This is an info message')
-logging.warning('This is a warning message')
-logging.error('This is an error message')
-logging.critical('This is a critical message')
+def config_mawndb(
+    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    section: str = "mawndb",
+) -> dict:
+    """
+    Reads database configuration for mawndb from a specified ini file.
 
-"""
+    Args:
+        filename (str): Path to the ini file containing database configurations.
+        section (str): Section in the ini file containing mawndb credentials.
 
-#Import the filename and database name from the database.ini file for mawndb
-#def config_mawndb(filename = "database.ini", section = "mawndb"):
-def config_mawndb(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb"):
+    Returns:
+        dict: A dictionary with database configuration credentials.
+
+    Raises:
+        Exception: If the specified section is not found in the ini file.
+    """
     parser = ConfigParser()
-    # Use the parser to read the database.ini file
     parser.read(filename)
-    # Create an empty dictionary db_info to store the configuration credentials for mawndb
     db_info = {}
-    # Loop through the section and collect the conguration credentials for mawndb and store them in the dictionary db_info
+
     if parser.has_section(section):
-        params = parser.items(section) #Use the .items() dictionary method to obtain the credentials since they're stored as (key,value) pairs
+        params = parser.items(section)
         for param in params:
-            db_info[param[0]] = param[1] # index 0: key and index 1: value
+            db_info[param[0]] = param[1]
     else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+        my_dbfiles_logger.error(f"Section {section} not found in the {filename} file")
+        raise Exception(f"Section {section} not found in the {filename} file")
+
     my_dbfiles_logger.debug("Mawndb login credentials returned successfully")
-    
-    return(db_info)
-    
-#Import the filename and database name from the database.ini file for mawndb_qcl
-#def config_mawndbqc(filename = "database.ini", section = "mawndb_qc"):
-def config_mawndbqc(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb_qcl"):
-        # creating a parser
-        parser = ConfigParser()
-        parser.read(filename)
-        # Create an empty dictionary db_info2 to store the configuration credentials for mawndb_qc
-        db_info2 = {}
-        # Loop through the section and collect the conguration credentials for mawndb_qc and store them in the dictionary db_info2
-        if parser.has_section(section):
-            params01 = parser.items(section) # Use the .items() dictionary method to obtain the credentials since they're stored as (key,value) pairs
-            for param01 in params01:
-                db_info2[param01[0]] = param01[1] # index 0: key and index 1: value
-
-        else:
-            raise Exception('Section {0} is not found in the {1} file.'.format(section, filename))
-        my_dbfiles_logger.info("Mawnqcl login information returned successfully")
-        return(db_info2)
-        #print(db2)
-
-def config_mawndbrtma(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawndb_rtma"):
-     # Creating a parser
-     parser = ConfigParser()
-     parser.read(filename)
-     # Create an empty dictionary dbinfo3 to store the configuration credentials for mawndb_rtma
-     db_info3 = {}
-     # Loop though the section and collect the configuration credentials for mawndb_rtma and store them in the dictionary db_info3
-     if parser.has_section(section):
-          params02 = parser.items(section) # Use the .items() dictionary method to obtain the credentials since they're stored as (key, value) pairs
-          for param02 in params02:
-               db_info3[param02[0]] = param02[1] #index 0: key and index 1: value
-     else:
-        raise Exception('Section {0} is not found in the {1} file.'.format(section, filename))
-     my_dbfiles_logger.info("RTMA login credentials returned successfully")
-     return(db_info3)
-    
-def config_qctest(filename = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini", section = "mawnqc_test"):
-          # Creating a parser
-          parser = ConfigParser()
-          # reading the configfile
-          parser.read(filename)
-          # creating an empty dictionary to store mawnqc_test configurations in
-          db_info4 = {}
-          if parser.has_section(section):
-               params03 = parser.items(section)
-               for param03 in params03:
-                    db_info4[param03[0]] = param03[1]
-          else:
-               raise Exception('Section {0} is not found in the {1} file'.format(section,filename))
-          my_dbfiles_logger.info("QCTEST login credentials returned successfully")
-          return(db_info4)
+    return db_info
 
 
+def config_mawndbqc(
+    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    section: str = "mawndb_qcl",
+) -> dict:
+    """
+    Reads database configuration for mawndb_qcl from a specified ini file.
+
+    Args:
+        filename (str): Path to the ini file containing database configurations.
+        section (str): Section in the ini file containing mawndb_qcl credentials.
+
+    Returns:
+        dict: A dictionary with database configuration credentials.
+
+    Raises:
+        Exception: If the specified section is not found in the ini file.
+    """
+    parser = ConfigParser()
+    parser.read(filename)
+    db_info2 = {}
+
+    if parser.has_section(section):
+        params01 = parser.items(section)
+        for param01 in params01:
+            db_info2[param01[0]] = param01[1]
+    else:
+        my_dbfiles_logger.error(
+            f"Section {section} is not found in the {filename} file"
+        )
+        raise Exception(f"Section {section} is not found in the {filename} file")
+
+    my_dbfiles_logger.info("Mawnqcl login information returned successfully")
+    return db_info2
 
 
-"""
-except Exception as e:
-logging.error('Error reading mawndb configuration: %s', exc_info = e)
-return None
-except Exception as e:
-logging.error('Error reading mawndb_qc database configuration: %s', exc_info = e)
-return None
+def config_mawndbrtma(
+    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    section: str = "mawndb_rtma",
+) -> dict:
+    """
+    Reads database configuration for mawndb_rtma from a specified ini file.
 
-"""
+    Args:
+        filename (str): Path to the ini file containing database configurations.
+        section (str): Section in the ini file containing mawndb_rtma credentials.
+
+    Returns:
+        dict: A dictionary with database configuration credentials.
+
+    Raises:
+        Exception: If the specified section is not found in the ini file.
+    """
+    parser = ConfigParser()
+    parser.read(filename)
+    db_info3 = {}
+
+    if parser.has_section(section):
+        params02 = parser.items(section)
+        for param02 in params02:
+            db_info3[param02[0]] = param02[1]
+    else:
+        my_dbfiles_logger.error(
+            f"Section {section} is not found in the {filename} file"
+        )
+        raise Exception(f"Section {section} is not found in the {filename} file")
+
+    my_dbfiles_logger.info("RTMA login credentials returned successfully")
+    return db_info3
 
 
+def config_qctest(
+    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    section: str = "mawnqc_test",
+) -> dict:
+    """
+    Reads database configuration for mawnqc_test from a specified ini file.
 
+    Args:
+        filename (str): Path to the ini file containing database configurations.
+        section (str): Section in the ini file containing mawnqc_test credentials.
+
+    Returns:
+        dict: A dictionary with database configuration credentials.
+
+    Raises:
+        Exception: If the specified section is not found in the ini file.
+    """
+    parser = ConfigParser()
+    parser.read(filename)
+    db_info4 = {}
+
+    if parser.has_section(section):
+        params03 = parser.items(section)
+        for param03 in params03:
+            db_info4[param03[0]] = param03[1]
+    else:
+        my_dbfiles_logger.error(
+            f"Section {section} is not found in the {filename} file"
+        )
+        raise Exception(f"Section {section} is not found in the {filename} file")
+
+    my_dbfiles_logger.info("QCTEST login credentials returned successfully")
+    return db_info4
+
+
+def main():
+    """
+    Main function to demonstrate configuration retrieval.
+    """
+    try:
+        mawndb_config = config_mawndb()
+        my_dbfiles_logger.info(f"mawndb_config: {mawndb_config}")
+
+        mawndbqc_config = config_mawndbqc()
+        my_dbfiles_logger.info(f"mawndbqc_config: {mawndbqc_config}")
+
+        rtma_config = config_mawndbrtma()
+        my_dbfiles_logger.info(f"rtma_config: {rtma_config}")
+
+        qctest_config = config_qctest()
+        my_dbfiles_logger.info(f"qctest_config: {qctest_config}")
+
+    except Exception as e:
+        my_dbfiles_logger.error(f"Error in main function: {e}")
+
+
+if __name__ == "__main__":
+    main()

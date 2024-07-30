@@ -38,3 +38,72 @@
 2024-06-18 15:32:25,986 - ERROR - db_files.dbfiles_logs_config - error message
 2024-06-18 15:32:25,986 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
 2024-06-18 15:32:25,986 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 08:52:39,232 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 08:52:39,233 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 08:52:39,254 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 08:52:39,254 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 08:52:39,255 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 08:52:39,255 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:00:31,076 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:00:31,077 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:00:31,083 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:00:31,083 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:00:31,085 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:00:31,085 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:02:10,444 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:02:10,444 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:02:10,457 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:02:10,457 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:02:10,460 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:02:10,460 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:35:35,407 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:35:35,408 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:35:35,409 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:35:35,409 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:35:35,410 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:35:35,410 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:35:37,457 - ERROR - db_files.dbfiles_logs_config - Error Connecting to Mawndb Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-07-08 09:35:37,457 - ERROR - db_files.dbfiles_logs_config - Error Connecting to Mawndb Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-07-08 09:35:37,463 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-07-08 09:35:37,463 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-07-08 09:36:54,688 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:36:54,689 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:36:54,690 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:36:54,690 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 09:36:54,692 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:36:54,692 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-07-08 09:36:56,759 - ERROR - db_files.dbfiles_logs_config - Error Connecting to Mawndb Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-07-08 09:36:56,759 - ERROR - db_files.dbfiles_logs_config - Error Connecting to Mawndb Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-07-08 09:36:56,762 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-07-08 09:36:56,762 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-07-08 10:23:14,941 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:23:14,942 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:23:14,942 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:23:17,003 - ERROR - db_files.dbfiles_logs_config - Error Connecting to RTMA Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-07-08 10:23:17,003 - ERROR - db_files.dbfiles_logs_config - Error Connecting to RTMA Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-07-08 10:23:17,005 - ERROR - db_files.dbfiles_logs_config - Error establishing rtma cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-07-08 10:23:17,005 - ERROR - db_files.dbfiles_logs_config - Error establishing rtma cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-07-08 10:24:02,523 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:02,524 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:02,524 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:17,497 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:17,498 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:17,498 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:31,243 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:31,243 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:24:31,243 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:26:44,244 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:26:44,246 - ERROR - db_files.dbfiles_logs_config - error message
+2024-07-08 10:26:44,246 - ERROR - db_files.dbfiles_logs_config - error message

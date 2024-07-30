@@ -1,14 +1,10 @@
 import sys
-sys.path.append('c:/Users/mwangija/data_file/ewx_utils/ewx_utils')
+
+sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 import psycopg2
 import psycopg2.extras
 import datetime as datetime
 import logging
-#logging.debug('This is a debug message')
-#logging.info('This is an info message')
-#logging.warning('This is a warning message')
-#logging.error('This is an error message')
-#logging.critical('This is a critical message')
 from db_files.dbconnection import connect_to_mawndb
 from db_files.dbconnection import connect_to_mawndbqc
 from db_files.dbconnection import mawndb_cursor_connection
@@ -16,19 +12,6 @@ from db_files.dbconnection import mawnqc_cursor_connection
 from validation_logsconfig import validation_logger
 
 my_validation_logger = validation_logger()
-
-my_validation_logger = validation_logger()
-my_validation_logger.error("Remember to log errors using my_logger")
-
-"""
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.formatter("%(asctime)% - %(levelname)s - %(message)s")
-file_handler = logging.FileHandler("validation_logs.log")
-file_handler.setLevel(logging.DEBUG)
-logger.addHandler(file_handler)
-
-"""
 
 mawndb_connection = connect_to_mawndb()
 mawndb_cursor = mawndb_cursor_connection(mawndb_connection)
@@ -38,31 +21,33 @@ mawndbqc_cursor = mawnqc_cursor_connection(mawndbqc_connection)
 select_qc_columns = """ SELECT column_name FROM information_schema.columns WHERE table_name = 'aetna_hourly' """
 mawndbqc_cursor.execute(select_qc_columns)
 qc_columns = mawndbqc_cursor.fetchall()
-#print(f"qc_columns: {qc_columns}")
+# print(f"qc_columns: {qc_columns}")
 
-#qc_column_list = [item for sublist in qc_columns for item in sublist]
-#print(qc_column_list)
-#print(len(qc_column_list))
+# qc_column_list = [item for sublist in qc_columns for item in sublist]
+# print(qc_column_list)
+# print(len(qc_column_list))
 
-# Converting RealDictRow into a normal python dictionary 
+# Converting RealDictRow into a normal python dictionary
 qc_col_dict = [dict(row) for row in qc_columns]
-#print(f"(qc_col_list: {qc_col_dict})")
+# print(f"(qc_col_list: {qc_col_dict})")
 
 # Extracting the values from key, value items that have a common key column_name
-qc_col_list = [sub ['column_name'] for sub in qc_col_dict ]
+qc_col_list = [sub["column_name"] for sub in qc_col_dict]
 print(f"(qc_col_list: {qc_col_list})")
 print(len(qc_col_list))
 
-mawndbqc_cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'aetna_hourly' AND column_name LIKE '%src'")
+mawndbqc_cursor.execute(
+    "SELECT column_name FROM information_schema.columns WHERE table_name = 'aetna_hourly' AND column_name LIKE '%src'"
+)
 src_columns = mawndbqc_cursor.fetchall()
-#print(f"src_columns: {src_columns}")
+# print(f"src_columns: {src_columns}")
 
-#Using a select sql statement to retrieve data from mawndb_qcl 
-#mawndbqcl_select = ("SELECT * FROM aetna_hourly WHERE date = '2022-03-10'")
-#records = mawndbqc_cursor.fetchall()
-#print(records)
-    
-#select_src_columns = """ #SELECT column_name FROM information_schema.columns WHERE table_name = 'aetna_hourly AND column_name LIKE %src' """
+# Using a select sql statement to retrieve data from mawndb_qcl
+# mawndbqcl_select = ("SELECT * FROM aetna_hourly WHERE date = '2022-03-10'")
+# records = mawndbqc_cursor.fetchall()
+# print(records)
+
+# select_src_columns = """ #SELECT column_name FROM information_schema.columns WHERE table_name = 'aetna_hourly AND column_name LIKE %src' """
 """
 mawndbqc_cursor.execute(select_src_columns)
 src_columns = mawndbqc_cursor.fetchall()
@@ -84,8 +69,8 @@ for col in qc_columns:
         update_query = f"UPDATE aetna_hourly {col_name}_src = 'MAWN' WHERE {col_name} IS NOT NULL;"
         mawndbqc_cursor.execute(update_query)
 """
-        
-#Commit the transaction for mawndb
+
+# Commit the transaction for mawndb
 mawndbqc_connection.commit()
 
 """
@@ -99,9 +84,3 @@ for column in src_columns:
 # Close the cursor and connection for mawndbqc
 mawndbqc_cursor.close()
 mawndbqc_connection.close()
-
-
-
-
-
-
