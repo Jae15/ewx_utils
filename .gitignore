@@ -4,3 +4,4 @@ configfile/
 database/
 tests/venv
 venv/
+sample_records.py/

@@ -1,0 +1,44 @@
+2024-07-17 13:36:27,200 - ERROR - dryrun_logger - Error accessing record keys: 0
+2024-07-17 13:36:27,200 - ERROR - dryrun_logger - Error accessing record keys: 0
+2024-07-17 15:24:18,817 - ERROR - dryrun_logger - Error inserting records into aetna_hourly: duplicate key value violates unique constraint "aetna_hourly_dttm"
+DETAIL:  Key (date, "time")=(2022-03-10, 00:00:00) already exists.
+
+2024-07-17 15:24:18,818 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 16:10:41,241 - ERROR - dryrun_logger - Error inserting records into aetna_hourly: duplicate key value violates unique constraint "aetna_hourly_dttm"
+DETAIL:  Key (date, "time")=(2022-03-10, 00:00:00) already exists.
+
+2024-07-17 16:10:41,244 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 16:14:30,284 - ERROR - dryrun_logger - Error processing records: main() takes 0 positional arguments but 2 were given
+2024-07-17 16:33:33,150 - ERROR - dryrun_logger - Error processing records: main() takes 0 positional arguments but 2 were given
+2024-07-17 17:09:05,624 - ERROR - dryrun_logger - Error creating database connections: 'NoneType' object has no attribute 'cursor'
+2024-07-17 17:09:05,625 - CRITICAL - dryrun_logger - Failed to create database connections. Exiting.
+2024-07-17 17:09:50,824 - ERROR - dryrun_logger - Error inserting records into aetna_hourly_cleaned: relation "aetna_hourly_cleaned" does not exist
+LINE 1: INSERT INTO aetna_hourly_cleaned (year, day, hour, rpt_time,...
+                    ^
+
+2024-07-17 17:09:50,824 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 17:10:50,305 - ERROR - dryrun_logger - Error inserting records into aetna_hourly_cleaned: relation "aetna_hourly_cleaned" does not exist
+LINE 1: INSERT INTO aetna_hourly_cleaned (year, day, hour, rpt_time,...
+                    ^
+
+2024-07-17 17:10:50,306 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 17:10:59,665 - ERROR - dryrun_logger - Error inserting records into aetna_hourly: column "wspd_maxt_src" of relation "aetna_hourly" does not exist
+LINE 1: ...src, wspd_src, wdir_src, wstdv_src, wspd_max_src, wspd_maxt_...
+                                                             ^
+
+2024-07-17 17:10:59,666 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 17:14:40,343 - ERROR - dryrun_logger - Error inserting records into aetna_hourly: column "wspd_maxt_src" of relation "aetna_hourly" does not exist
+LINE 1: ...src, wspd_src, wdir_src, wstdv_src, wspd_max_src, wspd_maxt_...
+                                                             ^
+
+2024-07-17 17:14:40,345 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 17:20:36,400 - ERROR - dryrun_logger - Error inserting records into aetna_hourly: invalid input syntax for type integer: "MAWN"
+LINE 1: ..., 'OOR', 'EMPTY', 'MAWN', 'MAWN', 'MAWN', 'MAWN', 'MAWN', 'M...
+                                                             ^
+
+2024-07-17 17:20:36,402 - ERROR - dryrun_logger - Failed to insert records. Exiting.
+2024-07-17 17:25:20,146 - ERROR - dryrun_logger - Error inserting records into aetna_hourly: invalid input syntax for type integer: "MAWN"
+LINE 1: ..., 'OOR', 'EMPTY', 'MAWN', 'MAWN', 'MAWN', 'MAWN', 'MAWN', 'M...
+                                                             ^
+
+2024-07-17 17:25:20,148 - ERROR - dryrun_logger - Failed to insert records. Exiting.
