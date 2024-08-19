@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import psycopg2
+import logging
 import sys
 
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
@@ -16,16 +17,18 @@ from variables_list import (
     wspd_vars,
     wdir_vars,
     leafwt_vars,
+    dwpt_vars
 )
-from mawndb_classes.humidity import humidity
-from mawndb_classes.windspeed import windspeed
-from mawndb_classes.leafwetness import leafwetness
-from mawndb_classes.temperature import temperature
-from mawndb_classes.precipitation import precipitation
-from mawndb_classes.winddirection import winddirection
-from mawndb_classes.evapotranspiration import evapotranspiration
+from mawndb_classes.humidity import Humidity
+from mawndb_classes.dew_point import DewPoint
+from mawndb_classes.windspeed import WindSpeed
+from mawndb_classes.leafwetness import LeafWetness
+from mawndb_classes.temperature import Temperature
+from mawndb_classes.precipitation import Precipitation
+from mawndb_classes.winddirection import WindDirection
+from mawndb_classes.evapotranspiration import Evapotranspiration
+from mawndb_classes.dew_point import DewPoint
 from typing import List, Dict, Tuple
-import logging
 from validation_logsconfig import validations_logger
 
 # Initialize the logger
@@ -43,26 +46,29 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         bool: True if the value is valid, False otherwise.
     """
     if k in relh_vars:
-        rh = humidity(v, "PCT", d)
-        return rh.IsInRange() and rh.IsValid()
+        rh = Humidity(v, "PCT", d)
+        return rh.is_in_range() and rh.is_valid()
     if k in pcpn_vars:
-        pn = precipitation(v, "hourly", "MM", d)
-        return pn.IsValid()
+        pn = Precipitation(v, "hourly", "MM", d)
+        return pn.is_valid()
     if k in rpet_vars:
-        rp = evapotranspiration(v, "hourly", "MM", d)
-        return rp.IsValid()
+        rp = Evapotranspiration(v, "hourly", "MM", d)
+        return rp.is_valid()
     if k in temp_vars:
-        tp = temperature(v, "C", d)
-        return tp.IsValid()
+        tp = Temperature(v, "C", d)
+        return tp.is_valid()
     if k in wspd_vars:
-        ws = windspeed(v, "MPS", d)
-        return ws.IsValid()
+        ws = WindSpeed(v, "MPS", d)
+        return ws.is_valid()
     if k in wdir_vars:
-        wd = winddirection(v, "DEGREES", d)
-        return wd.IsValid()
+        wd = WindDirection(v, "DEGREES", d)
+        return wd.is_valid()
     if k in leafwt_vars:
-        lw = leafwetness(v, "hourly", k, d)
-        return lw.IsValid()
+        lw = LeafWetness(v, "hourly", k, d)
+        return lw.is_valid()
+    if k in dwpt_vars:
+        dp = Temperature(v,"C", d)
+        return dp.is_valid()
     return True
 
 
@@ -143,13 +149,26 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
         dict: The processed MAWN source record.
     """
     for key in mawnsrc_record:
-        if key in relh_vars and 100 <= mawnsrc_record[key] <= 105:
+        if key in relh_vars and (mawnsrc_record[key] is None or mawnsrc_record.get(key + "_src") == "EMPTY"):
+            mawnsrc_record[key] = None
+        elif key in relh_vars and 100 <= mawnsrc_record[key] <= 105:
             mawnsrc_record[key + "_src"] = "RELH_CAP"
             mawnsrc_record[key] = 100
-        elif key in relh_vars and mawnsrc_record.get(key + "_src") == "EMPTY":
-            mawnsrc_record[key] = None
+
     return mawnsrc_record
 
+def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) -> dict:
+    if 'dwpt' in rtma_record.keys():
+        #dwpt_key_rtma = rtma_record['dwpt']
+        if rtma_record['dwpt'] is None:
+            # get the atmp and use it to create a temp object
+            # get the relh
+            temp = Temperature(rtma_record['atmp'], 'C', combined_datetime)
+            relh = Humidity(rtma_record['relh'], 'PCT',combined_datetime)
+            dwpt = DewPoint(temp, relh, combined_datetime)
+            dwptC = dwpt.calculate_dew_point()
+            rtma_record['dwpt'] = dwptC
+    return rtma_record
 
 def replace_none_with_rtmarecord(
     mawnsrc_record: dict, rtma_record: dict, combined_datetime: datetime.datetime
@@ -205,7 +224,7 @@ def one_rtma_record(rtma_records: list) -> list:
 def main():
     """
     Main function to process example records and perform validation and cleaning.
-    """
+    
     # Example Records
     rtma_records = [
         {
@@ -323,6 +342,17 @@ def main():
             "id": 18721453,
         },
     ]
+    """
+    mawndb_records = [{'year': 2019, 'day': 230, 'hour': 12, 'rpt_time': 1200, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(12, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 11.43, 'lws0_pwet': 0.724, 'lws1_pwet': None, 'wspd': 3.527, 'wdir': 182.6, 'wstdv': 27.64, 'wspd_max': 14.2, 'wspd_maxt': 1123, 'srad': 109.1811, 'stmp_05cm': 21.81, 'stmp_10cm': 21.22, 'stmp_20cm': 20.87, 'stmp_50cm': 20.42, 'smst_05cm': 0.216, 'smst_10cm': 0.148, 'smst_20cm': 0.127, 'smst_50cm': 0.251, 'volt': 13.1, 'rpet': None, 'id': 7356}, 
+                      {'year': 2019, 'day': 230, 'hour': 13, 'rpt_time': 1300, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(13, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 2.286, 'lws0_pwet': 1.0, 'lws1_pwet': None, 'wspd': 3.459, 'wdir': 140.5, 'wstdv': 17.55, 'wspd_max': 7.2, 'wspd_maxt': 1232, 'srad': 203.3628, 'stmp_05cm': 21.39, 'stmp_10cm': 21.29, 'stmp_20cm': 20.96, 'stmp_50cm': 20.4, 'smst_05cm': 0.26, 'smst_10cm': 0.15, 'smst_20cm': 0.127, 'smst_50cm': 0.251, 'volt': 13.18, 'rpet': None, 'id': 7357},
+                      {'year': 2019, 'day': 230, 'hour': 14, 'rpt_time': 1400, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(14, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 0.0, 'lws0_pwet': 0.456, 'lws1_pwet': None, 'wspd': 4.169, 'wdir': 148.0, 'wstdv': 21.19, 'wspd_max': 7.7, 'wspd_maxt': 1345, 'srad': 1628.859, 'stmp_05cm': 21.22, 'stmp_10cm': 21.16, 'stmp_20cm': 20.99, 'stmp_50cm': 20.38, 'smst_05cm': 0.266, 'smst_10cm': 0.153, 'smst_20cm': 0.127, 'smst_50cm': 0.251, 'volt': 13.3, 'rpet': None, 'id': 7358}, 
+                      {'year': 2019, 'day': 230, 'hour': 15, 'rpt_time': 1500, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(15, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 2.271, 'wdir': 195.8, 'wstdv': 29.08, 'wspd_max': 5.2, 'wspd_maxt': 1417, 'srad': 1986.219, 'stmp_05cm': 21.93, 'stmp_10cm': 21.25, 'stmp_20cm': 20.98, 'stmp_50cm': 20.36, 'smst_05cm': 0.264, 'smst_10cm': 0.156, 'smst_20cm': 0.127, 'smst_50cm': 0.25, 'volt': 13.2, 'rpet': None, 'id': 7359}, 
+                      {'year': 2019, 'day': 230, 'hour': 16, 'rpt_time': 1600, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(16, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 3.282, 'wdir': 219.2, 'wstdv': 22.28, 'wspd_max': 8.7, 'wspd_maxt': 1553, 'srad': 1625.044, 'stmp_05cm': 22.79, 'stmp_10cm': 21.68, 'stmp_20cm': 21.03, 'stmp_50cm': 20.36, 'smst_05cm': 0.261, 'smst_10cm': 0.16, 'smst_20cm': 0.128, 'smst_50cm': 0.25, 'volt': 13.19, 'rpet': None, 'id': 7360}]
+    rtma_records = [{'year': 2019, 'day': 230, 'hour': 12, 'rpt_time': 1200, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(12, 0), 'atmp': 19.42, 'relh': 97.43, 'dwpt': 19.0, 'pcpn': 1.4, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 1.461, 'wdir': 260.4, 'wspd_max': 7.777, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5706}, 
+                    {'year': 2019, 'day': 230, 'hour': 13, 'rpt_time': 1300, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(13, 0), 'atmp': 19.89, 'relh': 96.24, 'dwpt': 19.27, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 4.955, 'wdir': 169.5, 'wspd_max': 7.86, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5708}, 
+                    {'year': 2019, 'day': 230, 'hour': 14, 'rpt_time': 1400, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(14, 0), 'atmp': 22.45, 'relh': 80.08, 'dwpt': 18.83, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 2.897, 'wdir': 167.5, 'wspd_max': 8.383, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5710}, 
+                    {'year': 2019, 'day': 230, 'hour': 15, 'rpt_time': 1500, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(15, 0), 'atmp': 24.92, 'relh': 68.84, 'dwpt': 18.79, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 3.826, 'wdir': 231.2, 'wspd_max': 6.897, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5712}, 
+                    {'year': 2019, 'day': 230, 'hour': 16, 'rpt_time': 1600, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(16, 0), 'atmp': 24.56, 'relh': 70.21, 'dwpt': 18.76, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 6.474, 'wdir': 243.1, 'wspd_max': 10.74, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5714}]
 
     # Iterate over records and perform validation and cleaning
     for record in mawndb_records:
@@ -351,8 +381,9 @@ def main():
 
         # If a matching RTMA record is found, replace None values in the MAWN source record with valid values from the RTMA record
         if rtma_record:
+            rtma_record_with_dwpt = create_rtma_dwpt(rtma_record, combined_date)
             mawnsrc_record = replace_none_with_rtmarecord(
-                mawnsrc_record, rtma_record, combined_date
+                mawnsrc_record, rtma_record_with_dwpt, combined_date
             )
 
         # Append the cleaned MAWN source record to the list of clean records
@@ -375,3 +406,13 @@ if __name__ == "__main__":
     clean_records = main()
     for record in clean_records:
         print(f"Clean Record: {record}")
+
+"""
+Create a function to check if the column dwpt exists in an RTMA table.
+If it does have a dwpt column, and the value is None(if the value is not a valid temp), then we 
+calculate it from temp and relh and insert the calculated value into the record we are working with.
+Some tables in RTMA don't have dwpt in them.
+
+some logs to check: if an rtma
+
+"""

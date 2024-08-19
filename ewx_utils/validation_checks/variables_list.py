@@ -60,9 +60,6 @@ temp_vars = [
     "ctmp02ft",
     "ctmp02ft_max",
     "ctmp02ft_min",
-    "dwpt",
-    "dwpt_min",
-    "dwpt_max",
     "polyatmp",
     "polyatmp_max",
     "polyatmp_min",
@@ -158,5 +155,10 @@ mstr_vars = [
     "smst_05cm",
     "smst_10cm",
     "smst_20cm",
-    "smst_50cm" "smst_100cm",
+    "smst_50cm" ,
+    "smst_100cm"]
+
+dwpt_vars =  [ "dwpt",
+    "dwpt_min",
+    "dwpt_max",
 ]

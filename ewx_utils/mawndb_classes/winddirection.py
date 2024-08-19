@@ -1,48 +1,93 @@
-"""
-The wind direction class below defines the valid hourly default monthly ranges.
-It also specifies the units of measurement and their respective conversions and choice of degrees on a 0-360 scale as stored in mawndb.
-"""
+import sys
+import logging
+sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 
-
-class winddirection:
+class WindDirection:
+    """
+    The WindDirection class defines the valid hourly default range for wind direction.
+    It also specifies the units of measurement (degrees) and their respective compass directions.
+    """
     valid_wdir_hourly_default = (0, 360)
 
     def __init__(self, wdir, units, record_date=None):
-        self.record_date = record_date
-        if wdir == None:
-            wdir = -9999
-        unitsU = units.upper()
-        if unitsU == "DEGREES":
-            self.wdirDEGREES = float(wdir)
-            x = self.wdirDEGREES
-            choice = {
-                x < 0: "NA",
-                0 <= x < 11.25: "N",
-                11.25 <= x < 33.75: "NNE",
-                33.75 <= x < 56.25: "NE",
-                56.25 <= x < 78.75: "ENE",
-                78.75 <= x < 101.25: "E",
-                101.25 <= x < 123.75: "ESE",
-                123.75 <= x < 146.25: "SE",
-                146.25 <= x < 168.75: "SSE",
-                168.75 <= x < 191.25: "S",
-                191.25 <= x < 213.75: "SSW",
-                213.75 <= x < 236.25: "SW",
-                236.25 <= x < 258.75: "WSW",
-                258.75 <= x < 281.25: "W",
-                281.25 <= x < 303.75: "WNW",
-                303.75 <= x < 326.25: "NW",
-                326.25 <= x < 348.75: "NNW",
-                348.75 <= x <= 360: "N",
-                x > 360: "NA",
-            }
-        self.wdirCOMPASS = choice[True]
+        """
+        Initializes the WindDirection object.
+        
+        Parameters:
+        wdir (float): Wind direction value.
+        units (str): The unit of measurement ('DEGREES').
+        record_date (datetime, optional): The date of the record.
+        """
+        self.logger = mawndb_classes_logger()
+        self.logger.debug("Initializing WindDirection object with wdir: %s, units: %s, record_date: %s",
+                          wdir, units, record_date)
 
-    def IsValid(self):
-        if (
-            self.wdirDEGREES > self.valid_wdir_hourly_default[0]
-            and self.wdirDEGREES < self.valid_wdir_hourly_default[1]
-        ):
-            return True
+        self.record_date = record_date
+        if wdir is None:
+            self.wdirDEGREES = None
+            self.wdirCOMPASS = None
+            self.logger.debug("Wind direction is None, setting all direction values to None")
+            return
+
+        unitsU = units.upper()
+        if unitsU == 'DEGREES':
+            self.wdirDEGREES = float(wdir)
+            self.wdirCOMPASS = self._degrees_to_compass(self.wdirDEGREES)
         else:
+            self.logger.error("Invalid units provided: %s", units)
+            raise ValueError("Units must be 'DEGREES'")
+
+        self.logger.debug("WindDirection object initialized with wdirDEGREES: %s and wdirCOMPASS: %s",
+                          self.wdirDEGREES, self.wdirCOMPASS)
+    
+    def set_src(self, src):
+        """
+        Initializes the source of wind direction data.
+
+        Parameters:
+        src(str): Source of the data
+        """
+        self.src = src
+        self.logger.debug("Source set to: %s, src")
+
+    def _degrees_to_compass(self, degrees):
+        """
+        Converts wind direction in degrees to compass direction.
+        
+        Parameters:
+        degrees (float): Wind direction in degrees.
+        
+        Returns:
+        str: Compass direction corresponding to the degrees.
+        """
+        if degrees < 0 or degrees > 360:
+            return 'NA'
+        compass = {
+            (0, 11.25): 'N', (11.25, 33.75): 'NNE', (33.75, 56.25): 'NE', (56.25, 78.75): 'ENE',
+            (78.75, 101.25): 'E', (101.25, 123.75): 'ESE', (123.75, 146.25): 'SE', (146.25, 168.75): 'SSE',
+            (168.75, 191.25): 'S', (191.25, 213.75): 'SSW', (213.75, 236.25): 'SW', (236.25, 258.75): 'WSW',
+            (258.75, 281.25): 'W', (281.25, 303.75): 'WNW', (303.75, 326.25): 'NW', (326.25, 348.75): 'NNW',
+            (348.75, 360): 'N'
+        }
+        for (low, high), direction in compass.items():
+            if low <= degrees < high:
+                return direction
+        return 'NA'
+
+    def is_valid(self):
+        """
+        Checks if the wind direction value is within the valid hourly default range.
+        
+        Returns:
+        bool: True if the wind direction value is within the valid range, False otherwise.
+        """
+        self.logger.debug("Validating wind direction value: %s", self.wdirDEGREES)
+        if self.wdirDEGREES is None:
+            self.logger.debug("Wind direction is None, returning False")
             return False
+
+        is_valid = self.valid_wdir_hourly_default[0] <= self.wdirDEGREES <= self.valid_wdir_hourly_default[1]
+        self.logger.debug("Wind direction value: %s is valid: %s", self.wdirDEGREES, is_valid)
+        return is_valid
+

@@ -28,7 +28,7 @@ logger = dryrun_logger()
 
 def create_db_connections():
     """
-    Create and return database connections and cursors for mawndb, mawndbqc, rtma, and qctest databases.
+    Creating and returning database connections and cursors for mawndb, mawndbqc, rtma, and qctest databases.
     """
     logger.info("Creating database connections.")
     try:
@@ -62,7 +62,7 @@ def create_db_connections():
 
 def fetch_records(cursor, table_name, date):
     """
-    Fetch records from the specified table and date.
+    Fetching records from the specified table and date.
 
     Args:
         cursor: Database cursor object.
@@ -176,6 +176,22 @@ def process_records(mawn_records, rtma_records):
 
         clean_records.append(mawnsrc_record)
 
+        # Finding and inserting missing records from RTMA
+        for rtma_record in rtma_records:
+            if not any(
+                rec["date"] == rtma_record["date"]
+                and rec["time"] == rtma_record["time"]
+                and rec["hour"] == rtma_record["hour"]
+                for rec in mawn_records
+            ):
+                combined_date = combined_datetime(rtma_record)
+                id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
+
+                mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_date, id_col_list)
+                mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
+
+                clean_records.append(mawnsrc_record)
+                
     return clean_records
 
 
@@ -203,12 +219,12 @@ def main():
 
     # Define table name and date for querying
     table_name = "aetna_hourly"
-    date = "2023-04-27"  # The same date for both mawndb and rtma
+    date = "2019-08-18"  # The same date for both mawndb and rtma
 
     # Fetch records from mawndb and rtma
     try:
         mawn_records = fetch_records(mawndb_cur, table_name, date)
-        print(f"lNumber Mawn_records: {len(mawn_records)}")
+        print(f"Number Mawn_records: {len(mawn_records)}")
         rtma_records = fetch_records(rtma_cur, table_name, date)
         print(f"Number rtma_records: {len(rtma_records)}")
     except Exception as e:
@@ -216,8 +232,8 @@ def main():
         return
 
     # Print fetched records
-    logger.info(f"MAWNDB Records: {mawn_records}")
-    logger.info(f"RTMA Records: {rtma_records}")
+    #logger.info(f"MAWNDB Records: {mawn_records}")
+    #logger.info(f"RTMA Records: {rtma_records}")
 
     # Process records and get clean_records
     try:
@@ -252,7 +268,7 @@ if __name__ == "__main__":
     main()
 
 """
-Remember to think through a function that checks for non-exsitent MAWN records and creates fake MAWN records from RTMA records
+Remember to think through a function that checks for non-exsitent MAWN records (eg data missing on certain dates) and replaces the missing MAWN records (from those dates)with RTMA records
 to avoid a case of skipping hours like in the case of date = '2023-04-27' with MAWN 22 records in aetna_hourly table
 and 24 records in the RTMA aetna_hourly
 
@@ -260,5 +276,9 @@ Check timeloop script for hints. Do you want to loop through date and time in th
 
 In my functions above... before checking for record in mawndb_records...I need to check for datetime in datetime list...
 And I can obtain this from the timeloop script...
+
+Thought process: 08/15/2024
+- Create script that examines whether the records retrieved in the dry_run match the qc tables records 
+
 
 """
