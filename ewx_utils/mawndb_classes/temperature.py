@@ -1,10 +1,17 @@
-"""
-The temperature class below defines the valid hourly default monthly ranges.
-It also specifies the units of measurement and their respective conversions as stored in mawndb.
-"""
+import sys
+import logging
+from datetime import datetime
 
+# Assuming mawndb_classes_logger is correctly configured elsewhere
+sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 
-class temperature:
+class Temperature:
+    """
+    The Temperature class defines the valid hourly default monthly ranges.
+    It also specifies the units of measurement and their respective conversions as stored in mawndb.
+    """
+
     valid_hourly_atmp = {
         "jan": (-39, 25),
         "feb": (-39, 24),
@@ -21,38 +28,82 @@ class temperature:
     }
 
     def __init__(self, temp, units, record_date=None):
+        """
+        Initializes the Temperature object.
+
+        Parameters:
+        temp (float): Temperature value.
+        units (str): The unit of measurement ('C', 'F', 'K').
+        record_date (datetime, optional): The date of the record.
+        """
+        self.logger = mawndb_classes_logger()
+        self.logger.debug("Initializing Temperature object with temp: %s, units: %s, record_date: %s",
+                          temp, units, record_date)
         self.record_date = record_date
-        if temp == None:
+
+        if temp is None:
             self.tempC = None
             self.tempF = None
             self.tempK = None
+            self.logger.debug("Temperature is None, setting all temperature values to None")
             return
+
         unitsU = units.upper()
-        nine_fifths = float(9) / float(5)
+        nine_fifths = 9.0 / 5.0
+
         if unitsU == "C":
             self.tempC = float(temp)
             self.tempF = nine_fifths * self.tempC + 32
             self.tempK = self.tempC + 273.15
-        if unitsU == "F":
+        elif unitsU == "F":
             self.tempF = float(temp)
-            self.tempC = (1 / nine_fifths) * (self.tempF - 32)
+            self.tempC = (self.tempF - 32) / nine_fifths
             self.tempK = self.tempC + 273.15
-        if unitsU == "K":
+        elif unitsU == "K":
             self.tempK = float(temp)
             self.tempC = self.tempK - 273.15
             self.tempF = nine_fifths * self.tempC + 32
+        else:
+            self.logger.error("Invalid units provided: %s", units)
+            raise ValueError("Units must be 'C', 'F', or 'K'")
 
-    def IsValid(self):
-        if self == None:
+        self.logger.debug("Temperature object initialized with tempC: %s, tempF: %s, tempK: %s",
+                          self.tempC, self.tempF, self.tempK)
+        
+    def set_src(self, src):
+        """
+        Initializes the source of temperature data.
+
+        Parameters:
+        src(str): Source of the data
+        """
+        self.src = src
+        self.logger.debug("Source set to: %s, src")
+
+    def is_valid(self):
+        """
+        Checks if the temperature value is within the valid hourly default monthly range.
+
+        Returns:
+        bool: True if the temperature value is within the valid range, False otherwise.
+        """
+        self.logger.debug("Validating temperature value: %s, record_date: %s", self.tempC, self.record_date)
+
+        if self.tempC is None:
+            self.logger.debug("Temperature is None, returning False")
             return False
-        if self.tempC == None:
-            return False
+
         if self.record_date is not None:
-            datestring = self.record_date.strftime("%b %d, %Y")
-            month_abbrv = (datestring[0:3]).lower()
-            atmp_valid_range = self.valid_hourly_atmp[month_abbrv][0:2]
-            return (
-                atmp_valid_range[0] <= self.tempC and self.tempC <= atmp_valid_range[1]
-            )
-        if self.tempC < -40 or self.tempC > 46:
-            return False
+            month_abbrv = self.record_date.strftime("%b").lower()
+            atmp_valid_range = self.valid_hourly_atmp.get(month_abbrv)
+            if atmp_valid_range:
+                is_valid = atmp_valid_range[0] <= self.tempC <= atmp_valid_range[1]
+                self.logger.debug("Temperature value: %s is valid for month %s: %s",
+                                  self.tempC, month_abbrv, is_valid)
+                return is_valid
+
+        is_valid = -40 <= self.tempC <= 46
+        self.logger.debug("Temperature value: %s is within general valid range (-40 to 46): %s",
+                          self.tempC, is_valid)
+        return is_valid
+
