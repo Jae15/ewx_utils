@@ -1,0 +1,26 @@
+2024-09-05 10:40:46,868 - ERROR - ewxutils_logsconfig - An error occurred: 'NoneType' object has no attribute 'cursor'
+2024-09-05 10:41:25,296 - ERROR - ewxutils_logsconfig - Error fetching records from mawnqc_test.aetna_hourly: relation "mawnqc_test.aetna_hourly" does not exist
+LINE 2:     SELECT * FROM mawnqc_test.aetna_hourly 
+                          ^
+
+2024-09-05 10:41:25,298 - ERROR - ewxutils_logsconfig - An error occurred: relation "mawnqc_test.aetna_hourly" does not exist
+LINE 2:     SELECT * FROM mawnqc_test.aetna_hourly 
+                          ^
+
+2024-09-05 11:16:52,606 - ERROR - ewxutils_logsconfig - An error occurred: 'Namespace' object has no attribute 'test_table'
+2024-09-05 11:20:19,840 - ERROR - ewxutils_logsconfig - Error fetching records from mawnqc_test: relation "mawnqc_test" does not exist
+LINE 2:     SELECT * FROM mawnqc_test 
+                          ^
+
+2024-09-05 11:20:19,841 - ERROR - ewxutils_logsconfig - An error occurred: relation "mawnqc_test" does not exist
+LINE 2:     SELECT * FROM mawnqc_test 
+                          ^
+
+2024-09-05 11:20:27,958 - ERROR - ewxutils_logsconfig - Error fetching records from mawnqc_test: relation "mawnqc_test" does not exist
+LINE 2:     SELECT * FROM mawnqc_test 
+                          ^
+
+2024-09-05 11:20:27,961 - ERROR - ewxutils_logsconfig - An error occurred: relation "mawnqc_test" does not exist
+LINE 2:     SELECT * FROM mawnqc_test 
+                          ^
+

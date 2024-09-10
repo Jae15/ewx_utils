@@ -6,9 +6,9 @@ from datetime import datetime, timedelta
 import tz
 
 # from dateutil import tz
-from validation_logsconfig import validations_logger
+# from validation_logsconfig import validations_logger
 
-validation_logger = validations_logger()
+# validation_logger = validations_logger()
 
 
 def generate_list_of_hours(begin_date: str, end_date: str) -> list:

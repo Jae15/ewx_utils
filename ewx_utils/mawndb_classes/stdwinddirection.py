@@ -31,6 +31,16 @@ class StdWindDirection:
             if unitsU == "DEGREES":
                 self.wstdvM = float(wstdv)
 
+    def set_src(self, src):
+        """
+        Initializes the source of std wind direction data.
+
+        Parameters:
+        src(str): Source of the data
+        """
+        self.src = src
+        self.logger.debug("Source set to: %s, src")
+
     def is_valid(self):
         if (
             self.wstdvM < self.valid_wstdv_hourly_default[0]

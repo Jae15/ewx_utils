@@ -9,7 +9,7 @@ import psycopg2.extras
 import datetime
 from datetime import timezone
 from zoneinfo import ZoneInfo
-from variables_list import (
+from .variables_list import (
     relh_vars,
     pcpn_vars,
     rpet_vars,
@@ -17,7 +17,7 @@ from variables_list import (
     wspd_vars,
     wdir_vars,
     leafwt_vars,
-    dwpt_vars
+    dwpt_vars,
 )
 from mawndb_classes.humidity import Humidity
 from mawndb_classes.dew_point import DewPoint
@@ -29,7 +29,8 @@ from mawndb_classes.winddirection import WindDirection
 from mawndb_classes.evapotranspiration import Evapotranspiration
 from mawndb_classes.dew_point import DewPoint
 from typing import List, Dict, Tuple
-from validation_logsconfig import validations_logger
+from .validation_logsconfig import validations_logger
+from .timeloop import generate_list_of_hours
 
 # Initialize the logger
 my_validation_logger = validations_logger()
@@ -73,6 +74,7 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
 
 
 def combined_datetime(record: dict) -> datetime.datetime:
+
     """
     Combines the date and time from a record into a single datetime object.
     Args:
@@ -220,199 +222,115 @@ def one_rtma_record(rtma_records: list) -> list:
     """
     return [dict(rtma_record) for rtma_record in rtma_records]
 
-
-def main():
+def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_date: str, end_date: str) -> List[Dict]:
     """
-    Main function to process example records and perform validation and cleaning.
+    Process and clean the records by utilizing the validation logic.
     
-    # Example Records
-    rtma_records = [
-        {
-            "year": 2022,
-            "day": 68,
-            "hour": 24,
-            "rpt_time": 2400,
-            "date": datetime.date(2022, 3, 10),
-            "time": datetime.time(0, 0),
-            "atmp": -4.92,
-            "relh": 81.35,
-            "dwpt": None,
-            "pcpn": 0.0,
-            "lws0_pwet": None,
-            "lws1_pwet": None,
-            "wspd": 0.938,
-            "wdir": 291.6,
-            "wspd_max": 6.897,
-            "srad": None,
-            "stmp_05cm": None,
-            "stmp_10cm": None,
-            "stmp_20cm": None,
-            "stmp_50cm": None,
-            "smst_05cm": None,
-            "smst_10cm": None,
-            "smst_20cm": None,
-            "smst_50cm": None,
-            "rpet": None,
-            "id": 18720707,
-        },
-        {
-            "year": 2022,
-            "day": 69,
-            "hour": 1,
-            "rpt_time": 100,
-            "date": datetime.date(2022, 3, 10),
-            "time": datetime.time(1, 0),
-            "atmp": -5.17,
-            "relh": 79.35,
-            "dwpt": None,
-            "pcpn": 0.0,
-            "lws0_pwet": None,
-            "lws1_pwet": None,
-            "wspd": 0.631,
-            "wdir": 253.2,
-            "wspd_max": 6.051,
-            "srad": None,
-            "stmp_05cm": None,
-            "stmp_10cm": None,
-            "stmp_20cm": None,
-            "stmp_50cm": None,
-            "smst_05cm": None,
-            "smst_10cm": None,
-            "smst_20cm": None,
-            "smst_50cm": None,
-            "rpet": None,
-            "id": 18721453,
-        },
-    ]
-    mawndb_records = [
-        {
-            "year": 2022,
-            "day": 68,
-            "hour": 24,
-            "rpt_time": 2400,
-            "date": datetime.date(2022, 3, 10),
-            "time": datetime.time(0, 0),
-            "atmp": 500,
-            "relh": 500,
-            "dwpt": 500,
-            "pcpn": 500,
-            "lws0_pwet": 500,
-            "lws1_pwet": 500,
-            "wspd": 500,
-            "wdir": 500,
-            "wspd_max": 500,
-            "srad": 500,
-            "stmp_05cm": 500,
-            "stmp_10cm": 500,
-            "stmp_20cm": 500,
-            "stmp_50cm": 500,
-            "smst_05cm": 500,
-            "smst_10cm": 500,
-            "smst_20cm": 500,
-            "smst_50cm": 500,
-            "rpet": 500,
-            "id": 18720707,
-        },
-        {
-            "year": 2022,
-            "day": 69,
-            "hour": 1,
-            "rpt_time": 100,
-            "date": datetime.date(2022, 3, 10),
-            "time": datetime.time(1, 0),
-            "atmp": -5.0,
-            "relh": 79,
-            "dwpt": -8.4,
-            "pcpn": 0.0,
-            "lws0_pwet": 0,
-            "lws1_pwet": 0,
-            "wspd": 0.7,
-            "wdir": 253.0,
-            "wspd_max": 5.8,
-            "srad": 0.0,
-            "stmp_05cm": 1.2,
-            "stmp_10cm": 1.2,
-            "stmp_20cm": 1.7,
-            "stmp_50cm": 2.8,
-            "smst_05cm": 0.273,
-            "smst_10cm": 0.282,
-            "smst_20cm": 0.291,
-            "smst_50cm": 0.334,
-            "rpet": 0.0,
-            "id": 18721453,
-        },
-    ]
+    Args:
+    mawn_records: List of records from mawndb.
+    rtma_records: List of records from rtma.
+    
+    Returns:
+    List of cleaned records.
+    
     """
-    mawndb_records = [{'year': 2019, 'day': 230, 'hour': 12, 'rpt_time': 1200, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(12, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 11.43, 'lws0_pwet': 0.724, 'lws1_pwet': None, 'wspd': 3.527, 'wdir': 182.6, 'wstdv': 27.64, 'wspd_max': 14.2, 'wspd_maxt': 1123, 'srad': 109.1811, 'stmp_05cm': 21.81, 'stmp_10cm': 21.22, 'stmp_20cm': 20.87, 'stmp_50cm': 20.42, 'smst_05cm': 0.216, 'smst_10cm': 0.148, 'smst_20cm': 0.127, 'smst_50cm': 0.251, 'volt': 13.1, 'rpet': None, 'id': 7356}, 
-                      {'year': 2019, 'day': 230, 'hour': 13, 'rpt_time': 1300, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(13, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 2.286, 'lws0_pwet': 1.0, 'lws1_pwet': None, 'wspd': 3.459, 'wdir': 140.5, 'wstdv': 17.55, 'wspd_max': 7.2, 'wspd_maxt': 1232, 'srad': 203.3628, 'stmp_05cm': 21.39, 'stmp_10cm': 21.29, 'stmp_20cm': 20.96, 'stmp_50cm': 20.4, 'smst_05cm': 0.26, 'smst_10cm': 0.15, 'smst_20cm': 0.127, 'smst_50cm': 0.251, 'volt': 13.18, 'rpet': None, 'id': 7357},
-                      {'year': 2019, 'day': 230, 'hour': 14, 'rpt_time': 1400, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(14, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 0.0, 'lws0_pwet': 0.456, 'lws1_pwet': None, 'wspd': 4.169, 'wdir': 148.0, 'wstdv': 21.19, 'wspd_max': 7.7, 'wspd_maxt': 1345, 'srad': 1628.859, 'stmp_05cm': 21.22, 'stmp_10cm': 21.16, 'stmp_20cm': 20.99, 'stmp_50cm': 20.38, 'smst_05cm': 0.266, 'smst_10cm': 0.153, 'smst_20cm': 0.127, 'smst_50cm': 0.251, 'volt': 13.3, 'rpet': None, 'id': 7358}, 
-                      {'year': 2019, 'day': 230, 'hour': 15, 'rpt_time': 1500, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(15, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 2.271, 'wdir': 195.8, 'wstdv': 29.08, 'wspd_max': 5.2, 'wspd_maxt': 1417, 'srad': 1986.219, 'stmp_05cm': 21.93, 'stmp_10cm': 21.25, 'stmp_20cm': 20.98, 'stmp_50cm': 20.36, 'smst_05cm': 0.264, 'smst_10cm': 0.156, 'smst_20cm': 0.127, 'smst_50cm': 0.25, 'volt': 13.2, 'rpet': None, 'id': 7359}, 
-                      {'year': 2019, 'day': 230, 'hour': 16, 'rpt_time': 1600, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(16, 0), 'atmp': None, 'relh': None, 'dwpt': None, 'pcpn': 0.0, 'lws0_pwet': 0.0, 'lws1_pwet': None, 'wspd': 3.282, 'wdir': 219.2, 'wstdv': 22.28, 'wspd_max': 8.7, 'wspd_maxt': 1553, 'srad': 1625.044, 'stmp_05cm': 22.79, 'stmp_10cm': 21.68, 'stmp_20cm': 21.03, 'stmp_50cm': 20.36, 'smst_05cm': 0.261, 'smst_10cm': 0.16, 'smst_20cm': 0.128, 'smst_50cm': 0.25, 'volt': 13.19, 'rpet': None, 'id': 7360}]
-    rtma_records = [{'year': 2019, 'day': 230, 'hour': 12, 'rpt_time': 1200, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(12, 0), 'atmp': 19.42, 'relh': 97.43, 'dwpt': 19.0, 'pcpn': 1.4, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 1.461, 'wdir': 260.4, 'wspd_max': 7.777, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5706}, 
-                    {'year': 2019, 'day': 230, 'hour': 13, 'rpt_time': 1300, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(13, 0), 'atmp': 19.89, 'relh': 96.24, 'dwpt': 19.27, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 4.955, 'wdir': 169.5, 'wspd_max': 7.86, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5708}, 
-                    {'year': 2019, 'day': 230, 'hour': 14, 'rpt_time': 1400, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(14, 0), 'atmp': 22.45, 'relh': 80.08, 'dwpt': 18.83, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 2.897, 'wdir': 167.5, 'wspd_max': 8.383, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5710}, 
-                    {'year': 2019, 'day': 230, 'hour': 15, 'rpt_time': 1500, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(15, 0), 'atmp': 24.92, 'relh': 68.84, 'dwpt': 18.79, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 3.826, 'wdir': 231.2, 'wspd_max': 6.897, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5712}, 
-                    {'year': 2019, 'day': 230, 'hour': 16, 'rpt_time': 1600, 'date': datetime.date(2019, 8, 18), 'time': datetime.time(16, 0), 'atmp': 24.56, 'relh': 70.21, 'dwpt': 18.76, 'pcpn': 0.0, 'lws0_pwet': None, 'lws1_pwet': None, 'wspd': 6.474, 'wdir': 243.1, 'wspd_max': 10.74, 'srad': None, 'stmp_05cm': None, 'stmp_10cm': None, 'stmp_20cm': None, 'stmp_50cm': None, 'smst_05cm': None, 'smst_10cm': None, 'smst_20cm': None, 'smst_50cm': None, 'rpet': None, 'id': 5714}]
+    clean_records = []
+    datetime_list = generate_list_of_hours(begin_date, end_date)
 
-    # Iterate over records and perform validation and cleaning
-    for record in mawndb_records:
-        # Combine the date and time parts of the record to form a single datetime object
-        combined_date = combined_datetime(record)
+    for dt in datetime_list:
+        matching_mawn_record = None
+        matching_rtma_record = None
 
-        # Define the list of ID columns to be used for creating the MAWN source record
-        id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
-
-        # Create the initial MAWN source record using the record data, combined datetime, and ID columns
-        mawnsrc_record = creating_mawnsrc_record(record, combined_date, id_col_list)
-
-        # Apply relative humidity cap to the MAWN source record using the relative humidity variables
-        mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
-
-        # Find the corresponding RTMA record by matching 'date', 'time', and 'hour'
-        rtma_record = None
-        for rt in rtma_records:
-            if (
-                rt["date"] == record["date"]
-                and rt["time"] == record["time"]
-                and rt["hour"] == record["hour"]
-            ):
-                rtma_record = rt
+        for record in mawndb_records:
+            if record["date"] == dt.date() and record["time"] == dt.time():
+                matching_mawn_record = record
                 break
+            
+        if matching_mawn_record:
+            combined_date = combined_datetime(matching_mawn_record)
+            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
 
-        # If a matching RTMA record is found, replace None values in the MAWN source record with valid values from the RTMA record
-        if rtma_record:
-            rtma_record_with_dwpt = create_rtma_dwpt(rtma_record, combined_date)
-            mawnsrc_record = replace_none_with_rtmarecord(
-                mawnsrc_record, rtma_record_with_dwpt, combined_date
-            )
+            mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list)
+            mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
 
-        # Append the cleaned MAWN source record to the list of clean records
-        clean_records.append(mawnsrc_record)
+            for rtma_record in rtma_records:
+                if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
+                    combined_rtma_date = combined_datetime(rtma_record)
+                    rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
+                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date)
+                    clean_records.append(clean_record)
+                    break
 
-        # Extract the keys of the cleaned record for further processing (e.g., inserting into a database)
-        record_keys = list(mawnsrc_record.keys())
-
-        # Extract the values of the cleaned record for further processing
-        record_vals.append(list(mawnsrc_record.values()))
-
-        # Set the database columns to match the keys of the cleaned record
-        db_columns = record_keys
-
-    # Return all cleaned records
     return clean_records
 
+def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_date: str, end_date: str) -> List[Dict]:
+    """
+    Process and clean the records by utilizing the validation logic.
+   
+    Args:
+    mawn_records: List of records from mawndb.
+    rtma_records: List of records from rtma.
+    begin_date: Start date for the records to process.
+    end_date: End date for the records to process.
+   
+    Returns:
+    List of cleaned records.
+    """
+    clean_records = []
+    datetime_list = generate_list_of_hours(begin_date, end_date)
 
-if __name__ == "__main__":
-    clean_records = main()
-    for record in clean_records:
-        print(f"Clean Record: {record}")
+    # Process each hour in the datetime list
+    for dt in datetime_list:
+        matching_mawn_record = None
+        matching_rtma_record = None
 
-"""
-Create a function to check if the column dwpt exists in an RTMA table.
-If it does have a dwpt column, and the value is None(if the value is not a valid temp), then we 
-calculate it from temp and relh and insert the calculated value into the record we are working with.
-Some tables in RTMA don't have dwpt in them.
+        # Find the matching MAWN record for the current datetime
+        for record in mawndb_records:
+            if record["date"] == dt.date() and record["time"] == dt.time():
+                matching_mawn_record = record
+                break
 
-some logs to check: if an rtma
+        # Process the MAWN record if found
+        if matching_mawn_record:
+            combined_date = combined_datetime(matching_mawn_record)
+            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
 
-"""
+            # Create and validate the MAWN source record
+            mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list)
+            mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
+
+            # Find the matching RTMA record for the same datetime
+            for rtma_record in rtma_records:
+                if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
+                    combined_rtma_date = combined_datetime(rtma_record)
+                    rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
+
+                    # Replace None values in MAWN record with corresponding RTMA values
+                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date)
+                    clean_records.append(clean_record)
+                    break
+        else:
+            # If no MAWN record exists for this datetime, process RTMA records directly
+            for rtma_record in rtma_records:
+                if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
+                    combined_rtma_date = combined_datetime(rtma_record)
+                    rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
+
+                    # Create a MAWN-like source record directly from the RTMA record
+                    mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_rtma_date, id_col_list=[])
+                    mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
+                    clean_records.append(mawnsrc_record)
+                    break
+
+    return clean_records
+
+# Provide the functions needed for external scripts
+__all__ = [
+    "check_value",
+    "combined_datetime",
+    "creating_mawnsrc_record",
+    "relh_cap",
+    "create_rtma_dwpt",
+    "replace_none_with_rtmarecord",
+    "process_records"
+]

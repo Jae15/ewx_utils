@@ -1,16 +1,18 @@
 import logging
 from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 
 def validations_logger():
     # Creating a custom logger
     logger = logging.getLogger(__name__)
 
-    # Creating handlers
+ # Creating handlers
     console_handler = logging.StreamHandler()
-    file_handler = RotatingFileHandler(
-        filename="validation_logs.log", maxBytes=1024, backupCount=3
+    file_handler = TimedRotatingFileHandler(
+        filename="dryrunlogs.log", when="midnight", interval=1, backupCount=7
     )
+
     # time rotating file handler eg 1 per day, can increase max size,
 
     # Setting levels for the handlers
