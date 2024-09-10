@@ -1,56 +1,40 @@
 import sys
 import logging
 from typing import List, Dict, Any
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime, timedelta
+from validation_checks.validation_logsconfig import validations_logger
 
 # Append the path for importing custom modules
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+
 # Import database connection functions
 from db_files.dbconnection import (
-    connect_to_mawndb,
-    connect_to_mawndbqc,
-    connect_to_rtma,
+    connect_to_mawn_dbh11,
+    connect_to_mawnqc_dbh11,
+    connect_to_rtma_dbh11,
+    mawn_dbh11_cursor_connection,
+    mawnqc_dbh11_cursor_connection,
+    rtma_dbh11_cursor_connection,
 )
-from db_files.dbconnection import (
-    mawndb_cursor_connection,
-    mawnqc_cursor_connection,
-    rtma_cursor_connection,
-)
-from validation_logsconfig import validations_logger
 
-# Set up validation logger using validations_logger() function from validation_logsconfig.py
-logger = validations_logger()
-
+# Set up validation logger using TimedRotatingFileHandler
+# Initialize the logger
+my_validation_logger = validations_logger()
 
 def fetch_station_list(cursor, query: str) -> List[Dict[str, Any]]:
-    """
-    Fetches the list of stations from the database.
-
-    Args:
-        cursor: Database cursor.
-        query: SQL query to fetch station names.
-
-    Returns:
-        A list of dictionaries containing station names.
-    """
+    """Fetches the list of stations from the database."""
     cursor.execute(query)
     return cursor.fetchall()
 
-
 def get_db_connections():
-    """
-    Establish connections to the databases and return connection and cursor objects.
-
-    Returns:
-        Tuple of connections and cursors for mawndb, mawndbqc, and rtma.
-    """
-    mawndb_connection = connect_to_mawndb()
-    mawndb_cursor = mawndb_cursor_connection(mawndb_connection)
-    mawndbqc_connection = connect_to_mawndbqc()
-    mawndbqc_cursor = mawnqc_cursor_connection(mawndbqc_connection)
-    rtma_connection = connect_to_rtma()
-    rtma_cursor = rtma_cursor_connection(rtma_connection)
+    """Establish connections to the databases and return connection and cursor objects."""
+    mawndb_connection = connect_to_mawn_dbh11()
+    mawndb_cursor = mawn_dbh11_cursor_connection(mawndb_connection)
+    mawndbqc_connection = connect_to_mawnqc_dbh11()
+    mawndbqc_cursor = mawnqc_dbh11_cursor_connection(mawndbqc_connection)
+    rtma_connection = connect_to_rtma_dbh11()
+    rtma_cursor = rtma_dbh11_cursor_connection(rtma_connection)
     return (
         mawndb_connection,
         mawndb_cursor,
@@ -60,24 +44,19 @@ def get_db_connections():
         rtma_cursor,
     )
 
-
 def close_db_connections(connections: List[Any], cursors: List[Any]):
-    """
-    Close the database connections and cursors.
-
-    Args:
-        connections: List of database connections.
-        cursors: List of database cursors.
-    """
+    """Close the database connections and cursors."""
     for cursor in cursors:
         cursor.close()
     for connection in connections:
         connection.close()
 
+def db_stations(mawndb_station_list, mawndbqc_station_list) -> List[str]:
+    """Get the list of stations that are in both mawndb and mawndbqc."""
+    return [stnqc for stnqc in mawndb_station_list if stnqc in mawndbqc_station_list]
 
 def main():
     try:
-        # SQL queries to obtain a list of station names
         select_stations_query = """SELECT table_name FROM information_schema.tables
                                    WHERE table_schema = 'public' AND table_name like '%hourly'
                                    ORDER BY table_name ASC"""
@@ -114,43 +93,24 @@ def main():
         rtma_station_list = [dict(row)["table_name"] for row in rtma_stations]
 
         # Print RTMA station list
-        logger.debug(f"RTMA stations: {rtma_station_list}")
+        validations_logger.debug(f"RTMA stations: {rtma_station_list}")
 
-        def db_stations() -> List[str]:
-            """
-            Get the list of stations that are in both mawndb and mawndbqc.
-
-            Returns:
-                List of station names.
-            """
-            return [
-                stnqc for stnqc in mawndb_station_list if stnqc in mawndb_station_list
-            ]
-
-        stations_list = db_stations()
-        logger.debug(f"DB Stations: {stations_list}")
+        stations_list = db_stations(mawndb_station_list, mawndbqc_station_list)
+        validations_logger.debug(f"DB Stations: {stations_list}")
 
         def extra_stations() -> List[str]:
-            """
-            Get the list of stations that are in mawndb but not in mawndbqc.
-
-            Returns:
-                List of station names.
-            """
+            """Get the list of stations that are in mawndb but not in mawndbqc."""
             stations_not_in_qc = [
-                stndb
-                for stndb in mawndb_station_list
-                if stndb not in mawndbqc_station_list
+                stndb for stndb in mawndb_station_list if stndb not in mawndbqc_station_list
             ]
-            logger.debug(f"Stations not in QC: {stations_not_in_qc}")
+            validations_logger.debug(f"Stations not in QC: {stations_not_in_qc}")
             return stations_not_in_qc
 
         extra_stations_list = extra_stations()
-        logger.debug(f"Extra Stations: {extra_stations_list}")
+        validations_logger.debug(f"Extra Stations: {extra_stations_list}")
 
     except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
-
+        validations_logger.error(f"An error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main()

@@ -2,14 +2,14 @@ import sys
 
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from db_files.dbconnection import (
-    connect_to_mawndb,
-    connect_to_mawndbqc,
-    connect_to_rtma,
+    connect_to_mawn_dbh11,
+    connect_to_mawnqc_dbh11,
+    connect_to_rtma_dbh11,
 )
 from db_files.dbconnection import (
-    mawndb_cursor_connection,
-    mawnqc_cursor_connection,
-    rtma_cursor_connection,
+    mawn_dbh11_cursor_connection,
+    mawnqc_dbh11_cursor_connection,
+    rtma_dbh11_cursor_connection,
 )
 from mawnqclogs_config import mawnqcl_logger  # Import the logger configuration
 from validation_checks.mawndbsrc import (
@@ -30,14 +30,14 @@ def create_db_connections():
     """
     logger.info("Creating database connections.")
     try:
-        mawndb_conn = connect_to_mawndb()
-        mawndb_cur = mawndb_cursor_connection(mawndb_conn)
+        mawndb_conn = connect_to_mawn_dbh11()
+        mawndb_cur = mawn_dbh11_cursor_connection(mawndb_conn)
 
-        mawnqc_conn = connect_to_mawndbqc()
-        mawnqc_cur = mawnqc_cursor_connection(mawnqc_conn)
+        mawnqc_conn = connect_to_mawnqc_dbh11()
+        mawnqc_cur = mawnqc_dbh11_cursor_connection(mawnqc_conn)
 
-        rtma_conn = connect_to_rtma()
-        rtma_cur = rtma_cursor_connection(rtma_conn)
+        rtma_conn = connect_to_rtma_dbh11()
+        rtma_cur = rtma_dbh11_cursor_connection(rtma_conn)
 
         logger.info("Database connections created successfully.")
         return (mawndb_conn, mawndb_cur, mawnqc_conn, mawnqc_cur, rtma_conn, rtma_cur)

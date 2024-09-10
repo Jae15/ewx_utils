@@ -7,11 +7,12 @@ def mawndb_classes_logger():
     # Creating a custom logger
     logger = logging.getLogger(__name__)
 
-    # Creatingg handlers
+ # Creating handlers
     console_handler = logging.StreamHandler()
-    file_handler = RotatingFileHandler(
-        filename = "mawndb_classes_logs.logs", maxBytes=1024, backupCount=5
+    file_handler = TimedRotatingFileHandler(
+        filename="dryrunlogs.log", when="midnight", interval=1, backupCount=7
     )
+
 
     # Setting levels for the handlers
     console_handler.setLevel(logging.DEBUG)

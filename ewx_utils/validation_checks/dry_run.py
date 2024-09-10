@@ -1,57 +1,88 @@
 import sys
+import os
 
+# Add the directory containing the `ewx_utils` module to the Python path
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+from .mawndbsrc import process_records
+
+# Import database connection functions
 from db_files.dbconnection import (
-    connect_to_mawndb,
-    connect_to_mawndbqc,
-    connect_to_rtma,
-    connect_to_qctest,
+    connect_to_mawn_dbh11,
+    connect_to_mawn_supercell,
+    connect_to_mawnqc_dbh11,
+    connect_to_mawnqc_supercell,
+    connect_to_mawnqcl,
+    connect_to_rtma_dbh11,
+    connect_to_rtma_supercell,
+    connect_to_mawnqc_test,
 )
+
+# Import database cursor connection functions
 from db_files.dbconnection import (
-    mawndb_cursor_connection,
-    mawnqc_cursor_connection,
-    rtma_cursor_connection,
-    qctest_cursor_connection,
+    mawn_dbh11_cursor_connection,
+    mawn_supercell_cursor_connection,
+    mawnqc_dbh11_cursor_connection,
+    mawnqc_supercell_cursor_connection,
+    mawnqcl_cursor_connection,
+    rtma_dbh11_cursor_connection,
+    rtma_supercell_cursor_connection,
+    mawnqc_test_cursor_connection,
 )
-from dryrunlogs_config import dryrun_logger  # Import the logger configuration
+
+# Import the logger configuration
+from dryrunlogs_config import dryrun_logger
+
+# Import necessary functions from the `mawndbsrc` module
 from validation_checks.mawndbsrc import (
     combined_datetime,
     creating_mawnsrc_record,
     relh_cap,
     replace_none_with_rtmarecord,
+    process_records,
 )
-from variables_list import relh_vars  # Import required variables list
+
+# Import required variables list
+from variables_list import relh_vars
 
 # Initialize the logger
 logger = dryrun_logger()
 
-
 def create_db_connections():
     """
-    Creating and returning database connections and cursors for mawndb, mawndbqc, rtma, and qctest databases.
+    Create and return database connections and cursors for mawndb, mawndbqc, rtma, and qctest databases.
     """
     logger.info("Creating database connections.")
     try:
-        mawndb_conn = connect_to_mawndb()
-        mawndb_cur = mawndb_cursor_connection(mawndb_conn)
+        # Connect to various databases and get cursor objects
+        mawn_dbh11_conn = connect_to_mawn_dbh11()
+        mawn_dbh11_cur = mawn_dbh11_cursor_connection(mawn_dbh11_conn)
 
-        mawnqc_conn = connect_to_mawndbqc()
-        mawnqc_cur = mawnqc_cursor_connection(mawnqc_conn)
+        mawn_supercell_conn = connect_to_mawn_supercell()
+        mawn_supercell_cur = mawn_supercell_cursor_connection(mawn_supercell_conn)
 
-        rtma_conn = connect_to_rtma()
-        rtma_cur = rtma_cursor_connection(rtma_conn)
+        mawnqc_dbh11_conn = connect_to_mawnqc_dbh11()
+        mawnqc_dbh11_cur = mawnqc_dbh11_cursor_connection(mawnqc_dbh11_conn)
 
-        qctest_conn = connect_to_qctest()
-        qctest_cur = qctest_cursor_connection(qctest_conn)
+        mawnqc_supercell_conn = connect_to_mawnqc_supercell()
+        mawnqc_supercell_cur = mawnqc_supercell_cursor_connection(mawnqc_supercell_conn)
+
+        rtma_dbh11_conn = connect_to_rtma_dbh11()
+        rtma_dbh11_cur = rtma_dbh11_cursor_connection(rtma_dbh11_conn)
+
+        rtma_supercell_conn = connect_to_rtma_supercell()
+        rtma_supercell_cur = rtma_supercell_cursor_connection(rtma_supercell_conn)
+
+        qctest_conn = connect_to_mawnqc_test()
+        qctest_cur = mawnqc_test_cursor_connection(qctest_conn)
 
         logger.info("Database connections created successfully.")
         return (
-            mawndb_conn,
-            mawndb_cur,
-            mawnqc_conn,
-            mawnqc_cur,
-            rtma_conn,
-            rtma_cur,
+            mawn_dbh11_conn,
+            mawn_dbh11_cur,
+            mawnqc_dbh11_conn,
+            mawnqc_dbh11_cur,
+            rtma_dbh11_conn,
+            rtma_supercell_cur,
             qctest_conn,
             qctest_cur,
         )
@@ -59,41 +90,24 @@ def create_db_connections():
         logger.error(f"Error creating database connections: {e}")
         raise
 
-
 def fetch_records(cursor, table_name, date):
     """
-    Fetching records from the specified table and date.
-
-    Args:
-        cursor: Database cursor object.
-        table_name: Name of the table to query.
-        date: Date for which records are to be fetched.
-
-    Returns:
-        List of records.
+    Fetch records from the specified table and date.
     """
     query = f"SELECT * FROM {table_name} WHERE date = '{date}'"
     logger.info(f"Executing query: {query}")
     try:
         cursor.execute(query)
         records = cursor.fetchall()
-        logger.info(
-            f"Fetched {len(records)} records from {table_name} for date {date}."
-        )
+        logger.info(f"Fetched {len(records)} records from {table_name} for date {date}.")
         return [dict(record) for record in records]
     except Exception as e:
         logger.error(f"Error fetching records from {table_name} for date {date}: {e}")
         raise
 
-
 def insert_records(cursor, table_name, records):
     """
     Insert records into the specified table.
-
-    Args:
-        cursor: Database cursor object.
-        table_name: Name of the table to insert records into.
-        records: List of records to insert.
     """
     if not records:
         logger.warning(f"No records to insert into {table_name}.")
@@ -110,25 +124,19 @@ def insert_records(cursor, table_name, records):
 
     query = f"INSERT INTO {table_name} ({db_columns}) VALUES ({qc_values})"
     logger.info(f"Constructed INSERT query: {query}")
-    print(f"Instert Query: {query}")
 
     try:
         for record in records:
             record_vals = list(record.values())
-            print(cursor.mogrify(query, record_vals))
             cursor.execute(query, record_vals)
         logger.info(f"Inserted {len(records)} records into {table_name}.")
     except Exception as e:
         logger.error(f"Error inserting records into {table_name}: {e}")
         raise
 
-
 def commit_and_close(conn):
     """
     Commit the transaction and close the database connection.
-
-    Args:
-        conn: Database connection object.
     """
     try:
         conn.commit()
@@ -137,63 +145,6 @@ def commit_and_close(conn):
     except Exception as e:
         logger.error(f"Error committing transaction or closing connection: {e}")
         raise
-
-
-def process_records(mawn_records, rtma_records):
-    """
-    Process and clean the records by utilizing the validation logic.
-
-    Args:
-        mawn_records: List of records from mawndb.
-        rtma_records: List of records from rtma.
-
-    Returns:
-        List of cleaned records.
-    """
-    clean_records = []
-
-    for record in mawn_records:
-        combined_date = combined_datetime(record)
-        id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
-
-        mawnsrc_record = creating_mawnsrc_record(record, combined_date, id_col_list)
-        mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
-
-        rtma_record = None
-        for rt in rtma_records:
-            if (
-                rt["date"] == record["date"]
-                and rt["time"] == record["time"]
-                and rt["hour"] == record["hour"]
-            ):
-                rtma_record = rt
-                break
-
-        if rtma_record:
-            mawnsrc_record = replace_none_with_rtmarecord(
-                mawnsrc_record, rtma_record, combined_date
-            )
-
-        clean_records.append(mawnsrc_record)
-
-        # Finding and inserting missing records from RTMA
-        for rtma_record in rtma_records:
-            if not any(
-                rec["date"] == rtma_record["date"]
-                and rec["time"] == rtma_record["time"]
-                and rec["hour"] == rtma_record["hour"]
-                for rec in mawn_records
-            ):
-                combined_date = combined_datetime(rtma_record)
-                id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
-
-                mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_date, id_col_list)
-                mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
-
-                clean_records.append(mawnsrc_record)
-                
-    return clean_records
-
 
 def main():
     """
@@ -224,22 +175,14 @@ def main():
     # Fetch records from mawndb and rtma
     try:
         mawn_records = fetch_records(mawndb_cur, table_name, date)
-        print(f"Number Mawn_records: {len(mawn_records)}")
         rtma_records = fetch_records(rtma_cur, table_name, date)
-        print(f"Number rtma_records: {len(rtma_records)}")
     except Exception as e:
         logger.critical("Failed to fetch records. Exiting.")
         return
 
-    # Print fetched records
-    #logger.info(f"MAWNDB Records: {mawn_records}")
-    #logger.info(f"RTMA Records: {rtma_records}")
-
     # Process records and get clean_records
     try:
-        clean_records = process_records(
-            mawn_records, rtma_records
-        )  # Process records using the integrated logic
+        clean_records = process_records(mawn_records, rtma_records)
         logger.info(f"Cleaned Records: {clean_records}")
     except Exception as e:
         logger.error(f"Error processing records: {e}")
@@ -247,7 +190,7 @@ def main():
 
     # Insert clean records into qctest
     try:
-        insert_records(qctest_cur, "aetna_hourly", clean_records)
+        insert_records(qctest_cur, table_name, clean_records)
     except Exception as e:
         logger.error("Failed to insert records. Exiting.")
         return
@@ -263,14 +206,16 @@ def main():
 
     logger.info("Main function completed.")
 
-
 if __name__ == "__main__":
     main()
 
+
+
 """
+Pseudo code:
 Remember to think through a function that checks for non-exsitent MAWN records (eg data missing on certain dates) and replaces the missing MAWN records (from those dates)with RTMA records
 to avoid a case of skipping hours like in the case of date = '2023-04-27' with MAWN 22 records in aetna_hourly table
-and 24 records in the RTMA aetna_hourly
+and 24 records in the RTMA aetna_hourly - Done
 
 Check timeloop script for hints. Do you want to loop through date and time in the time loop script rather than the mawn records.
 
@@ -279,6 +224,5 @@ And I can obtain this from the timeloop script...
 
 Thought process: 08/15/2024
 - Create script that examines whether the records retrieved in the dry_run match the qc tables records 
-
 
 """

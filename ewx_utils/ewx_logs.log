@@ -1,0 +1,15 @@
+2024-09-06 14:44:17,887 - ERROR - ewxutils_logsconfig - Function execution completed
+2024-09-06 14:48:11,595 - ERROR - ewxutils_logsconfig - Function execution completed
+2024-09-06 14:49:12,127 - ERROR - ewxutils_logsconfig - An error occurred: 'NoneType' object has no attribute 'cursor'
+2024-09-06 14:50:55,863 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-07'
+    
+2024-09-06 14:50:55,876 - ERROR - ewxutils_logsconfig - Fetched 0 records from aetna_hourly for date range 2023-01-01 to 2023-01-07.
+2024-09-06 14:50:55,877 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-07'
+    
+2024-09-06 14:50:59,217 - ERROR - ewxutils_logsconfig - Fetched 168 records from aetna_hourly for date range 2023-01-01 to 2023-01-07.
+2024-09-06 14:50:59,221 - ERROR - ewxutils_logsconfig - Records found only in supercell database: 168
+2024-09-06 16:03:09,894 - ERROR - ewxutils_logsconfig - Function execution completed
