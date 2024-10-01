@@ -20,7 +20,7 @@ my_dbfiles_logger = dbfiles_logger()
 
 def connect_to_mawn_dbh11():
     """
-    Establishes a connection to the mawndb database.
+    Establishes a connection to the mawndb_dbh11 database.
 
     Returns:
         psycopg2.extensions.connection: Connection object for the mawndb database.
@@ -40,7 +40,7 @@ def connect_to_mawn_dbh11():
 
 def connect_to_mawn_supercell():
     """
-    Establishes a connection to the mawndb database.
+    Establishes a connection to the mawndb_supercell database.
 
     Returns:
         psycopg2.extensions.connection: Connection object for the mawndb database.
@@ -54,14 +54,14 @@ def connect_to_mawn_supercell():
         mawn_supercell_connection.autocommit = False
 
     except OperationalError as e:
-        my_dbfiles_logger.error(f"Error Connecting to Mawn Supercell Database: {e}")
+        my_dbfiles_logger.error(f"Error Connecting to mawn_supercell Database: {e}")
 
     return mawn_supercell_connection
 
 
 def connect_to_mawnqc_dbh11():
     """
-    Establishes a connection to the mawndb_qc database.
+    Establishes a connection to the mawnqc database.
 
     Returns:
         psycopg2.extensions.connection: Connection object for the mawnqc dbh11 database.
@@ -71,7 +71,7 @@ def connect_to_mawnqc_dbh11():
 
     try:
         mawnqc_dbh11_connection = psycopg2.connect(**db_info2)
-        my_dbfiles_logger.info("Successfully connected to mawndb_qc")
+        my_dbfiles_logger.info("Successfully connected to mawnqc")
         mawnqc_dbh11_connection.autocommit = False
 
     except OperationalError as e:
@@ -81,7 +81,7 @@ def connect_to_mawnqc_dbh11():
 
 def connect_to_mawnqc_supercell():
     """
-    Establishes a connection to the mawndb_qc database.
+    Establishes a connection to the mawnqc database.
 
     Returns:
         psycopg2.extensions.connection: Connection object for the mawnqc supercell database.
@@ -91,7 +91,7 @@ def connect_to_mawnqc_supercell():
 
     try:
         mawnqc_supercell_connection = psycopg2.connect(**db_info3)
-        my_dbfiles_logger.info("Successfully connected to mawndb_qc")
+        my_dbfiles_logger.info("Successfully connected to mawnqc")
         mawnqc_supercell_connection.autocommit = False
 
     except OperationalError as e:
@@ -101,7 +101,7 @@ def connect_to_mawnqc_supercell():
 
 def connect_to_rtma_dbh11():
     """
-    Establishes a connection to the rtma database.
+    Establishes a connection to the rtma_dbh11 database.
 
     Returns:
         psycopg2.extensions.connection: Connection object for the rtma database.
@@ -111,11 +111,11 @@ def connect_to_rtma_dbh11():
 
     try:
         rtma_dbh11_connection = psycopg2.connect(**db_info4)
-        my_dbfiles_logger.info("Successfully connected to RTMA Database")
+        my_dbfiles_logger.info("Successfully connected to rtma_dbh11 database")
         rtma_dbh11_connection.autocommit = False
 
     except OperationalError as e:
-        my_dbfiles_logger.error(f"Error Connecting to RTMA dbh11 Database: {e}")
+        my_dbfiles_logger.error(f"Error Connecting to rtma_dbh11 Database: {e}")
 
     return rtma_dbh11_connection
 
@@ -185,7 +185,7 @@ def mawn_dbh11_cursor_connection(mawn_dbh11_connection):
     Establishes a cursor connection for the mawndb database.
 
     Args:
-        mawndb_connection (psycopg2.extensions.connection): Connection object for the mawndb database.
+        mawndb_dbh11_connection (psycopg2.extensions.connection): Connection object for the mawndb database.
 
     Returns:
         psycopg2.extras.RealDictCursor: Cursor object for the mawndb database.
@@ -196,9 +196,9 @@ def mawn_dbh11_cursor_connection(mawn_dbh11_connection):
         )
         my_dbfiles_logger.info("Mawndb dbh11 cursor connection successfully established")
 
-    except (Exception, psycopg2.DatabaseError) as MawnCursorError:
+    except (Exception, psycopg2.DatabaseError) as MawnDbh11CursorError:
         my_dbfiles_logger.error(
-            "Error establishing mawndb cursor connection: %s", MawnCursorError
+            "Error establishing mawndb cursor connection: %s", MawnDbh11CursorError
         )
         raise
 
@@ -230,10 +230,10 @@ def mawn_supercell_cursor_connection(mawn_supercell_connection):
 
 def mawnqc_dbh11_cursor_connection(mawnqc_dbh11_connection):
     """
-    Establishes a cursor connection for the mawndb_qc database.
+    Establishes a cursor connection for the mawnqc database.
 
     Args:
-        mawndbqc_connection (psycopg2.extensions.connection): Connection object for the mawndb_qc database.
+        mawnqc_connection (psycopg2.extensions.connection): Connection object for the mawnqc database.
 
     Returns:
         psycopg2.extras.RealDictCursor: Cursor object for the mawndb_qc database.
@@ -272,7 +272,7 @@ def mawnqc_supercell_cursor_connection(mawnqc_supercell_connection):
         my_dbfiles_logger.error(
             "Error establishing mawnqc dbh11 cursor connection: %s", MawnqcCursorError
         )
-        raise
+        raise                           
     
     return mawnqc_supercell_cursor
 

@@ -1,12 +1,5 @@
-2024-09-05 10:40:46,806 - ERROR - db_files.dbfiles_logs_config - Error connecting to database
-Traceback (most recent call last):
-  File "C:\Users\mwangija\data_file\ewx_utils\ewx_utils\db_files\dbconnection.py", line 93, in connect_to_mawnqc_supercell
-    mawnqc_supercell_connection = psycopg2.connect(**db_info3)
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\mwangija\data_file\ewx_utils\venv\Lib\site-packages\psycopg2\__init__.py", line 122, in connect
-    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-psycopg2.OperationalError: connection to server at "127.0.0.1", port 15501 failed: Connection refused (0x0000274D/10061)
+2024-09-13 13:45:48,051 - ERROR - db_files.dbfiles_logs_config - Error Connecting to Mawn dbh11 Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
 	Is the server running on that host and accepting TCP/IP connections?
 
-2024-09-05 10:40:46,851 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb supercell cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-09-13 13:45:48,067 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
+2024-09-13 13:45:48,067 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'
