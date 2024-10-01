@@ -11,7 +11,7 @@ def config_mawn_dbh11(
     section: str = "mawn_dbh11",
 ) -> dict:
     """
-    Reads database configuration for mawndb from a specified ini file.
+    Reads database configuration credentials for mawndb from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -43,7 +43,7 @@ def config_mawn_supercell(
     section: str = "mawn_supercell",
 ) -> dict:
     """
-    Reads database configuration for mawndb from a specified ini file.
+    Reads database configuration credentials for mawndb from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -57,18 +57,18 @@ def config_mawn_supercell(
     """
     parser = ConfigParser()
     parser.read(filename)
-    db_info = {}
+    db_info1 = {}
 
     if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db_info[param[0]] = param[1]
+        params01 = parser.items(section)
+        for param01 in params01:
+            db_info1[param01[0]] = param01[1]
     else:
         my_dbfiles_logger.error(f"Section {section} not found in the {filename} file")
         raise Exception(f"Section {section} not found in the {filename} file")
 
     my_dbfiles_logger.debug("mawn_supercell login credentials returned successfully")
-    return db_info
+    return db_info1
 
 
 def config_mawnqc_dbh11(
@@ -76,11 +76,11 @@ def config_mawnqc_dbh11(
     section: str = "mawnqc_dbh11",
 ) -> dict:
     """
-    Reads database configuration for mawndb_qcl from a specified ini file.
+    Reads database configuration credentials for mawnqc_dbh11 from the specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawndb_qcl credentials.
+        section (str): Section in the ini file containing mawndbqc credentials.
 
     Returns:
         dict: A dictionary with database configuration credentials.
@@ -93,9 +93,9 @@ def config_mawnqc_dbh11(
     db_info2 = {}
 
     if parser.has_section(section):
-        params01 = parser.items(section)
-        for param01 in params01:
-            db_info2[param01[0]] = param01[1]
+        params02 = parser.items(section)
+        for param02 in params02:
+            db_info2[param02[0]] = param02[1]
     else:
         my_dbfiles_logger.error(
             f"Section {section} is not found in the {filename} file"
@@ -110,7 +110,7 @@ def config_mawnqc_supercell(
     section: str = "mawnqc_supercell",
 ) -> dict:
     """
-    Reads database configuration for mawndb_qcl from a specified ini file.
+    Reads database configuration credentials for mawnqc_supercell from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -124,12 +124,12 @@ def config_mawnqc_supercell(
     """
     parser = ConfigParser()
     parser.read(filename)
-    db_info2 = {}
+    db_info3 = {}
 
     if parser.has_section(section):
-        params01 = parser.items(section)
-        for param01 in params01:
-            db_info2[param01[0]] = param01[1]
+        params03 = parser.items(section)
+        for param03 in params03:
+            db_info3[param03[0]] = param03[1]
     else:
         my_dbfiles_logger.error(
             f"Section {section} is not found in the {filename} file"
@@ -137,14 +137,14 @@ def config_mawnqc_supercell(
         raise Exception(f"Section {section} is not found in the {filename} file")
 
     my_dbfiles_logger.info("mawnqc_supercell login information returned successfully")
-    return db_info2
+    return db_info3
 
 def config_rtma_dbh11(
     filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
     section: str = "rtma_dbh11",
 ) -> dict:
     """
-    Reads database configuration for mawndb_rtma from a specified ini file.
+    Reads database configuration credentials for rtma_dbh11 from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -158,20 +158,20 @@ def config_rtma_dbh11(
     """
     parser = ConfigParser()
     parser.read(filename)
-    db_info3 = {}
+    db_info4 = {}
 
     if parser.has_section(section):
-        params02 = parser.items(section)
-        for param02 in params02:
-            db_info3[param02[0]] = param02[1]
+        params04 = parser.items(section)
+        for param04 in params04:
+            db_info4[param04[0]] = param04[1]
     else:
         my_dbfiles_logger.error(
             f"Section {section} is not found in the {filename} file"
         )
         raise Exception(f"Section {section} is not found in the {filename} file")
 
-    my_dbfiles_logger.info("RTMA dbh11 login credentials returned successfully")
-    return db_info3
+    my_dbfiles_logger.info("rtma_dbh11 login credentials returned successfully")
+    return db_info4
 
 
 def config_rtma_supercell(
@@ -179,7 +179,7 @@ def config_rtma_supercell(
     section: str = "rtma_supercell",
 ) -> dict:
     """
-    Reads database configuration for mawndb_rtma from a specified ini file.
+    Reads database configuration credentials for mawndb_rtma from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -193,12 +193,12 @@ def config_rtma_supercell(
     """
     parser = ConfigParser()
     parser.read(filename)
-    db_info3 = {}
+    db_info5 = {}
 
     if parser.has_section(section):
-        params02 = parser.items(section)
-        for param02 in params02:
-            db_info3[param02[0]] = param02[1]
+        params05 = parser.items(section)
+        for param05 in params05:
+            db_info5[param05[0]] = param05[1]
     else:
         my_dbfiles_logger.error(
             f"Section {section} is not found in the {filename} file"
@@ -206,7 +206,7 @@ def config_rtma_supercell(
         raise Exception(f"Section {section} is not found in the {filename} file")
 
     my_dbfiles_logger.info("RTMA supercell login credentials returned successfully")
-    return db_info3
+    return db_info5
 
 
 def config_mawnqc_test(
@@ -214,7 +214,7 @@ def config_mawnqc_test(
     section: str = "mawnqc_test",
 ) -> dict:
     """
-    Reads database configuration for mawnqc_test from a specified ini file.
+    Reads database configuration credentials for mawnqc_test from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -228,12 +228,12 @@ def config_mawnqc_test(
     """
     parser = ConfigParser()
     parser.read(filename)
-    db_info4 = {}
+    db_info6 = {}
 
     if parser.has_section(section):
-        params03 = parser.items(section)
-        for param03 in params03:
-            db_info4[param03[0]] = param03[1]
+        params06 = parser.items(section)
+        for param06 in params06:
+            db_info6[param06[0]] = param06[1]
     else:
         my_dbfiles_logger.error(
             f"Section {section} is not found in the {filename} file"
@@ -241,14 +241,14 @@ def config_mawnqc_test(
         raise Exception(f"Section {section} is not found in the {filename} file")
 
     my_dbfiles_logger.info("QCTEST login credentials returned successfully")
-    return db_info4
+    return db_info6
 
 def config_mawnqcl(
     filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
     section: str = "mawnqcl",
 ) -> dict:
     """
-    Reads database configuration for mawnqc_test from a specified ini file.
+    Reads database configuration credentials for mawnqc_test from a specified ini file.
 
     Args:
         filename (str): Path to the ini file containing database configurations.
@@ -262,12 +262,12 @@ def config_mawnqcl(
     """
     parser = ConfigParser()
     parser.read(filename)
-    db_info4 = {}
+    db_info7 = {}
 
     if parser.has_section(section):
-        params03 = parser.items(section)
-        for param03 in params03:
-            db_info4[param03[0]] = param03[1]
+        params07 = parser.items(section)
+        for param07 in params07:
+            db_info7[param07[0]] = param07[1]
     else:
         my_dbfiles_logger.error(
             f"Section {section} is not found in the {filename} file"
@@ -275,7 +275,7 @@ def config_mawnqcl(
         raise Exception(f"Section {section} is not found in the {filename} file")
 
     my_dbfiles_logger.info("QCL login credentials returned successfully")
-    return db_info4
+    return db_info7
 
 def main():
     """
