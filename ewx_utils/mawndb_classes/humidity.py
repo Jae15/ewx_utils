@@ -1,7 +1,6 @@
 import sys
 import logging
 from datetime import datetime
-
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 
@@ -76,17 +75,24 @@ class Humidity:
         Returns:
         tuple: (upper limit value, 'RELH_CAP') if in range, (None, None) otherwise.
         """
-        self.logger.debug("Checking if relhPCT value: %s is in range between %s and RELH_CAP: %s",
-                          self.relhPCT,
-                          self.valid_relh_hourly_default[1],
-                          self.RELH_CAP)
-       
-        if self.valid_relh_hourly_default[1] <= self.relhPCT <= self.RELH_CAP:
-            self.logger.debug("relhPCT value: %s is within the range, returning (%s, 'RELH_CAP')",
-                              self.relhPCT, self.RELH_CAP)
-            return (self.RELH_CAP, 'RELH_CAP')
-        else:
-            self.logger.debug("relhPCT value: %s is not within the range, returning (None, None)",
-                              self.relhPCT)
-            return (None, None)
+        # Checking if the humidity value is below the minimum threshold
+        if self.relhPCT < 0:
+            self.logger.debug("relhPCT value: %s is below 0, returning (0, 'RELH_CAP')", self.relhPCT)
+            return (0, 'RELH_CAP')  # Cap at 0%
 
+        # Checking if the humidity value is within the capped range
+        if 100 <= self.relhPCT <= self.RELH_CAP:
+            self.logger.debug("relhPCT value: %s is within the range, returning (100, 'RELH_CAP')",
+                            self.relhPCT, self.RELH_CAP)
+            return (100, 'RELH_CAP')
+
+        # Checking if the humidity value is above the maximum threshold
+        elif self.relhPCT > self.RELH_CAP:
+            self.logger.debug("relhPCT value: %s is above RELH_CAP, returning None", self.relhPCT)
+            return None  # Return None for values above 105
+
+        # Return the actual value for valid humidity below 100
+        self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'RELH')", self.relhPCT)
+        return (self.relhPCT, 'RELH')
+    
+ 

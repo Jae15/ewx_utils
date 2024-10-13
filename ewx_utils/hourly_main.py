@@ -1,9 +1,3 @@
-import psycopg2
-import os
-import sys
-import time
-import shutil
-import getopt
 import datetime as datetime
 import pprint
 import argparse
@@ -14,60 +8,63 @@ from datetime import datetime, timedelta
 from datetime import date, time
 from psycopg2 import OperationalError
 from db_files.dbconnection import (
-    connect_to_mawn_dbh11,
-    connect_to_mawn_supercell,
-    connect_to_mawnqc_dbh11,
-    connect_to_mawnqc_supercell,
-    connect_to_mawnqcl,
-    connect_to_rtma_dbh11,
-    connect_to_rtma_supercell,
-    connect_to_mawnqc_test,
-    mawn_dbh11_cursor_connection,
-    mawn_supercell_cursor_connection,
-    mawnqc_dbh11_cursor_connection,
-    mawnqc_supercell_cursor_connection,
-    mawnqcl_cursor_connection,
-    rtma_dbh11_cursor_connection,
-    rtma_supercell_cursor_connection,
-    mawnqc_test_cursor_connection,
+    connect_to_mawn_dbh11, connect_to_mawn_supercell,
+    connect_to_mawnqc_dbh11, connect_to_mawnqc_supercell,
+    connect_to_mawnqcl, connect_to_rtma_dbh11,
+    connect_to_rtma_supercell, connect_to_mawnqc_test,
+    mawn_dbh11_cursor_connection, mawn_supercell_cursor_connection,
+    mawnqc_dbh11_cursor_connection, mawnqc_supercell_cursor_connection,
+    mawnqcl_cursor_connection, rtma_dbh11_cursor_connection,
+    rtma_supercell_cursor_connection, mawnqc_test_cursor_connection
 )
-from validation_checks.timeloop import generate_list_of_hours
 from validation_checks.mawndbsrc import process_records
 from ewxutils_logsconfig import ewx_utils_logger
 
 # Initialize the logger
+
 my_logger = ewx_utils_logger()
 
-def create_db_connections():
+# Function to create necessary database connections based on user-specified arguments
+def create_db_connections(args):
     """
-    Create and return database connections and cursors for mawndb, mawndbqc, rtma, and qctest databases.
+    Creating and returning only the necessary database connections and cursors for mawndb, rtma, qctest, etc.,
+    based on the user-specified arguments.
     """
-    my_logger.error("Creating database connections.")
+    my_logger.info("Creating only necessary database connections.")
     connections = {}
+
     try:
-        # Connect to various databases and get cursor objects
-        connections['mawn_dbh11_connection'] = connect_to_mawn_dbh11()
-        connections['mawn_dbh11_cursor'] = mawn_dbh11_cursor_connection(connections['mawn_dbh11_connection'])
+        # Connect to mawn database only if it's specified
+        if args.mawn == 'mawn:dbh11':
+            my_logger.info("Connecting to MAWN database (dbh11).")
+            connections['mawn_dbh11_connection'] = connect_to_mawn_dbh11()
+            connections['mawn_dbh11_cursor'] = mawn_dbh11_cursor_connection(connections['mawn_dbh11_connection'])
 
-        connections['mawn_supercell_connection'] = connect_to_mawn_supercell()
-        connections['mawn_supercell_cursor'] = mawn_supercell_cursor_connection(connections['mawn_supercell_connection'])
+        # Connect to rtma database only if it's specified
+        if args.rtma == 'rtma:dbh11':
+            my_logger.info("Connecting to RTMA database (dbh11).")
+            connections['rtma_dbh11_connection'] = connect_to_rtma_dbh11()
+            connections['rtma_dbh11_cursor'] = rtma_dbh11_cursor_connection(connections['rtma_dbh11_connection'])
 
-        connections['mawnqc_dbh11_connection'] = connect_to_mawnqc_dbh11()
-        connections['mawnqc_dbh11_cursor'] = mawnqc_dbh11_cursor_connection(connections['mawnqc_dbh11_connection'])
+        # Connect to the appropriate QC database based on the args.qcwrite value
+        if args.qcwrite == 'mawnqc_test:local':
+            my_logger.info("Connecting to QC Test database (local).")
+            connections['qctest_connection'] = connect_to_mawnqc_test()
+            connections['qctest_cursor'] = mawnqc_test_cursor_connection(connections['qctest_connection'])
+        elif args.qcwrite == 'mawnqcl:local':
+            my_logger.info("Connecting to MAWNQCL database (local).")
+            connections['mawnqcl_connection'] = connect_to_mawnqcl()
+            connections['mawnqcl_cursor'] = mawnqcl_cursor_connection(connections['mawnqcl_connection'])
+        elif args.qcwrite == 'mawnqc:dbh11':
+            my_logger.info("Connecting to MAWNQC DBH11 database.")
+            connections['mawnqc_dbh11_connection'] = connect_to_mawnqc_dbh11()
+            connections['mawnqc_dbh11_cursor'] = mawnqc_dbh11_cursor_connection(connections['mawnqc_dbh11_connection'])
+        elif args.qcwrite == 'mawnqc:supercell':
+            my_logger.info("Connecting to MAWNQC Supercell database.")
+            connections['mawnqc_supercell_connection'] = connect_to_mawnqc_supercell()
+            connections['mawnqc_supercell_cursor'] = mawnqc_supercell_cursor_connection(connections['mawnqc_supercell_connection'])
 
-        connections['mawnqc_supercell_connection'] = connect_to_mawnqc_supercell()
-        connections['mawnqc_supercell_cursor'] = mawnqc_supercell_cursor_connection(connections['mawnqc_supercell_connection'])
-
-        connections['rtma_dbh11_connection'] = connect_to_rtma_dbh11()
-        connections['rtma_dbh11_cursor'] = rtma_dbh11_cursor_connection(connections['rtma_dbh11_connection'])
-
-        connections['rtma_supercell_connection'] = connect_to_rtma_supercell()
-        connections['rtma_supercell_cursor'] = rtma_supercell_cursor_connection(connections['rtma_supercell_connection'])
-
-        connections['qctest_connection'] = connect_to_mawnqc_test()
-        connections['qctest_cursor'] = mawnqc_test_cursor_connection(connections['qctest_connection'])
-
-        my_logger.error("Database connections created successfully.")
+        my_logger.info("Database connections created successfully based on the required databases.")
         return connections
 
     except OperationalError as e:
@@ -78,6 +75,7 @@ def create_db_connections():
         my_logger.error(f"Unexpected error: {e}")
         close_connections(connections)
         raise
+
 
 def close_connections(connections):
     """
@@ -109,53 +107,129 @@ def commit_and_close(connection):
 
 def fetch_records(cursor, station, begin_date, end_date):
     """
-    Fetch records from the specified table and date.
+    Fetch records from the specified station between begin_date and end_date.
     """
-    query = f"SELECT * FROM {station} WHERE date BETWEEN '{begin_date}' AND '{end_date}'"
-    my_logger.info(f"Executing query: {query}")
+    query = f"SELECT * FROM {station} WHERE date BETWEEN %s AND %s"
+    my_logger.error(f"Executing query: {query} with parameters: {begin_date}, {end_date}")
     try:
-        cursor.execute(query)
+        cursor.execute(query, (begin_date, end_date))
         records = cursor.fetchall()
-        my_logger.info(f"Fetched {len(records)} records from {station} for date range {begin_date} to {end_date}.")
+        my_logger.error(f"Fetched {len(records)} records from {station}.")
         return [dict(record) for record in records]
     except Exception as e:
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
+
+def get_insert_table_columns(cursor, station):
+    """
+    Fetch column names of the specified table and log them.
+    """
+    query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = 'public' "
+    try:
+        if cursor is None:
+            my_logger.error("Cursor is not valid.")
+            return []
+
+        cursor.execute(query, (station,))
+        columns = cursor.fetchall()
+        #print(columns)
+
+        if not columns:
+            my_logger.warning(f"No columns found for table {station}.")
+            return []
+
+        # Creating a list of column names and logging them
+        columns_list = [row['column_name'] for row in columns]
+        my_logger.info(f"Fetched columns for table {station}: {columns_list}")
+
+        # Print and/ log the retrieved QC columns for verification
+        #print("QC Columns:", columns_list)  
+        my_logger.info(f"QC Columns retrieved: {columns_list}")
+
+        return columns_list
+
+    except Exception as e:
+        my_logger.error(f"Error fetching columns for table {station}: {e}")
+        raise
+
+
+def filter_records_by_columns(records, qc_columns):
+    """
+    Filter the records to only include the QC columns.
+    """
+    if not qc_columns:
+        my_logger.error("No QC columns provided for filtering.")
+        return []
+
+    filtered_records = [
+        {k: v for k, v in record.items() if k in qc_columns}
+        for record in records
+    ]
+    #print(filtered_records)
+    
+    my_logger.info(f"Filtered records to include columns: {qc_columns}")
+    return filtered_records
+
+
 def insert_records(cursor, station, records):
     """
-    Insert records into the specified table.
+    Insert records into the specified table, filtered by the table's columns.
     """
     if not records:
-        my_logger.warning(f"No records to insert into {station}.")
+        my_logger.error(f"No records to insert into {station}.")
         return
 
     try:
-        record_keys = list(records[0].keys())
+        # Fetch allowed columns for the insert table
+        qc_columns = get_insert_table_columns(cursor, station)
+
+        if not qc_columns:
+            my_logger.error(f"No valid columns found for table {station}. Cannot proceed with insert.")
+            return
+
+        # Filter the records by the allowed columns
+        filtered_records = filter_records_by_columns(records, qc_columns)
+        my_logger.info(f"Filtered Records: {filtered_records}")
+
+        if not filtered_records:
+            my_logger.error(f"No valid columns to insert after filtering for table {station}.")
+            return
+
+        # Use the first filtered record to get column names
+        record_keys = list(filtered_records[0].keys())
+        my_logger.info(f"Record Keys: {record_keys}")
+
+        if not record_keys:
+            my_logger.error(f"No keys found in the filtered records for {station}.")
+            return
+
     except (IndexError, AttributeError, KeyError) as e:
         my_logger.error(f"Error accessing record keys: {e}")
         return
 
+    # Prepare the INSERT query using only the filtered columns
     db_columns = ", ".join(record_keys)
     qc_values = ", ".join(["%s"] * len(record_keys))
     query = f"INSERT INTO {station} ({db_columns}) VALUES ({qc_values})"
-    my_logger.info(f"Constructed INSERT query: {query}")
 
+    my_logger.error(f"Constructed INSERT query: {query}")
+    
     try:
-        for record in records:
-            record_vals = list(record.values())
+        for record in filtered_records:
+            record_vals = [record[key] for key in record_keys]
             cursor.execute(query, record_vals)
-        my_logger.info(f"Inserted {len(records)} records into {station}.")
+        my_logger.error(f"Inserted {len(filtered_records)} records into {station}.")
     except Exception as e:
         my_logger.error(f"Error inserting records into {station}: {e}")
         raise
+
 
 def time_defaults(user_begin_date: str, user_end_date: str):
     """
     Set default begin and end dates if not provided, and ensure the dates are returned as strings.
     """
     try:
-        # Default begin_date is 7 days ago if not provided
         if user_begin_date is None:
             user_begin_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
         else:
@@ -175,14 +249,15 @@ def time_defaults(user_begin_date: str, user_end_date: str):
 
     except ValueError as ve:
         my_logger.error(f"ValueError occurred: {ve}")
-        print("ValueError:", ve)
+        #print("ValueError:", ve)
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
-        print("An error occurred:", e)
+        #print("An error occurred:", e)
     finally:
         my_logger.info("time_defaults function execution completed.")
 
 def main():
+    # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog='hourly_main',
         description='Checks data from hourly_main in mawndb_qc and adds estimates from RTMA or fivemin data as needed',
@@ -215,36 +290,43 @@ def main():
     # Parse and set date ranges
     begin_date, end_date = time_defaults(args.begin, args.end)
 
-    # Establish database connections
-    db_connections = create_db_connections()
+    # Establish only necessary database connections based on args
+    db_connections = create_db_connections(args)
 
     try:
-        if args.mawn == 'mawn:dbh11':
-            mawn_cursor = db_connections["mawn_dbh11_cursor"]
-        if args.rtma == 'rtma:dbh11':
-            rtma_cursor = db_connections["rtma_dbh11_cursor"]
-        if args.qcwrite == 'mawnqc_test:local':
-            qctest_cursor = db_connections["qctest_cursor"]
+        # Use the necessary connections and cursors based on what is required
+        mawn_cursor = db_connections.get('mawn_dbh11_cursor')
+        rtma_cursor = db_connections.get('rtma_dbh11_cursor')
+        qc_cursor = db_connections.get('qctest_cursor') or db_connections.get('mawnqcl_cursor') or \
+                    db_connections.get('mawnqc_dbh11_cursor') or db_connections.get('mawnqc_supercell_cursor')
 
-        for station in args.stations:
-            mawn_records = fetch_records(mawn_cursor, station, begin_date, end_date)
-            rtma_records = fetch_records(rtma_cursor, station, begin_date, end_date)
+        # Process records for the specified stations
+        if args.all:
+            stations = get_all_stations()  # Fetch all station names
+        else:
+            stations = args.stations
 
+        for station in stations:
+            mawn_records = fetch_records(mawn_cursor, station, begin_date, end_date) if mawn_cursor else []
+            rtma_records = fetch_records(rtma_cursor, station, begin_date, end_date) if rtma_cursor else []
+
+            # Process and clean the records
             cleaned_records = process_records(mawn_records, rtma_records, begin_date, end_date)
 
-            if args.execute:
-                insert_records(qctest_cursor, station, cleaned_records)
+            # Insert cleaned records if execution mode is set
+            if args.execute and qc_cursor:
+                insert_records(qc_cursor, station, cleaned_records)
 
     finally:
-        # Commit and close the connections
-        commit_and_close(db_connections["mawn_dbh11_connection"])
-        commit_and_close(db_connections["rtma_dbh11_connection"])
-        commit_and_close(db_connections["mawnqc_dbh11_connection"])
-        commit_and_close(db_connections["qctest_connection"])
+        # Commit and close only the open connections
+        for conn_key, conn in db_connections.items():
+            if 'connection' in conn_key:
+                commit_and_close(conn)
         close_connections(db_connections)
 
 if __name__ == "__main__":
     main()
+
 
 """
 python hourly_main.py --begin 2023-1-1 --end 2023-1-7 --station aetna_hourly -x

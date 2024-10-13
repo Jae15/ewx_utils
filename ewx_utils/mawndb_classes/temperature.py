@@ -2,7 +2,6 @@ import sys
 import logging
 from datetime import datetime
 
-# Assuming mawndb_classes_logger is correctly configured elsewhere
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 

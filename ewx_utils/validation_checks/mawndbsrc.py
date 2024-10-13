@@ -18,6 +18,7 @@ from .variables_list import (
     wdir_vars,
     leafwt_vars,
     dwpt_vars,
+    vapr_vars
 )
 from mawndb_classes.humidity import Humidity
 from mawndb_classes.dew_point import DewPoint
@@ -28,6 +29,7 @@ from mawndb_classes.precipitation import Precipitation
 from mawndb_classes.winddirection import WindDirection
 from mawndb_classes.evapotranspiration import Evapotranspiration
 from mawndb_classes.dew_point import DewPoint
+from mawndb_classes.vapor_pressure import VaporPressure
 from typing import List, Dict, Tuple
 from .validation_logsconfig import validations_logger
 from .timeloop import generate_list_of_hours
@@ -51,6 +53,10 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         return rh.is_in_range() and rh.is_valid()
     if k in pcpn_vars:
         pn = Precipitation(v, "hourly", "MM", d)
+        #print(pn.is_valid())
+        #print(pn.pcpnMM)
+        #print(pn.pcpnMM + pn.is_valid())
+
         return pn.is_valid()
     if k in rpet_vars:
         rp = Evapotranspiration(v, "hourly", "MM", d)
@@ -70,6 +76,9 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     if k in dwpt_vars:
         dp = Temperature(v,"C", d)
         return dp.is_valid()
+    if k in vapr_vars:
+        vp = VaporPressure(v, "hourly", d)
+        return vp.is_valid()
     return True
 
 
@@ -225,54 +234,13 @@ def one_rtma_record(rtma_records: list) -> list:
 def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_date: str, end_date: str) -> List[Dict]:
     """
     Process and clean the records by utilizing the validation logic.
-    
-    Args:
-    mawn_records: List of records from mawndb.
-    rtma_records: List of records from rtma.
-    
-    Returns:
-    List of cleaned records.
-    
-    """
-    clean_records = []
-    datetime_list = generate_list_of_hours(begin_date, end_date)
 
-    for dt in datetime_list:
-        matching_mawn_record = None
-        matching_rtma_record = None
-
-        for record in mawndb_records:
-            if record["date"] == dt.date() and record["time"] == dt.time():
-                matching_mawn_record = record
-                break
-            
-        if matching_mawn_record:
-            combined_date = combined_datetime(matching_mawn_record)
-            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
-
-            mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list)
-            mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
-
-            for rtma_record in rtma_records:
-                if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
-                    combined_rtma_date = combined_datetime(rtma_record)
-                    rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
-                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date)
-                    clean_records.append(clean_record)
-                    break
-
-    return clean_records
-
-def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_date: str, end_date: str) -> List[Dict]:
-    """
-    Process and clean the records by utilizing the validation logic.
-   
     Args:
     mawn_records: List of records from mawndb.
     rtma_records: List of records from rtma.
     begin_date: Start date for the records to process.
     end_date: End date for the records to process.
-   
+
     Returns:
     List of cleaned records.
     """
@@ -302,6 +270,7 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
             # Find the matching RTMA record for the same datetime
             for rtma_record in rtma_records:
                 if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
+                    matching_rtma_record = rtma_record
                     combined_rtma_date = combined_datetime(rtma_record)
                     rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
 
@@ -309,6 +278,11 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
                     clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date)
                     clean_records.append(clean_record)
                     break
+
+            # If no matching RTMA record is found, keep the MAWN record as is
+            if not matching_rtma_record:
+                clean_records.append(mawnsrc_record)
+
         else:
             # If no MAWN record exists for this datetime, process RTMA records directly
             for rtma_record in rtma_records:

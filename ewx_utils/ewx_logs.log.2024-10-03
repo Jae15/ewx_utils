@@ -1,0 +1,712 @@
+2024-10-03 09:40:59,995 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 09:41:00,013 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 09:41:00,015 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 09:41:00,186 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 09:41:00,188 - ERROR - ewxutils_logsconfig - Mismatched records: 48
+2024-10-03 09:41:00,189 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,191 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,191 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,192 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,192 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,193 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,193 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,194 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,194 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,195 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,195 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,196 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,196 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,196 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,197 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,197 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,197 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,198 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,199 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,199 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,199 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,200 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,201 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,203 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,203 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,203 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,203 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,203 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,204 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,204 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,204 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,205 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,205 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,205 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,206 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,206 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,207 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,207 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,207 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,207 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,208 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,208 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,208 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,208 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,208 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,209 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,210 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,210 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,210 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,211 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,211 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,212 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,212 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,212 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,213 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,213 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,213 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,213 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,214 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,214 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,214 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,214 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,214 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,215 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,215 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,216 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,216 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,217 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,218 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,219 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,219 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,219 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,220 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,220 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,221 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,221 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,222 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,222 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,222 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,223 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,223 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,223 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,223 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,224 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,224 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,225 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,226 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,226 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,227 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,228 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,228 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,228 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,230 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,230 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:41:00,231 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:41:00,231 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:15,792 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 09:45:15,807 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 09:45:15,808 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 09:45:16,040 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 09:45:16,041 - ERROR - ewxutils_logsconfig - Mismatched records: 48
+2024-10-03 09:45:16,042 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,054 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,074 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,085 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,100 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,114 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,126 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,141 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,152 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,161 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,177 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,193 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,206 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,215 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,222 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,230 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,238 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,247 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,255 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,265 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,275 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,281 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,291 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,302 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,314 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,325 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,336 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,345 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,353 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,360 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,368 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,376 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,384 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,393 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,400 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,407 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,413 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,421 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,429 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,436 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,443 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,450 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,458 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,466 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,473 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,483 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,490 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,497 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,504 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,512 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,519 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,526 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,545 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,560 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,573 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,586 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,599 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,607 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,615 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,622 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,628 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,635 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,643 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,651 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,660 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,667 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,675 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,683 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,692 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,700 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,710 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,718 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,725 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,735 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,743 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,750 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,757 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,766 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,772 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,779 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,786 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,793 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,801 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,813 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,821 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,828 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,836 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,844 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,852 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,861 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,868 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,876 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,882 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,891 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 09:45:16,901 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 09:45:16,909 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:21:44,683 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:21:44,701 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:21:44,703 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:21:45,006 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:21:45,019 - ERROR - ewxutils_logsconfig - An error occurred: 'wspd_maxt'
+2024-10-03 11:22:08,910 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:22:08,925 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:22:08,926 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:22:09,351 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:22:09,352 - ERROR - ewxutils_logsconfig - An error occurred: 'wspd_maxt'
+2024-10-03 11:26:00,800 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:26:00,820 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:26:00,823 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:26:00,998 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:26:01,001 - ERROR - ewxutils_logsconfig - An error occurred: list.append() takes exactly one argument (3 given)
+2024-10-03 11:27:54,273 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:27:54,291 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:27:54,296 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:27:54,433 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:27:54,435 - ERROR - ewxutils_logsconfig - Mismatched records: 48
+2024-10-03 11:27:54,435 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,445 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,473 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,475 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,494 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,504 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,504 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,512 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,517 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,518 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,525 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,532 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,532 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,547 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,554 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,555 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,564 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,571 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,571 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,578 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,583 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,584 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,589 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,594 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,595 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,601 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,607 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,608 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,613 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,617 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,617 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,621 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,626 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,626 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,632 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,637 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,637 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,641 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,648 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,648 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,654 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,659 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,660 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,667 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,675 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,675 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,681 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,688 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,688 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,694 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,698 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,700 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,706 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,712 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,712 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,716 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,725 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,725 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,730 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,735 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,737 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,740 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,747 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,748 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,753 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,756 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,757 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,765 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,771 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,771 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,779 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,786 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,787 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,791 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,796 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,797 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,800 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,807 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,808 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,813 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,816 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,817 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,821 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,826 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,827 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,831 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,836 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,837 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,840 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,849 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,849 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,854 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,859 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,859 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,865 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,869 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,870 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,876 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,881 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,882 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,887 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,892 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,893 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,897 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,900 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,901 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,905 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,909 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,909 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,914 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,918 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,918 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,922 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,927 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,927 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,931 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,935 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,936 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,940 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,945 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,946 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,950 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,955 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,955 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,959 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,963 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,963 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,966 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,970 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,971 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,976 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,979 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,980 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,984 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,989 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,989 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:54,993 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:54,997 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:54,997 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:55,001 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:55,006 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:27:55,006 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:27:55,036 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:27:55,044 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:03,811 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:31:03,826 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:31:03,828 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:31:03,973 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:31:03,975 - ERROR - ewxutils_logsconfig - Mismatched records: 48
+2024-10-03 11:31:03,975 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:03,990 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,023 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,024 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,050 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,088 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,089 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,130 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,163 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,166 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,183 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,201 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,203 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,220 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,244 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,245 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,269 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,284 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,286 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,301 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,318 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,319 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,338 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,353 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,355 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,374 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,389 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,390 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,403 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,412 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,413 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,422 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,433 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,433 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,445 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,459 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,460 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,480 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,490 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,491 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,503 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,513 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,514 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,523 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,534 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,535 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,548 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,558 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,559 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,571 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,580 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,581 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,591 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,607 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,609 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,621 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,637 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,639 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,658 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,679 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,680 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,696 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,714 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,715 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,731 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,748 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,749 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,768 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,785 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,786 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,802 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,818 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,820 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,839 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,854 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,855 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,871 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,883 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,885 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,901 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,921 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,922 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,941 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,957 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,958 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:04,979 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:04,998 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:04,999 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,011 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,021 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,023 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,032 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,041 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,043 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,053 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,061 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,063 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,071 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,079 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,080 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,096 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,107 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,108 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,118 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,127 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,127 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,137 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,148 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,149 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,167 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,181 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,181 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,196 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,214 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,215 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,231 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,247 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,249 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,271 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,289 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,290 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,312 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,328 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,329 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,342 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,351 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,353 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,361 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,369 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,369 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,380 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,387 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,388 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,397 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,405 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,406 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,416 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,426 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,427 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,438 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,450 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:05,451 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:05,462 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:05,471 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:09,817 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:31:09,830 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:31:09,831 - ERROR - ewxutils_logsconfig - Executing query: 
+    SELECT * FROM aetna_hourly 
+    WHERE date BETWEEN '2023-01-01' AND '2023-01-02'
+    
+2024-10-03 11:31:09,978 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly for date range 2023-01-01 to 2023-01-02.
+2024-10-03 11:31:09,981 - ERROR - ewxutils_logsconfig - Mismatched records: 48
+2024-10-03 11:31:09,981 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,009 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,031 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,035 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,064 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,092 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,093 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,120 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,138 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,139 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,155 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,171 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,172 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,185 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,198 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,198 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,213 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,226 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,227 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,242 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,260 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,262 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,282 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,303 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,305 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,319 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,337 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,338 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,350 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,367 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,368 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,383 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,391 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,393 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,411 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,424 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,425 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,439 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,451 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,451 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,462 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,471 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,471 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,481 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,489 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,490 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,497 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,505 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,505 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,514 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,523 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,524 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,531 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,541 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,541 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,557 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,567 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,568 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,577 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,586 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,587 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,596 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,607 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,608 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,621 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,638 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,638 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,650 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,664 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,665 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,680 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,693 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,693 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,708 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,721 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,723 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,736 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,749 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,749 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,765 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,788 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,790 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,808 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,824 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,824 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,838 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,852 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,854 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,872 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,889 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,890 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,904 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,920 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,921 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,938 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,955 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,956 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,968 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:10,981 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:10,981 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:10,996 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,010 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,011 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,025 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,041 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,042 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,064 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,073 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,073 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,090 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,101 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,102 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,113 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,125 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,126 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,141 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,155 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,155 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,169 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,182 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,183 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,196 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,212 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,213 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,231 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,247 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,247 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,259 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,273 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,274 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,289 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,303 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,305 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,324 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,340 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,341 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,356 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,367 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,369 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,381 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,399 - ERROR - ewxutils_logsconfig - Details: 
+2024-10-03 11:31:11,399 - ERROR - ewxutils_logsconfig - Test Record:
+2024-10-03 11:31:11,407 - ERROR - ewxutils_logsconfig - Supercell Record:
+2024-10-03 11:31:11,414 - ERROR - ewxutils_logsconfig - Details: 
