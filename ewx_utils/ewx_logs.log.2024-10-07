@@ -1,0 +1,114 @@
+2024-10-07 10:00:18,744 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:00:20,812 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:00:20,812 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:00:20,903 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:00:20,904 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:00:21,000 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:00:21,259 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:00:21,259 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 10:09:28,895 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:09:30,255 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:09:30,256 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:09:30,345 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:09:30,345 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:09:30,451 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:09:30,681 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:09:30,681 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 10:17:45,205 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:17:46,745 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:17:46,745 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:17:46,858 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:17:46,859 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:17:46,956 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:17:47,212 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:17:47,212 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 10:33:08,678 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:33:10,035 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:33:10,036 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:33:10,133 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:33:10,135 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:33:10,226 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:33:10,478 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:33:10,479 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 10:35:07,137 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:35:08,496 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:35:08,497 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:35:08,587 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:35:08,588 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:35:08,678 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:35:08,995 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:35:08,995 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 10:39:20,902 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:39:22,329 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:39:22,330 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:39:22,457 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:39:22,458 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:39:22,556 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:39:22,798 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:39:22,798 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 10:44:35,764 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 10:44:38,148 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 10:44:38,149 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:44:38,240 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 10:44:38,241 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN '2022-04-01' AND '2022-04-02'
+2024-10-07 10:44:38,327 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 10:44:38,575 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 10:44:38,575 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 11:06:35,128 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 11:06:36,555 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 11:06:36,555 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:06:36,701 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 11:06:36,701 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:06:36,797 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 11:06:37,215 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 11:06:37,216 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 11:21:54,942 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 11:21:56,347 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 11:21:56,347 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:21:56,483 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 11:21:56,484 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:21:56,822 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 11:21:57,269 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 11:21:57,269 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 11:39:39,452 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 11:39:40,890 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 11:39:40,890 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:39:41,023 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 11:39:41,024 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:39:41,154 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 11:39:41,586 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 11:39:41,587 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 11:47:33,872 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 11:47:35,642 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 11:47:35,642 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:47:35,819 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 11:47:35,820 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:47:35,966 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 11:47:36,361 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 11:47:36,362 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 11:51:53,888 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 11:51:55,306 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 11:51:55,306 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:51:55,477 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 11:51:55,478 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 11:51:55,609 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 11:51:56,051 - ERROR - ewxutils_logsconfig - Error fetching columns for table aetna_hourly: 0
+2024-10-07 11:51:56,051 - ERROR - ewxutils_logsconfig - Error accessing record keys: 0
+2024-10-07 12:00:48,304 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 12:00:50,090 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 12:00:50,091 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 12:00:50,239 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 12:00:50,240 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 12:00:50,369 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 12:00:50,794 - ERROR - ewxutils_logsconfig - Constructed INSERT query: INSERT INTO aetna_hourly (year, day, hour, rpt_time, date, time, atmp, relh, dwpt, pcpn, lws0_pwet, lws1_pwet, wspd, wdir, wstdv, wspd_max, srad, stmp_05cm, stmp_10cm, stmp_20cm, stmp_50cm, smst_05cm, smst_10cm, smst_20cm, smst_50cm, volt, rpet, id, atmp_src, relh_src, dwpt_src, pcpn_src, lws0_pwet_src, lws1_pwet_src, wspd_src, wdir_src, wstdv_src, wspd_max_src, srad_src, stmp_05cm_src, stmp_10cm_src, stmp_20cm_src, stmp_50cm_src, smst_05cm_src, smst_10cm_src, smst_20cm_src, smst_50cm_src, volt_src, rpet_src) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+2024-10-07 12:00:50,833 - ERROR - ewxutils_logsconfig - Inserted 47 records into aetna_hourly.
+2024-10-07 12:11:24,994 - ERROR - ewxutils_logsconfig - Creating database connections.
+2024-10-07 12:11:26,841 - ERROR - ewxutils_logsconfig - Database connections created successfully.
+2024-10-07 12:11:26,841 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 12:11:27,077 - ERROR - ewxutils_logsconfig - Fetched 48 records from aetna_hourly.
+2024-10-07 12:11:27,081 - ERROR - ewxutils_logsconfig - Executing query: SELECT * FROM aetna_hourly WHERE date BETWEEN %s AND %s with parameters: 2022-04-01, 2022-04-02
+2024-10-07 12:11:27,287 - ERROR - ewxutils_logsconfig - Fetched 47 records from aetna_hourly.
+2024-10-07 12:11:27,706 - ERROR - ewxutils_logsconfig - Constructed INSERT query: INSERT INTO aetna_hourly (year, day, hour, rpt_time, date, time, atmp, relh, dwpt, pcpn, lws0_pwet, lws1_pwet, wspd, wdir, wstdv, wspd_max, srad, stmp_05cm, stmp_10cm, stmp_20cm, stmp_50cm, smst_05cm, smst_10cm, smst_20cm, smst_50cm, volt, rpet, id, atmp_src, relh_src, dwpt_src, pcpn_src, lws0_pwet_src, lws1_pwet_src, wspd_src, wdir_src, wstdv_src, wspd_max_src, srad_src, stmp_05cm_src, stmp_10cm_src, stmp_20cm_src, stmp_50cm_src, smst_05cm_src, smst_10cm_src, smst_20cm_src, smst_50cm_src, volt_src, rpet_src) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+2024-10-07 12:11:27,718 - ERROR - ewxutils_logsconfig - Error inserting records into aetna_hourly: duplicate key value violates unique constraint "aetna_hourly_dttm"
+DETAIL:  Key (date, "time")=(2022-04-01, 00:00:00) already exists.
+

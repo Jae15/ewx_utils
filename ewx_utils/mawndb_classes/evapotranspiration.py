@@ -1,5 +1,4 @@
 import sys
-import logging
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 
@@ -75,7 +74,7 @@ It also specifies the units of measurement and their respective conversions as s
             self.logger.error("Invalid table type provided: %s", self.tableU)
             raise ValueError("Table must be either 'HOURLY or 'DAILY'")
         
-        if validation_range[0] < self.rpetMM < validation_range[1]:
+        if validation_range[0] <= self.rpetMM <= validation_range[1]:
             self.logger.debug("rpet value: %s is within the valid range: %s", 
                               self.rpetMM, validation_range)
             return True

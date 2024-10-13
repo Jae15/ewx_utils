@@ -1,10 +1,10 @@
-#import sys
-#import pytest
-#sys.path.append('c:/Users/mwangija/data_file/mwangija_missing_data/ewx_utils')
-from ewx_utils.db_files.configfile import config_mawndb
-from ewx_utils.db_files.configfile import config_mawndbqc
+from ewx_utils.db_files.configfile import (
+    config_mawn_dbh11, config_mawn_supercell, 
+    config_mawnqc_dbh11, config_mawnqc_supercell,
+    config_rtma_dbh11, config_rtma_supercell,
+    config_mawnqc_test, config_mawnqcl
+)
 
-#from db_files.dbconnection import dbconnection
 """
 def test_config_section_found_mawndb():
     expected_config_details_mawndb = {

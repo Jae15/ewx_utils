@@ -13,7 +13,7 @@ relh_vars = [
     "relh_45cm_max",
     "relh_45cm_min",
     "relh_max",
-    "relh_min",
+    "relh_min"
 ]
 
 if "relh" in relh_vars:
@@ -113,7 +113,7 @@ temp_vars = [
     "stmp_50cm_min",
     "stmp_100cm",
     "stmp_100cm_max",
-    "stmp_100cm_min",
+    "stmp_100cm_min"
 ]
 
 if "dwpt" in temp_vars:
@@ -161,4 +161,22 @@ mstr_vars = [
 dwpt_vars =  [ "dwpt",
     "dwpt_min",
     "dwpt_max",
+    "dwpt_3m",
+    "dwpt_45cm",
+    "dwpt_3m_min",
+    "dwpt_3m_max",
+    "dwpt_45cm_min",
+    "dwpt_45cm_max"
+]
+
+vapr_vars = [
+    "vapr",
+    "vapr_min",
+    "vapr_max",
+    "vapr_3m",
+    "vapr_3m_min",
+    "vapr_45cm",
+    "vapr_45cm_min",
+    "vapr_45m_max"
+    ""
 ]

@@ -16,6 +16,7 @@ query all records in supercell database - get combined datetime for each - compa
 if they both match the timeloop - then you have all the records.  If not - we need to fix something.
  
 write a function that compares one record to another record - are they the same?  if so, output something.  If not output something else?
+
 """
 
 import argparse
@@ -62,13 +63,20 @@ def compare_records(test_records, supercell_records):
     only_in_test = []
     only_in_supercell = []
     mismatches = []
-
+    
     for key in test_records_dict:
         if key not in supercell_records_dict:
             only_in_test.append(test_records_dict[key])
         elif test_records_dict[key] != supercell_records_dict[key]:
-            mismatches.append((test_records_dict[key], supercell_records_dict[key]))
+            details = []
+            for column_name in test_records_dict[key].keys():
+                if column_name in supercell_records_dict[key].keys() and key != "id":
+                    if test_records_dict[key][column_name] != supercell_records_dict[key][column_name]:
+                        details.append(column_name) 
+                elif column_name not in supercell_records_dict[key].keys():
+                    details.append(column_name)
 
+            mismatches.append((test_records_dict[key], supercell_records_dict[key], details))
     for key in supercell_records_dict:
         if key not in test_records_dict:
             only_in_supercell.append(supercell_records_dict[key])
@@ -105,17 +113,20 @@ def main():
         # Report results
         if only_in_test:
             my_logger.error(f"Records found only in test database: {len(only_in_test)}")
-            #pprint.pprint(only_in_test)
+            pprint.pprint(only_in_test)
         if only_in_supercell:
             my_logger.error(f"Records found only in supercell database: {len(only_in_supercell)}")
-            #pprint.pprint(only_in_supercell)
+            pprint.pprint(only_in_supercell)
         if mismatches:
             my_logger.error(f"Mismatched records: {len(mismatches)}")
             for mismatch in mismatches:
                 my_logger.error("Test Record:")
-                #pprint.pprint(mismatch[0])
+                pprint.pprint(mismatch[0])
                 my_logger.error("Supercell Record:")
-                #pprint.pprint(mismatch[1])
+                pprint.pprint(mismatch[1])
+                my_logger.error("Details: ")
+                pprint.pprint(mismatch[2])
+
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
@@ -128,5 +139,7 @@ if __name__ == "__main__":
     main()
 
 """
-python hourly_utility.py --begin 2023-01-01 --end 2023-01-07 --station aetna_hourly --test_database mawnqc_test.aetna_hourly --supercell_table mawndb_qc.aetna_hourly
+python hourly_utility.py --begin 2023-01-01 --end 2023-01-02 --station aetna_hourly  
+
 """
+

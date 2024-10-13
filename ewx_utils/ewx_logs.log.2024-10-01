@@ -1,0 +1,1 @@
+2024-10-01 13:18:29,061 - ERROR - ewxutils_logsconfig - An error occurred: 'NoneType' object has no attribute 'cursor'

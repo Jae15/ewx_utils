@@ -32,8 +32,9 @@ class SoilMoisture:
         bool: True if the soil moisture value is within the valid range, False otherwise.
         """
         self.logger.debug("Validating soil moisture value: %s", self.mstr)
-        is_valid = self.valid_mstr_hourly_default[0] < self.mstr < self.valid_mstr_hourly_default[1]
+        is_valid = self.valid_mstr_hourly_default[0] <= self.mstr <= self.valid_mstr_hourly_default[1]
         self.logger.debug("Soil moisture value: %s is valid: %s", self.mstr, is_valid)
+
         return is_valid
 
 
@@ -66,7 +67,7 @@ class SoilHeatFlux:
         bool: True if the soil heat flux value is within the valid range, False otherwise.
         """
         self.logger.debug("Validating soil heat flux value: %s", self.sflux)
-        is_valid = self.valid_sflux_hourly_default[0] < self.sflux < self.valid_sflux_hourly_default[1]
+        is_valid = self.valid_sflux_hourly_default[0] <= self.sflux <= self.valid_sflux_hourly_default[1]
         self.logger.debug("Soil heat flux value: %s is valid: %s", self.sflux, is_valid)
         return is_valid
     
@@ -102,6 +103,6 @@ class NetRadiation:
 
         """
         self.logger.debug("Validating net radiation value: %s", self.nrad)
-        is_valid = self.valid_nrad_hourly_default[0] < self.nrad < self.valid_nrad_hourly_default[1]
+        is_valid = self.valid_nrad_hourly_default[0] <= self.nrad <= self.valid_nrad_hourly_default[1]
         self.logger.debug("Net radiation value: %s is valid: %s", self.nrad, is_valid)
         return is_valid

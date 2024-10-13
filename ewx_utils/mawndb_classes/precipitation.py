@@ -1,5 +1,4 @@
 import sys
-import logging
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 
@@ -75,3 +74,5 @@ It also specifies the units of measurement and their respective conversions and 
         is_valid = validation_range[0] <= self.pcpnMM <= validation_range[1]
         self.logger.debug("Precipitation value: %s is valid: %s",
                           self.pcpnMM, is_valid)
+        
+        return is_valid 
