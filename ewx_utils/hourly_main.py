@@ -1,11 +1,6 @@
 import datetime as datetime
-import pprint
 import argparse
-import logging
-from datetime import timezone
-from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
-from datetime import date, time
 from psycopg2 import OperationalError
 from db_files.dbconnection import (
     connect_to_mawn_dbh11, connect_to_mawn_supercell,
@@ -333,6 +328,5 @@ python hourly_main.py --begin 2023-1-1 --end 2023-1-7 --station aetna_hourly -x
 
 hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
 [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]
-
 
 """

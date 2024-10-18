@@ -18,7 +18,13 @@ from .variables_list import (
     wdir_vars,
     leafwt_vars,
     dwpt_vars,
-    vapr_vars
+    vapr_vars,
+    mstr_vars,
+    srad_vars,
+    nrad_vars,
+    sflux_vars,
+    wstdv_vars,
+    volt_vars
 )
 from mawndb_classes.humidity import Humidity
 from mawndb_classes.dew_point import DewPoint
@@ -30,6 +36,11 @@ from mawndb_classes.winddirection import WindDirection
 from mawndb_classes.evapotranspiration import Evapotranspiration
 from mawndb_classes.dew_point import DewPoint
 from mawndb_classes.vapor_pressure import VaporPressure
+from mawndb_classes.solar_radiation import SolarRadiation
+from mawndb_classes.soil_moisture import SoilMoisture
+from mawndb_classes.net_radiation import NetRadiation
+from mawndb_classes.soil_heat_flux import SoilHeatFlux
+from mawndb_classes.std_dev_wind_direction import StdDevWindDirection
 from typing import List, Dict, Tuple
 from .validation_logsconfig import validations_logger
 from .timeloop import generate_list_of_hours
@@ -79,8 +90,25 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     if k in vapr_vars:
         vp = VaporPressure(v, "hourly", d)
         return vp.is_valid()
-    return True
-
+    if k in mstr_vars:
+        ms = SoilMoisture(v, d)
+        return ms.is_valid()
+    if k in nrad_vars:
+        nr = NetRadiation(v, d)
+        return nr.is_valid()
+    if k in srad_vars:
+        sr = SolarRadiation(v,d)
+        return sr.is_valid()
+    if k in sflux_vars:
+        sf = SoilHeatFlux(v,d)
+        return sf.is_valid()
+    if k in wstdv_vars:
+        wv = StdDevWindDirection(v,d)
+        return wv.is_valid()
+    if k in volt_vars:
+        vo = Volt(v,d)
+        return vo.is_valid()
+    return False
 
 def combined_datetime(record: dict) -> datetime.datetime:
 
@@ -261,7 +289,7 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
         # Process the MAWN record if found
         if matching_mawn_record:
             combined_date = combined_datetime(matching_mawn_record)
-            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
+            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id", "volt"]
 
             # Create and validate the MAWN source record
             mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list)

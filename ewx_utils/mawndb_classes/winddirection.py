@@ -1,5 +1,4 @@
 import sys
-import logging
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
 

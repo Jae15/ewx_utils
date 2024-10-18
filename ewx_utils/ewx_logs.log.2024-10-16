@@ -1,0 +1,3 @@
+2024-10-16 11:05:29,822 - ERROR - ewxutils_logsconfig - Unexpected error: 'NoneType' object has no attribute 'cursor'
+2024-10-16 11:05:29,828 - ERROR - ewxutils_logsconfig - Error closing mawn_dbh11_connection: 'NoneType' object has no attribute 'close'
+2024-10-16 16:03:22,809 - ERROR - ewxutils_logsconfig - An error occurred: 'NoneType' object has no attribute 'cursor'
