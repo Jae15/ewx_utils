@@ -1,7 +1,9 @@
+import sys
 import psycopg2
 import psycopg2.extras
 import logging
 from psycopg2 import OperationalError
+sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from db_files.configfile import (
     config_mawn_dbh11,
     config_mawn_supercell,
@@ -10,7 +12,7 @@ from db_files.configfile import (
     config_rtma_dbh11,
     config_rtma_supercell,
     config_mawnqcl,
-    config_mawnqc_test,
+    config_mawnqc_test
 )
 from db_files.dbfiles_logs_config import dbfiles_logger
 

@@ -16,10 +16,13 @@ relh_vars = [
     "relh_min"
 ]
 
+"""
 if "relh" in relh_vars:
     print("True")
 else:
     print("False")
+"""
+
 
 """ pcpn/rpet  hourly and daily have different validations (they are sums - you can have more pcpn in a day than an hour) """
 """ Precipitation variables list - if k - key is in this list, treat the variable as 'pcpn_vars' """
@@ -116,10 +119,13 @@ temp_vars = [
     "stmp_100cm_min"
 ]
 
+"""
 if "dwpt" in temp_vars:
     print("True")
 else:
     print("False")
+"""
+
 
 """ Windspeed variables list - if the k - key - is in this list, treat the variable as 'wspd_vars' """
 
@@ -179,4 +185,18 @@ vapr_vars = [
     "vapr_45cm_min",
     "vapr_45m_max"
     ""
+]
+
+sflux_vars = [
+    "sflux",
+    "sflux_min",
+    "sflux_max"
+]
+
+wstdv_vars = [
+    "wstdv",
+    "wstdv_min",
+    "wstdv_max",
+    "wstdv_10m",
+    "wstdv_20m"
 ]

@@ -1,6 +1,8 @@
 from configparser import ConfigParser
 import logging
 from db_files.dbfiles_logs_config import dbfiles_logger
+import sys
+sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 
 # Initialize custom logger
 my_dbfiles_logger = dbfiles_logger()

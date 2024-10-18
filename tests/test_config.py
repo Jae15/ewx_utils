@@ -1,3 +1,5 @@
+
+"""
 from ewx_utils.db_files.configfile import (
     config_mawn_dbh11, config_mawn_supercell, 
     config_mawnqc_dbh11, config_mawnqc_supercell,
@@ -5,7 +7,6 @@ from ewx_utils.db_files.configfile import (
     config_mawnqc_test, config_mawnqcl
 )
 
-"""
 def test_config_section_found_mawndb():
     expected_config_details_mawndb = {
         'host' :'127.0.0.1',
