@@ -1,11 +1,7 @@
 #!/usr/bin/python3
-import psycopg2
-import logging
 import sys
-
+import math
 sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-import pprint
-import psycopg2.extras
 import datetime
 from datetime import timezone
 from zoneinfo import ZoneInfo
@@ -41,12 +37,20 @@ from mawndb_classes.soil_moisture import SoilMoisture
 from mawndb_classes.net_radiation import NetRadiation
 from mawndb_classes.soil_heat_flux import SoilHeatFlux
 from mawndb_classes.std_dev_wind_direction import StdDevWindDirection
+from mawndb_classes.voltage import Voltage
 from typing import List, Dict, Tuple
 from .validation_logsconfig import validations_logger
 from .timeloop import generate_list_of_hours
 
 # Initialize the logger
 my_validation_logger = validations_logger()
+
+def getValueInSigFigs(num, sig_figs):
+    if num == 0:
+        return 0
+    else:
+        sig_figs = 6
+        return round(num, sig_figs - int(math.floor(math.log10(abs(num)))) - 1)
 
 
 def check_value(k: str, v: float, d: datetime.datetime) -> bool:
@@ -97,8 +101,9 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         nr = NetRadiation(v, d)
         return nr.is_valid()
     if k in srad_vars:
-        sr = SolarRadiation(v,d)
-        return sr.is_valid()
+        v_sig_figs = getValueInSigFigs(v, 5)  # Apply rounding to v
+        sr = SolarRadiation(v_sig_figs, d)  # Create an instance of SolarRadiation with rounded value
+        return sr.is_valid()  # Return validity check
     if k in sflux_vars:
         sf = SoilHeatFlux(v,d)
         return sf.is_valid()
@@ -106,8 +111,8 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         wv = StdDevWindDirection(v,d)
         return wv.is_valid()
     if k in volt_vars:
-        vo = Volt(v,d)
-        return vo.is_valid()
+        vt = Voltage(v,d)
+        return vt.is_valid()
     return False
 
 def combined_datetime(record: dict) -> datetime.datetime:
@@ -289,7 +294,7 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
         # Process the MAWN record if found
         if matching_mawn_record:
             combined_date = combined_datetime(matching_mawn_record)
-            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id", "volt"]
+            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
 
             # Create and validate the MAWN source record
             mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list)

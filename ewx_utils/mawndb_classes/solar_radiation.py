@@ -20,14 +20,16 @@ class SolarRadiation:
 
         """
         self.logger = mawndb_classes_logger()
-        self.logger.debug("Initializing NetRadiation object with srad: %s, record_date: %s", srad, record_date)
+        self.logger.debug("Initializing Solar Radiation object with srad: %s, record_date: %s", srad, record_date)
         self.record_date = record_date
         self.srad = srad
 
+        """
         if self.srad is not None:
-            self.srad = round(srad, 6)
+            self.srad = round(srad, 5)
         else:
             self.srad = None
+        """
 
     def is_valid(self):
         """
