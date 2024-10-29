@@ -1,6 +1,10 @@
+import sys
+import math
+import decimal
 import argparse
 import pprint
 from datetime import datetime
+sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
 from ewxutils_logsconfig import ewx_utils_logger
 from db_files.dbconnection import (
     connect_to_mawnqc_test,
@@ -8,11 +12,50 @@ from db_files.dbconnection import (
     mawnqc_test_cursor_connection,
     mawn_supercell_cursor_connection,
 )
-
 # Initialize the logger
 my_logger = ewx_utils_logger()
 
+def limit_to_max_digits(num, max_digits=None):
+    """
+    Rounds a number to the specified maximum of significant digits.
+    It follows PostgreSQL-like rounding rules i.e (ROUND_HALF_UP)
+
+    Args:
+    num(float): The number to round.
+    max_digits(int): The maximum number of significant digits allowed(default is 6)
+
+    Returns:
+    float: The number rounded according to PostgreSQL-like behavior
+    """
+def limit_to_max_digits(num, max_digits=None):
+    if max_digits is None:
+        max_digits = 6
+
+    if num == 0:
+        return decimal.Decimal('0.0')
+    
+    # Create a Decimal object from the number
+    num_decimal = decimal.Decimal(str(num))
+
+    # Calculate the number of digits before the decimal point
+    integer_part = num_decimal.to_integral_value()
+    integer_digits = len(str(integer_part))
+
+    # Calculate the number of decimal places to preserve
+    decimal_places = max_digits - integer_digits
+
+    # If decimal_places is negative, it means we have more than max_digits in the integer part
+    if decimal_places < 0:
+        decimal_places = 0
+    # Create a quantizer string that matches the precision required 
+    quantize_str = decimal.Decimal('1.' + '0' * decimal_places)
+
+    # Round the number using ROUND_HALF_UP to behave like PostgreSQL
+    rounded_decimal = num_decimal.quantize(quantize_str, rounding=decimal.ROUND_HALF_UP)
+    return rounded_decimal
+
 def fetch_records_by_date(cursor, station, start_date, end_date):
+
     """
     Fetching records from the specified table based on date range.
     """
@@ -47,18 +90,22 @@ def compare_records(test_records, supercell_records):
         else:
             test_record = {k: v for k, v in test_records_dict[key].items() if k != 'id'}
             supercell_record = {k: v for k, v in supercell_records_dict[key].items() if k != 'id'}
-
             if test_record != supercell_record:
                 details = []
                 for column_name in test_record.keys():
-                    if column_name in supercell_record and test_record[column_name] != supercell_record[column_name]:
+                    if column_name in supercell_record and column_name == 'srad':
+                        print(f"Test Record Post Rounding/Truncation {column_name}: {limit_to_max_digits(test_record[column_name])}")
+                        print(f"Supercell Record {column_name}: {limit_to_max_digits(supercell_record[column_name])}")
+                        if limit_to_max_digits(test_record[column_name]) != limit_to_max_digits(supercell_record[column_name]):
+                            details.append(column_name)
+                    elif column_name in supercell_record and test_record[column_name] != supercell_record[column_name]:
+                        print(f"Test Record {column_name}: {test_record[column_name]}")
+                        print(f"Supercell Record {column_name}: {test_record[column_name]}")
                         details.append(column_name)
                 mismatches.append((test_records_dict[key], supercell_records_dict[key], details))
-
     for key in supercell_records_dict:
         if key not in test_records_dict:
             only_in_supercell.append(supercell_records_dict[key])
-
     return only_in_test, only_in_supercell, mismatches
 
 def main():
@@ -96,8 +143,8 @@ def main():
         if mismatches:
             my_logger.error(f"Mismatched records: {len(mismatches)}")
             for mismatch in mismatches:
-                my_logger.error(f"Test Record: {mismatch[0]}")
-                pprint.pprint(f"Test Record: {mismatch[0]}")
+                my_logger.error(f"Test Record : {mismatch[0]}")
+                pprint.pprint(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
                 my_logger.error(f"Supercell Record: {mismatch[1]}")
                 pprint.pprint(f"Supercell Record: {mismatch[1]}")
                 my_logger.error(f"Details: {mismatch[2]}")

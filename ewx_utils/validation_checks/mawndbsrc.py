@@ -45,13 +45,6 @@ from .timeloop import generate_list_of_hours
 # Initialize the logger
 my_validation_logger = validations_logger()
 
-def getValueInSigFigs(num, sig_figs):
-    if num == 0:
-        return 0
-    else:
-        sig_figs = 6
-        return round(num, sig_figs - int(math.floor(math.log10(abs(num)))) - 1)
-
 
 def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     """
@@ -101,9 +94,8 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         nr = NetRadiation(v, d)
         return nr.is_valid()
     if k in srad_vars:
-        v_sig_figs = getValueInSigFigs(v, 5)  # Apply rounding to v
-        sr = SolarRadiation(v_sig_figs, d)  # Create an instance of SolarRadiation with rounded value
-        return sr.is_valid()  # Return validity check
+        sr = SolarRadiation(v, d)
+        return sr.is_valid()
     if k in sflux_vars:
         sf = SoilHeatFlux(v,d)
         return sf.is_valid()
