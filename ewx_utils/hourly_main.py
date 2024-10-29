@@ -166,6 +166,53 @@ def filter_records_by_columns(records, qc_columns):
     my_logger.info(f"Filtered records to include columns: {qc_columns}")
     return filtered_records
 
+def record_exists(cursor, station, record):
+    """
+    Check if a record exists in the table for the specific station based on the date and time
+    """
+    query = f"SELECT 1 FROM {station} WHERE date = %s AND time = %s"
+
+    try:
+        cursor.execute(query, (record['date'], record['time']))
+        return cursor.fetchone() is not None
+    except Exception as e:
+        my_logger.error(f"Error checking existece of record in {station}: {e}")
+        raise
+
+def update_records(cursor, station, records):
+    """
+    Update existing records in the specified table.
+    """
+    if not records:
+        my_logger.error(f"No records to update in {station}.")
+        return
+
+    try:
+        qc_columns = get_insert_table_columns(cursor, station)
+        if not qc_columns:
+            my_logger.error(f"No valid columns found for table {station}. Cannot proceed with update.")
+            return
+
+        filtered_records = filter_records_by_columns(records, qc_columns)
+        if not filtered_records:
+            my_logger.error(f"No valid columns to update for table {station}.")
+            return
+
+        record_keys = [key for key in filtered_records[0].keys() if key not in ['date', 'time']]
+        if not record_keys:
+            my_logger.error(f"No updatable keys found in the filtered records for {station}.")
+            return
+
+        update_query = f"UPDATE {station} SET " + ", ".join([f"{col} = %s" for col in record_keys]) + " WHERE date = %s AND time = %s"
+        
+        for record in filtered_records:
+            update_values = [record[key] for key in record_keys] + [record['date'], record['time']]
+            cursor.execute(update_query, update_values)
+
+        my_logger.info(f"Updated {len(filtered_records)} records in {station}.")
+    except Exception as e:
+        my_logger.error(f"Error updating records in {station}: {e}")
+        raise
 
 def insert_records(cursor, station, records):
     """
@@ -174,7 +221,6 @@ def insert_records(cursor, station, records):
     if not records:
         my_logger.error(f"No records to insert into {station}.")
         return
-
     try:
         # Fetch allowed columns for the insert table
         qc_columns = get_insert_table_columns(cursor, station)
@@ -219,6 +265,19 @@ def insert_records(cursor, station, records):
         my_logger.error(f"Error inserting records into {station}: {e}")
         raise
 
+def insert_or_update_records(cursor, station, records):
+    """
+    Insert or update records based on existence in the table
+    """
+    try:
+        for record in records:
+            if record_exists(cursor, station, record):
+                update_records(cursor, station, [record])
+            else:
+                insert_records(cursor, station, [record])
+    except Exception as e:
+        my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
+        raise
 
 def time_defaults(user_begin_date: str, user_end_date: str):
     """
@@ -228,7 +287,7 @@ def time_defaults(user_begin_date: str, user_end_date: str):
         if user_begin_date is None:
             user_begin_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
         else:
-            user_begin_date = datetime.strptime(user_begin_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+                user_begin_date = datetime.strptime(user_begin_date, '%Y-%m-%d').strftime('%Y-%m-%d')
 
         # Default end_date is 7 days from begin_date if not provided
         if user_end_date is None:
@@ -308,9 +367,14 @@ def main():
             # Process and clean the records
             cleaned_records = process_records(mawn_records, rtma_records, begin_date, end_date)
 
-            # Insert cleaned records if execution mode is set
+            """
+             # Insert cleaned records if execution mode is set
             if args.execute and qc_cursor:
                 insert_records(qc_cursor, station, cleaned_records)
+            """
+            # If execution is requested and QC cursor is available, insert or update records in the QC database
+            if args.execute and qc_cursor:
+                insert_or_update_records(qc_cursor, station, cleaned_records)
 
     finally:
         # Commit and close only the open connections
