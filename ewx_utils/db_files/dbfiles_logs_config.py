@@ -2,35 +2,35 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 
+# Global variable to hold the logger instance
+dbfiles_logger_instance = None
 
 def dbfiles_logger():
-    # Creating  a custom logger
-    logger = logging.getLogger(__name__)
+    global dbfiles_logger_instance
+    try:
+        # Check if the logger instance already exists
+        if dbfiles_logger_instance is None:
+            # Creating a custom logger
+            dbfiles_logger_instance = logging.getLogger(__name__)
 
-    # Creating handlers
-    console_handler = logging.StreamHandler()
-    file_handler = RotatingFileHandler(
-        filename="validation_logs.log", maxBytes=1024, backupCount=3
-    )
+            # Creating a file handler
+            file_handler = RotatingFileHandler(
+                filename="dbfiles_logs.log", maxBytes=1024, backupCount=3
+            )
+            # Setting level for the file handler to DEBUG to capture all levels
+            file_handler.setLevel(logging.DEBUG)
 
-    # Setting levels for the handlers
-    console_handler.setLevel(logging.DEBUG)
-    file_handler.setLevel(logging.ERROR)
+            # Creating a formatter and adding it to the file handler
+            file_formatter = logging.Formatter(
+                "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+            )
+            file_handler.setFormatter(file_formatter)
 
-    # Creating formatters and adding them to log handlers
-    console_formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
-    )
-    file_formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
-    )
+            # Adding the file handler to the logger
+            dbfiles_logger_instance.addHandler(file_handler)
 
-    # Set the formatters for the handlers
-    console_handler.setFormatter(console_formatter)
-    file_handler.setFormatter(file_formatter)
+        return dbfiles_logger_instance
 
-    # Adding handlers to the logger
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-
-    return logger
+    except Exception as e:
+        print(f"An error occurred while setting up the dbfiles logger: {e}")
+        return None

@@ -241,6 +241,10 @@ def insert_records(cursor, station, records):
         record_keys = list(filtered_records[0].keys())
         my_logger.info(f"Record Keys: {record_keys}")
 
+        # Skip the 'id' column if it exists
+        if 'id' in record_keys:
+            record_keys.remove('id')
+
         if not record_keys:
             my_logger.error(f"No keys found in the filtered records for {station}.")
             return
@@ -264,7 +268,7 @@ def insert_records(cursor, station, records):
     except Exception as e:
         my_logger.error(f"Error inserting records into {station}: {e}")
         raise
-
+    
 def insert_or_update_records(cursor, station, records):
     """
     Insert or update records based on existence in the table

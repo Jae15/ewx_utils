@@ -108,7 +108,6 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     return False
 
 def combined_datetime(record: dict) -> datetime.datetime:
-
     """
     Combines the date and time from a record into a single datetime object.
     Args:

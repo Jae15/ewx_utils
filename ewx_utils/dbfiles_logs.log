@@ -1,24 +1,4 @@
-2024-06-18 15:16:00,220 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:16:00,220 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:16:00,221 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:16:00,221 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:16:00,222 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:16:00,222 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:17:41,615 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:17:41,617 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:17:41,618 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:17:41,618 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:17:41,619 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:17:41,619 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:23:33,683 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:23:33,683 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:23:33,684 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:23:33,684 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:23:33,684 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:23:33,684 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:29:47,411 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:29:47,412 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:29:47,413 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:29:47,413 - ERROR - db_files.dbfiles_logs_config - error message
-2024-06-18 15:29:47,415 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
-2024-06-18 15:29:47,415 - ERROR - db_files.dbfiles_logs_config - Remember to log errors using my_logger
+2024-10-31 13:26:29,444 - ERROR - db_files.dbfiles_logs_config - Error Connecting to Mawn dbh11 Database: connection to server at "127.0.0.1", port 15503 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2024-10-31 13:26:29,444 - ERROR - db_files.dbfiles_logs_config - Error establishing mawndb cursor connection: 'NoneType' object has no attribute 'cursor'

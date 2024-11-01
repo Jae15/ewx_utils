@@ -27,7 +27,6 @@ def limit_to_max_digits(num, max_digits=None):
     Returns:
     float: The number rounded according to PostgreSQL-like behavior
     """
-def limit_to_max_digits(num, max_digits=None):
     if max_digits is None:
         max_digits = 6
 
@@ -73,9 +72,17 @@ def fetch_records_by_date(cursor, station, start_date, end_date):
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
+def is_within_margin(value1, value2, margin=0.001):
+    """
+    Check if two values are within a specified margin of error.
+    """
+    return abs(value1 - value2) <= margin
+
 def compare_records(test_records, supercell_records):
     """
     Comparing the two sets of records while ignoring the 'id' column.
+    Allows a tolerance of 0.001 for 'srad' column comparisons and uses
+    limit_to_max_digits only for 'srad' values.
     """
     test_records_dict = {(rec['date'], rec['time']): rec for rec in test_records}
     supercell_records_dict = {(rec['date'], rec['time']): rec for rec in supercell_records}
@@ -93,20 +100,24 @@ def compare_records(test_records, supercell_records):
             if test_record != supercell_record:
                 details = []
                 for column_name in test_record.keys():
-                    if column_name in supercell_record and column_name == 'srad':
-                        print(f"Test Record Post Rounding/Truncation {column_name}: {limit_to_max_digits(test_record[column_name])}")
-                        print(f"Supercell Record {column_name}: {limit_to_max_digits(supercell_record[column_name])}")
-                        if limit_to_max_digits(test_record[column_name]) != limit_to_max_digits(supercell_record[column_name]):
-                            details.append(column_name)
-                    elif column_name in supercell_record and test_record[column_name] != supercell_record[column_name]:
-                        print(f"Test Record {column_name}: {test_record[column_name]}")
-                        print(f"Supercell Record {column_name}: {test_record[column_name]}")
-                        details.append(column_name)
-                mismatches.append((test_records_dict[key], supercell_records_dict[key], details))
+                    if column_name in supercell_record:
+                        if column_name == 'srad':
+                            # Apply limit_to_max_digits for 'srad' and check within margin
+                            test_value = limit_to_max_digits(test_record[column_name])
+                            supercell_value = limit_to_max_digits(supercell_record[column_name])
+                            if not is_within_margin(test_value, supercell_value):
+                                details.append(column_name)
+                        else:
+                            # Direct comparison for other columns without limit_to_max_digits
+                            if test_record[column_name] != supercell_record[column_name]:
+                                details.append(column_name)
+                if details:
+                    mismatches.append((test_records_dict[key], supercell_records_dict[key], details))
     for key in supercell_records_dict:
         if key not in test_records_dict:
             only_in_supercell.append(supercell_records_dict[key])
     return only_in_test, only_in_supercell, mismatches
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -144,11 +155,11 @@ def main():
             my_logger.error(f"Mismatched records: {len(mismatches)}")
             for mismatch in mismatches:
                 my_logger.error(f"Test Record : {mismatch[0]}")
-                pprint.pprint(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
+                print(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
                 my_logger.error(f"Supercell Record: {mismatch[1]}")
-                pprint.pprint(f"Supercell Record: {mismatch[1]}")
+                print(f"Supercell Record: {mismatch[1]}")
                 my_logger.error(f"Details: {mismatch[2]}")
-                pprint.pprint(f"Details: {mismatch[2]}")
+                print(f"Details: {mismatch[2]}")
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
