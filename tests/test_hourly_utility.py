@@ -98,7 +98,6 @@ def test_limit_to_max_digits19():
     result = limit_to_max_digits(12345678.9, max_digits=4)
     expected = decimal.Decimal('12350000')
     assert result == expected
-
 """
 
 
@@ -153,20 +152,8 @@ def test_limit_to_max_digits21():
 134.830
 159.189
 159.189
+
 """
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 """

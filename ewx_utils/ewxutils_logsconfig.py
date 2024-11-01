@@ -1,33 +1,36 @@
 import logging
-import sys
-from logging.handlers import RotatingFileHandler
 from logging.handlers import TimedRotatingFileHandler
 
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+# Global variable to hold the logger instance
+logger_instance = None
+
 def ewx_utils_logger():
-    # Creating  a custom logger
-    logger = logging.getLogger(__name__)
+    global logger_instance
+    try:
+        # Check if the logger instance already exists
+        if logger_instance is None:
+            # Creating a custom logger
+            logger_instance = logging.getLogger(__name__)
 
- # Creating handlers
-    console_handler = logging.StreamHandler()
-    file_handler = TimedRotatingFileHandler(
-        filename="ewx_logs.log", when="midnight", interval=1, backupCount=7
-    )
-    # Setting levels for the handlers
-    console_handler.setLevel(logging.DEBUG)
-    file_handler.setLevel(logging.ERROR)
+            # Creating a file handler
+            file_handler = TimedRotatingFileHandler(
+                filename="ewx_logs.log", when="midnight", interval=1, backupCount=7
+            )
+            # Setting level for the file handler to DEBUG to capture all levels
+            file_handler.setLevel(logging.DEBUG)
 
-    # Creating formatters and adding them to log handlers
-    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
-    file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+            # Creating a formatter and adding it to the file handler
+            file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+            file_handler.setFormatter(file_formatter)
 
-    # Set the formatters for the handlers
-    console_handler.setFormatter(console_formatter)
-    file_handler.setFormatter(file_formatter)
+            # Adding the file handler to the logger
+            logger_instance.addHandler(file_handler)
 
-    # Adding handlers to the logger
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
+        return logger_instance
 
-
-    return logger
-
+    except Exception as e:
+        print(f"An error occurred while setting up the logger: {e}")
+        return None
