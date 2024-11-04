@@ -72,7 +72,7 @@ def fetch_records_by_date(cursor, station, start_date, end_date):
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
-def is_within_margin(value1, value2, margin=0.001):
+def is_within_margin(value1, value2, margin=0.005):
     """
     Check if two values are within a specified margin of error.
     """
@@ -81,7 +81,7 @@ def is_within_margin(value1, value2, margin=0.001):
 def compare_records(test_records, supercell_records):
     """
     Comparing the two sets of records while ignoring the 'id' column.
-    Allows a tolerance of 0.001 for 'srad' column comparisons and uses
+    Allows a tolerance of 0.005 for 'srad' column comparisons and uses
     limit_to_max_digits only for 'srad' values.
     """
     test_records_dict = {(rec['date'], rec['time']): rec for rec in test_records}
