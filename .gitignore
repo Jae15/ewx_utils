@@ -12,3 +12,4 @@ temp01.txt/
 temp.txt/
 validation_logs.log/
 ewx_logs.log/
+*.log
