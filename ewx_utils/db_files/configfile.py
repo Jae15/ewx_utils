@@ -1,17 +1,22 @@
-from configparser import ConfigParser
-import logging
-from db_files.dbfiles_logs_config import dbfiles_logger
+import os
 import sys
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+import dotenv
+dotenv.load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from ewx_utils.ewx_config import ewx_base_path, ewx_database_configfile, ewx_log_file
+from configparser import ConfigParser
+#from db_files.dbfiles_logs_config import dbfiles_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize custom logger
-my_dbfiles_logger = dbfiles_logger()
+my_dbfiles_logger = ewx_utils_logger(log_path = ewx_log_file) 
 
 
 def config_mawn_dbh11(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
-    section: str = "mawn_dbh11",
-) -> dict:
+    filename: str = ewx_database_configfile,
+    section: str = "mawn_dbh11" ) -> dict:
+
     """
     Reads database configuration credentials for mawndb from a specified ini file.
 
@@ -41,7 +46,7 @@ def config_mawn_dbh11(
     return db_info
 
 def config_mawn_supercell(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str = ewx_database_configfile,
     section: str = "mawn_supercell",
 ) -> dict:
     """
@@ -74,7 +79,7 @@ def config_mawn_supercell(
 
 
 def config_mawnqc_dbh11(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str =ewx_database_configfile,
     section: str = "mawnqc_dbh11",
 ) -> dict:
     """
@@ -108,7 +113,7 @@ def config_mawnqc_dbh11(
     return db_info2
 
 def config_mawnqc_supercell(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str =ewx_database_configfile,
     section: str = "mawnqc_supercell",
 ) -> dict:
     """
@@ -142,7 +147,7 @@ def config_mawnqc_supercell(
     return db_info3
 
 def config_rtma_dbh11(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str =ewx_database_configfile,
     section: str = "rtma_dbh11",
 ) -> dict:
     """
@@ -177,7 +182,7 @@ def config_rtma_dbh11(
 
 
 def config_rtma_supercell(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str =ewx_database_configfile,
     section: str = "rtma_supercell",
 ) -> dict:
     """
@@ -212,7 +217,7 @@ def config_rtma_supercell(
 
 
 def config_mawnqc_test(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str =ewx_database_configfile,
     section: str = "mawnqc_test",
 ) -> dict:
     """
@@ -246,7 +251,7 @@ def config_mawnqc_test(
     return db_info6
 
 def config_mawnqcl(
-    filename: str = "c:/Users/mwangija/data_file/ewx_utils/ewx_utils/database.ini",
+    filename: str =ewx_database_configfile,
     section: str = "mawnqcl",
 ) -> dict:
     """

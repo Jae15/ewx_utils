@@ -1,7 +1,10 @@
-import sys
-from mawndbsrc import clean_records
-from mawndbsrc import clean_record
-from mawndbsrc import mawndb_addingsrcto_cols
+import ewx_utils.ewx_config as ewx_config 
+from logs.ewx_utils_logs_config import ewx_utils_logger
+
+
+from .mawndbsrc import clean_records
+from .mawndbsrc import clean_record
+from .mawndbsrc import mawndb_addingsrcto_cols
 from mawndbsrc import mawndb_srccols_torecord
 from qcsrc_cols import qc_columns
 from check_value import check_value
@@ -9,8 +12,9 @@ from timeloop import generate_list_of_hours
 from validation_logsconfig import validations_logger
 import datetime
 
-validation_logger = validations_logger()
-validation_logger.error("Remember to log errors using my_logger")
+# Initialize the logger
+my_validation_logger = ewx_utils_logger(path = ewx_config.ewx_log_file)
+my_validation_logger.error("Remember to log errors using my_logger")
 # logger = logging.getLogger(__name__)
 
 mawn_records_with_bad_data = [

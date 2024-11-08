@@ -1,17 +1,16 @@
-import sys
+import ewx_utils.ewx_config as ewx_config 
+from logs.ewx_utils_logs_config import ewx_utils_logger
 
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-import psycopg2
-import psycopg2.extras
+
 import datetime as datetime
-import logging
 from db_files.dbconnection import connect_to_mawndb
 from db_files.dbconnection import connect_to_mawndbqc
 from db_files.dbconnection import mawndb_cursor_connection
 from db_files.dbconnection import mawnqc_cursor_connection
 from validation_logsconfig import validation_logger
 
-my_validation_logger = validation_logger()
+# Initialize the logger
+my_validation_logger = ewx_utils_logger(path = ewx_config.ewx_log_file)
 
 mawndb_connection = connect_to_mawndb()
 mawndb_cursor = mawndb_cursor_connection(mawndb_connection)

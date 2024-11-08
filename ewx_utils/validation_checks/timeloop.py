@@ -1,7 +1,21 @@
 import logging
+import os
+import sys
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from ewx_utils.ewx_config import (
+    ewx_base_path, ewx_log_file)
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil import tz
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+
+# Initialize the logger
+my_validation_logger = ewx_utils_logger(log_path = ewx_log_file)
 
 def generate_list_of_hours(begin_date: str, end_date: str) -> list:
     """
@@ -34,8 +48,8 @@ def generate_list_of_hours(begin_date: str, end_date: str) -> list:
             this_date += timedelta(hours=1)
 
     except ValueError as e:
-        logging.error(f"Invalid date format: {e}")
+        my_validation_logger.error(f"Invalid date format: {e}")
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        my_validation_logger.error(f"An error occurred: {e}")
 
     return datetime_list
