@@ -1,9 +1,15 @@
+import os
 import sys
-import logging
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
 from datetime import datetime
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-
-from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
+from ewx_utils.ewx_config import (
+    ewx_base_path, ewx_log_file)
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 class VaporPressure:
     """
@@ -21,7 +27,7 @@ class VaporPressure:
         units(str): The unit of measurement ('KPA')
         record_date(datetime, optional): The date of the record
         """
-        self.logger = mawndb_classes_logger()
+        self.logger = ewx_utils_logger(log_path = ewx_log_file)
         self.logger.debug("Initializing Vapor Pressure object with vapr: %s, units: %s, record_date: %s", 
                           vapr, record_date)
         

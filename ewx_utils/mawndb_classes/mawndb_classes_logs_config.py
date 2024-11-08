@@ -1,15 +1,16 @@
 import sys
 import logging
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+import dotenv
+dotenv.load_dotenv()
+import os
+ewx_path = os.getenv("EWX_PATH")
+sys.path.append(ewx_path)
 from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
-
-import logging
 from logging.handlers import TimedRotatingFileHandler
 
 # Global variable to hold the logger instance
 mawndb_logger_instance = None
-
-def mawndb_classes_logger():
+def mawndb_classes_logger(log_path = "../log"):
     global mawndb_logger_instance
     try:
         # Check if the logger instance already exists
@@ -19,7 +20,7 @@ def mawndb_classes_logger():
 
             # Creating a file handler
             file_handler = TimedRotatingFileHandler(
-                filename="mawndb_classes_logs.log", when="midnight", interval=1, backupCount=7
+                filename= os.path.append(log_path, "mawndb_classes_logs.log"), when="midnight", interval=1, backupCount=7
             )
             # Setting level for the file handler to DEBUG to capture all levels
             file_handler.setLevel(logging.DEBUG)

@@ -1,6 +1,15 @@
+import os
 import sys
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from datetime import datetime
+from ewx_utils.ewx_config import (
+    ewx_base_path, ewx_log_file)
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 class StdDevWindDirection:
     """
     The StdDevWindDirection class defines the valid hourly default range for standard deviation of wind direction.
@@ -18,7 +27,7 @@ class StdDevWindDirection:
         record_date(datetime, optional): The date of the record.
 
         """
-        self.logger = mawndb_classes_logger()
+        self.logger = ewx_utils_logger(log_path = ewx_log_file)
         self.logger.debug("Initializing StdDevWindDirection object with wstdv: %s, units: %s, record_date: %s",
                           wstdv, units, record_date)
         

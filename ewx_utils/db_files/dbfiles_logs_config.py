@@ -1,11 +1,19 @@
-import logging
+"""
 import sys
+import dotenv
+dotenv.load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+"""
+import os
+import logging
+import ewx_utils.ewx_config as ewx_config
 from logging.handlers import RotatingFileHandler
 
 # Global variable to hold the logger instance
 dbfiles_logger_instance = None
 
-def dbfiles_logger():
+def dbfiles_logger(log_path = ewx_config.ewx_log_path):
     global dbfiles_logger_instance
     try:
         # Check if the logger instance already exists
@@ -15,7 +23,7 @@ def dbfiles_logger():
 
             # Creating a file handler
             file_handler = RotatingFileHandler(
-                filename="dbfiles_logs.log", maxBytes=1024, backupCount=3
+                filename = os.path.join(log_path, "dbfiles_logs.log"),maxBytes=1024, backupCount=3
             )
             # Setting level for the file handler to DEBUG to capture all levels
             file_handler.setLevel(logging.DEBUG)

@@ -1,8 +1,9 @@
-import sys
-
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-import psycopg2
 import logging
+import ewx_utils.ewx_config as ewx_config
+from logs.ewx_utils_logs_config import ewx_utils_logger
+
+my_dbfiles_logger = ewx_utils_logger(path = ewx_config.ewx_log_file) 
+
 
 logging.debug("This is a debug message")
 logging.info("This is an info message")

@@ -6,10 +6,12 @@ tests/venv
 venv/
 sample_records.py/
 test_config.py/
-ewx_logs.log/
+**/ewx_logs.log/
 validation_logs.log/
 temp01.txt/
 temp.txt/
 validation_logs.log/
 ewx_logs.log/
 *.log
+.env
+*.log.*

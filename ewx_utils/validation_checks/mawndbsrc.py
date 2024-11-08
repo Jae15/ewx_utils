@@ -1,7 +1,14 @@
 #!/usr/bin/python3
+import os
 import sys
-import math
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from ewx_utils.ewx_config import (
+    ewx_base_path, ewx_log_file)
 import datetime
 from datetime import timezone
 from zoneinfo import ZoneInfo
@@ -22,28 +29,29 @@ from .variables_list import (
     wstdv_vars,
     volt_vars
 )
-from mawndb_classes.humidity import Humidity
-from mawndb_classes.dew_point import DewPoint
-from mawndb_classes.windspeed import WindSpeed
-from mawndb_classes.leafwetness import LeafWetness
-from mawndb_classes.temperature import Temperature
-from mawndb_classes.precipitation import Precipitation
-from mawndb_classes.winddirection import WindDirection
-from mawndb_classes.evapotranspiration import Evapotranspiration
-from mawndb_classes.dew_point import DewPoint
-from mawndb_classes.vapor_pressure import VaporPressure
-from mawndb_classes.solar_radiation import SolarRadiation
-from mawndb_classes.soil_moisture import SoilMoisture
-from mawndb_classes.net_radiation import NetRadiation
-from mawndb_classes.soil_heat_flux import SoilHeatFlux
-from mawndb_classes.std_dev_wind_direction import StdDevWindDirection
-from mawndb_classes.voltage import Voltage
+from ewx_utils.mawndb_classes.humidity import Humidity
+from ewx_utils.mawndb_classes.dew_point import DewPoint
+from ewx_utils.mawndb_classes.windspeed import WindSpeed
+from ewx_utils.mawndb_classes.leafwetness import LeafWetness
+from ewx_utils.mawndb_classes.temperature import Temperature
+from ewx_utils.mawndb_classes.precipitation import Precipitation
+from ewx_utils.mawndb_classes.winddirection import WindDirection
+from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
+from ewx_utils.mawndb_classes.dew_point import DewPoint
+from ewx_utils.mawndb_classes.vapor_pressure import VaporPressure
+from ewx_utils.mawndb_classes.solar_radiation import SolarRadiation
+from ewx_utils.mawndb_classes.soil_moisture import SoilMoisture
+from ewx_utils.mawndb_classes.net_radiation import NetRadiation
+from ewx_utils.mawndb_classes.soil_heat_flux import SoilHeatFlux
+from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
+from ewx_utils.mawndb_classes.voltage import Voltage
 from typing import List, Dict, Tuple
 from .validation_logsconfig import validations_logger
 from .timeloop import generate_list_of_hours
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize the logger
-my_validation_logger = validations_logger()
+my_validation_logger = ewx_utils_logger(log_path = ewx_log_file)
 
 
 def check_value(k: str, v: float, d: datetime.datetime) -> bool:

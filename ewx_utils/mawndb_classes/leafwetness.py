@@ -1,7 +1,15 @@
+import os
 import sys
-import logging
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from datetime import datetime
+from ewx_utils.ewx_config import (
+    ewx_base_path, ewx_log_file)
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 class LeafWetness:
     """
@@ -19,7 +27,7 @@ The units of measurements as stored in mawndb and their respective conversions, 
         sensor(str): The type of sensor('LEAF0','LEAF1', 'LWS0', 'LWS1').
         record_date(datetime, optiona): The date of the record.
         """
-        self.logger = mawndb_classes_logger()
+        self.logger = ewx_utils_logger(log_path = ewx_log_file)
         self.logger.debug("Initializing Leafwetness object with lw: %s, table: %s, sensor: %s, record_date: %s",
                           lw, table, sensor, record_date)
         self.record_date = record_date

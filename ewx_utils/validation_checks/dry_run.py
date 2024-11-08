@@ -1,8 +1,7 @@
-import sys
-import os
+import ewx_utils.ewx_config as ewx_config
+from logs.ewx_utils_logs_config import ewx_utils_logger
 
-# Add the directory containing the `ewx_utils` module to the Python path
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+my_dryrun_logger = ewx_utils_logger(path = ewx_config.ewx_log_file) 
 from .mawndbsrc import process_records
 
 # Import database connection functions

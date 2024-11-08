@@ -1,10 +1,16 @@
+import os
 import sys
+import dotenv
 import math
-import logging
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-from mawndb_classes.mawndb_classes_logs_config import mawndb_classes_logger
-from mawndb_classes.humidity import Humidity
-from mawndb_classes.temperature import Temperature
+dotenv.load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from ewx_utils.ewx_config import ewx_base_path, ewx_database_configfile, ewx_log_file
+from datetime import datetime
+import ewx_utils.ewx_config as ewx_config
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.mawndb_classes.humidity import Humidity
+from ewx_utils.mawndb_classes.temperature import Temperature
 
 class DewPoint:
     """
@@ -20,7 +26,7 @@ class DewPoint:
         temp(Temperature): A Temperature object.
         relh(Humidity): A Humidity object.
         """
-        self.logger = mawndb_classes_logger()
+        self.logger = ewx_utils_logger(log_path = ewx_log_file)
         self.logger.debug("Initializing DewPoint object with temp: %s and relh: %s", temp, relh)
 
         if not isinstance(temp, Temperature) or not isinstance(relh, Humidity):

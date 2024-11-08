@@ -1,4 +1,4 @@
-from ewx_utils.hourly_utility import limit_to_max_digits
+from scripts.hourly_utility import limit_to_max_digits
 import decimal
 
 def test_limit_to_max_digits01():
@@ -111,52 +111,3 @@ def test_limit_to_max_digits21():
     expected = decimal.Decimal('1.235')
     assert result == expected
 
-"""
-85.7499
-85.7499
-136.656
-136.656
-245.852
-245.852
-372.359
-372.359
-655.125
-655.125
-428.066
-428.066
-428.161
-428.161
-112.884
-112.884
-5.60204
-5.60204
-155.889
-155.889
-461.789
-461.789
-725.142
-725.142
-881.287
-881.287
-819.652
-819.652
-433.277
-433.277
-130.228
-130.227
-333.544
-333.543
-342.866
-342.866
-134.830
-134.830
-159.189
-159.189
-
-"""
-
-
-"""
-Remember to talk to Tracy about the fact that some of the values have been truncated in Supercell instead of being rounded off
-eg 333.5435 vs 333.543 vs 333.544
-"""

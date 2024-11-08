@@ -1,15 +1,12 @@
-import sys
-import logging
+import ewx_utils.ewx_config as ewx_config 
+from logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any, Optional
 import psycopg2.extras
-
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-
 from db_files.dbconnection import connect_to_rtma, rtma_cursor_connection
 from validation_logsconfig import validations_logger
 
-# Initialize custom logger
-my_validations_logger = validations_logger()
+# Initialize the logger
+my_validation_logger = ewx_utils_logger(path = ewx_config.ewx_log_file)
 
 
 def connect_to_rtma_db():

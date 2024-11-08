@@ -1,24 +1,24 @@
 import logging
+import os
 from logging.handlers import TimedRotatingFileHandler
 
-import logging
-from logging.handlers import TimedRotatingFileHandler
 
 # Global variable to hold the logger instance
 logger_instance = None
 
-def ewx_utils_logger():
+def ewx_utils_logger(log_path = "../log"):
     global logger_instance
     try:
         # Check if the logger instance already exists
         if logger_instance is None:
             # Creating a custom logger
             logger_instance = logging.getLogger(__name__)
-
+            
             # Creating a file handler
             file_handler = TimedRotatingFileHandler(
-                filename="ewx_logs.log", when="midnight", interval=1, backupCount=7
+                filename= os.path.join(log_path, "ewx_logs.log"), when="midnight", interval=1, backupCount=7
             )
+
             # Setting level for the file handler to DEBUG to capture all levels
             file_handler.setLevel(logging.DEBUG)
 

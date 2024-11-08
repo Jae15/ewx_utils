@@ -1,6 +1,9 @@
-import sys
+import ewx_utils.ewx_config as ewx_config 
+from logs.ewx_utils_logs_config import ewx_utils_logger
 
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+# Initialize the logger
+my_validation_logger = ewx_utils_logger(path = ewx_config.ewx_log_file)
+
 from db_files.dbconnection import (
     connect_to_mawn_dbh11,
     connect_to_mawnqc_dbh11,

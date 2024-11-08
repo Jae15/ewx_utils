@@ -1,8 +1,17 @@
-import datetime as datetime
+#!/usr/bin/env python
+import os
+import sys
 import argparse
+import datetime as datetime
 from datetime import datetime, timedelta
 from psycopg2 import OperationalError
-from db_files.dbconnection import (
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
+from ewx_utils.ewx_config import ewx_base_path, ewx_log_file
+from ewx_utils.db_files.dbconnection import (
     connect_to_mawn_dbh11, connect_to_mawn_supercell,
     connect_to_mawnqc_dbh11, connect_to_mawnqc_supercell,
     connect_to_mawnqcl, connect_to_rtma_dbh11,
@@ -12,12 +21,12 @@ from db_files.dbconnection import (
     mawnqcl_cursor_connection, rtma_dbh11_cursor_connection,
     rtma_supercell_cursor_connection, mawnqc_test_cursor_connection
 )
-from validation_checks.mawndbsrc import process_records
-from ewxutils_logsconfig import ewx_utils_logger
+from ewx_utils.validation_checks.mawndbsrc import process_records
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
+load_dotenv()
 # Initialize the logger
-
-my_logger = ewx_utils_logger()
+my_logger = ewx_utils_logger(log_path = ewx_log_file)
 
 # Function to create necessary database connections based on user-specified arguments
 def create_db_connections(args):

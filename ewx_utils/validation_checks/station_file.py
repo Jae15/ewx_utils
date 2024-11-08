@@ -1,12 +1,11 @@
-import sys
-import logging
 from typing import List, Dict, Any
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime, timedelta
-from validation_checks.validation_logsconfig import validations_logger
+import ewx_utils.ewx_config as ewx_config 
+from logs.ewx_utils_logs_config import ewx_utils_logger
 
-# Append the path for importing custom modules
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
+# Initialize the logger
+my_validation_logger = ewx_utils_logger(path = ewx_config.ewx_log_file)
 
 # Import database connection functions
 from db_files.dbconnection import (
@@ -18,9 +17,6 @@ from db_files.dbconnection import (
     rtma_dbh11_cursor_connection,
 )
 
-# Set up validation logger using TimedRotatingFileHandler
-# Initialize the logger
-my_validation_logger = validations_logger()
 
 def fetch_station_list(cursor, query: str) -> List[Dict[str, Any]]:
     """Fetches the list of stations from the database."""
@@ -93,24 +89,24 @@ def main():
         rtma_station_list = [dict(row)["table_name"] for row in rtma_stations]
 
         # Print RTMA station list
-        validations_logger.debug(f"RTMA stations: {rtma_station_list}")
+        my_validation_logger.debug(f"RTMA stations: {rtma_station_list}")
 
         stations_list = db_stations(mawndb_station_list, mawndbqc_station_list)
-        validations_logger.debug(f"DB Stations: {stations_list}")
+        my_validation_logger.debug(f"DB Stations: {stations_list}")
 
         def extra_stations() -> List[str]:
             """Get the list of stations that are in mawndb but not in mawndbqc."""
             stations_not_in_qc = [
                 stndb for stndb in mawndb_station_list if stndb not in mawndbqc_station_list
             ]
-            validations_logger.debug(f"Stations not in QC: {stations_not_in_qc}")
+            my_validation_logger.debug(f"Stations not in QC: {stations_not_in_qc}")
             return stations_not_in_qc
 
         extra_stations_list = extra_stations()
-        validations_logger.debug(f"Extra Stations: {extra_stations_list}")
+        my_validation_logger.debug(f"Extra Stations: {extra_stations_list}")
 
     except Exception as e:
-        validations_logger.error(f"An error occurred: {str(e)}")
+        my_validation_logger.error(f"An error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main()

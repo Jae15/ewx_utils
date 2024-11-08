@@ -1,12 +1,23 @@
+#!/usr/bin/env python
+import os
 import sys
-import math
 import decimal
 import argparse
 import pprint
+import dotenv
+dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+ewx_base_path = os.getenv("EWX_BASE_PATH")
+sys.path.append(ewx_base_path)
 from datetime import datetime
-sys.path.append("c:/Users/mwangija/data_file/ewx_utils/ewx_utils")
-from ewxutils_logsconfig import ewx_utils_logger
-from db_files.dbconnection import (
+from ewx_utils.ewx_config import (
+    ewx_base_path, ewx_log_file)
+from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+
+# Initialize the logger
+my_logger = ewx_utils_logger(log_path = ewx_log_file)
+from ewx_utils.db_files.dbconnection import (
     connect_to_mawnqc_test,
     connect_to_mawnqc_supercell,
     mawnqc_test_cursor_connection,
@@ -72,9 +83,14 @@ def fetch_records_by_date(cursor, station, start_date, end_date):
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
-def is_within_margin(value1, value2, margin=0.005):
+def is_within_margin(value1, value2):
+    margin
     """
     Check if two values are within a specified margin of error.
+    Check how many decimal places are to the left of the decimal point and change the margin
+    to by factors of ten based on the digits you're trying to match - in this case 6
+    if the last digit is a tenths/hundredths/thousandths respectively set margin to 0.1, 0.01, 0.001 
+    if/elif/else etc
     """
     return abs(value1 - value2) <= margin
 
