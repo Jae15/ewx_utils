@@ -17,7 +17,7 @@ from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize the logger
 my_logger = ewx_utils_logger(log_path = ewx_log_file)
-from ewx_utils.db_files.dbconnection import (
+from ewx_utils.db_files.dbs_connections import (
     connect_to_mawnqc_test,
     connect_to_mawnqc_supercell,
     mawnqc_test_cursor_connection,
@@ -83,15 +83,27 @@ def fetch_records_by_date(cursor, station, start_date, end_date):
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
+
 def is_within_margin(value1, value2):
-    margin
-    """
-    Check if two values are within a specified margin of error.
-    Check how many decimal places are to the left of the decimal point and change the margin
-    to by factors of ten based on the digits you're trying to match - in this case 6
-    if the last digit is a tenths/hundredths/thousandths respectively set margin to 0.1, 0.01, 0.001 
-    if/elif/else etc
-    """
+    # Convert value2 to string to check decimal places
+    str_value2 = str(value2)
+    if '.' in str_value2:
+        decimal_places = len(str_value2.split('.')[1])
+    else:
+        decimal_places = 0
+
+    # Set margin based on decimal places
+    if decimal_places == 0:
+        margin = 0
+    elif decimal_places == 1:
+        margin = 0.1
+    elif decimal_places == 2:
+        margin = 0.01
+    elif decimal_places == 3:
+        margin = 0.001
+    else:
+        margin = 0.001  # Default for more than 3 decimal places
+
     return abs(value1 - value2) <= margin
 
 def compare_records(test_records, supercell_records):

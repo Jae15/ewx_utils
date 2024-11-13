@@ -1,11 +1,11 @@
-from ewx_utils.db_files.dbconnection import connect_to_mawn_dbh11
-from ewx_utils.db_files.dbconnection import (
+from ewx_utils.db_files.dbs_connections import connect_to_mawn_dbh11
+from ewx_utils.db_files.dbs_connections import (
     connect_to_mawn_dbh11, connect_to_mawn_supercell,
     connect_to_mawnqc_dbh11, connect_to_mawnqc_supercell,
     connect_to_mawnqcl, connect_to_rtma_dbh11,
     connect_to_rtma_supercell, connect_to_mawnqc_test
 )
-from ewx_utils.db_files.dbconnection import (
+from ewx_utils.db_files.dbs_connections import (
     mawn_dbh11_cursor_connection, mawn_supercell_cursor_connection,
     mawnqc_dbh11_cursor_connection, mawnqc_supercell_cursor_connection,
     mawnqcl_cursor_connection, rtma_dbh11_cursor_connection,

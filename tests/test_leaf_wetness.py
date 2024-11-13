@@ -1,4 +1,4 @@
-from ewx_utils.mawndb_classes.leafwetness import LeafWetness
+from ewx_utils.mawndb_classes.leaf_wetness import LeafWetness
 
 def test_leafwt_hourly_leaf0_valid():
     leafwt_obj = LeafWetness(0.0, "HOURLY", "LEAF0")

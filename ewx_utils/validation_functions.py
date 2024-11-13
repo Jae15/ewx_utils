@@ -1,11 +1,11 @@
-from db_files.dbconnection import connect_to_mawndb
-from db_files.dbconnection import connect_to_rtma
-from db_files.dbconnection import connect_to_mawndbqc
-from db_files.dbconnection import connect_to_qctest
-from db_files.dbconnection import mawndb_cursor_connection
-from db_files.dbconnection import rtma_cursor_connection
-from db_files.dbconnection import mawnqc_cursor_connection
-from db_files.dbconnection import qctest_cursor_connection
+from ewx_utils.db_files.dbs_connections import connect_to_mawndb
+from ewx_utils.db_files.dbs_connections import connect_to_rtma
+from ewx_utils.db_files.dbs_connections import connect_to_mawndbqc
+from ewx_utils.db_files.dbs_connections import connect_to_qctest
+from ewx_utils.db_files.dbs_connections import mawndb_cursor_connection
+from ewx_utils.db_files.dbs_connections import rtma_cursor_connection
+from ewx_utils.db_files.dbs_connections import mawnqc_cursor_connection
+from ewx_utils.db_files.dbs_connections import qctest_cursor_connection
 import logging
 from validation_checks.validation_logsconfig import validations_logger
 

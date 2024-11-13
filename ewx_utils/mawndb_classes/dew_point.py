@@ -54,8 +54,7 @@ class DewPoint:
 
     def calculate_dew_point(self):
         """
-        Calculates dew point temperature
-            
+        Calculates dew point temperature 
         Returns:
         float: 
         The calculated dew point in temperature

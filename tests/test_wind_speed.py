@@ -1,4 +1,4 @@
-from ewx_utils.mawndb_classes.windspeed import WindSpeed
+from ewx_utils.mawndb_classes.wind_speed import WindSpeed
 
 def test_windspd_valid_creation_mps(): #meters per second
     windspd_obj = WindSpeed(10, "MPS") 

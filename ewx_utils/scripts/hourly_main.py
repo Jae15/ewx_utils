@@ -10,8 +10,8 @@ dotenv.load_dotenv()
 from dotenv import load_dotenv
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
-from ewx_utils.ewx_config import ewx_base_path, ewx_log_file
-from ewx_utils.db_files.dbconnection import (
+from ewx_utils.ewx_config import ewx_log_file
+from ewx_utils.db_files.dbs_connections import (
     connect_to_mawn_dbh11, connect_to_mawn_supercell,
     connect_to_mawnqc_dbh11, connect_to_mawnqc_supercell,
     connect_to_mawnqcl, connect_to_rtma_dbh11,
@@ -21,7 +21,7 @@ from ewx_utils.db_files.dbconnection import (
     mawnqcl_cursor_connection, rtma_dbh11_cursor_connection,
     rtma_supercell_cursor_connection, mawnqc_test_cursor_connection
 )
-from ewx_utils.validation_checks.mawndbsrc import process_records
+from ewx_utils.validation_checks.hourly_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 load_dotenv()
@@ -332,13 +332,12 @@ def main():
     )
     parser.add_argument('-b', '--begin', type=str, help='Start date (no time accepted)')
     parser.add_argument('-e', '--end', type=str, help='End date (no time accepted)')
-    parser.add_argument('-f', '--forcedelete', action='store_true', help="Force delete old records")
-    parser.add_argument('-c', '--clearoverride', action='store_true', help="Clear override active flag")
+    # parser.add_argument('-f', '--forcedelete', action='store_true', help="Force delete old records")
+    # parser.add_argument('-c', '--clearoverride', action='store_true', help="Clear override active flag")
 
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-x', '--execute', action='store_true', help='Execute SQL and change data in QC database')
-    group.add_argument('-d', '--dryrun', action='store_true', help='Do not execute SQL, just write to stdout/store data in test database')
-    parser.add_argument('-l', '--log', action='store_true', help='Create a logfile for this run')
+    # group = parser.add_mutually_exclusive_group(required=True)
+    # group.add_argument('-x', '--execute', action='store_true', help='Execute SQL and change data in QC database')
+    # group.add_argument('-d', '--dryrun', action='store_true', help='Do not execute SQL, just write to stdout/store data in test database')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-s', '--stations', nargs='*', type=str, help='Run for specific stations (list station names)')

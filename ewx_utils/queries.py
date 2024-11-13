@@ -1,14 +1,14 @@
 import logging
 import sys
 sys.path.append('c:/Users/mwangija/data_file/ewx_utils/ewx_utils/db_files')
-from ewx_utils.db_files.dbconnection import connect_to_mawndb
-from ewx_utils.db_files.dbconnection import connect_to_mawndbqc
-from ewx_utils.db_files.dbconnection import connect_to_qctest
-from ewx_utils.db_files.dbconnection import connect_to_rtma
-from ewx_utils.db_files.dbconnection import mawndb_cursor_connection
-from ewx_utils.db_files.dbconnection import mawnqc_cursor_connection
-from ewx_utils.db_files.dbconnection import rtma_cursor_connection
-from ewx_utils.db_files.dbconnection import qctest_cursor_connection
+from ewx_utils.db_files.dbs_connections import connect_to_mawndb
+from ewx_utils.db_files.dbs_connections import connect_to_mawndbqc
+from ewx_utils.db_files.dbs_connections import connect_to_qctest
+from ewx_utils.db_files.dbs_connections import connect_to_rtma
+from ewx_utils.db_files.dbs_connections import mawndb_cursor_connection
+from ewx_utils.db_files.dbs_connections import mawnqc_cursor_connection
+from ewx_utils.db_files.dbs_connections import rtma_cursor_connection
+from ewx_utils.db_files.dbs_connections import qctest_cursor_connection
 #from validation_checks.mawndbsrc import mawndb_addingsrcto_cols
 #from validation_checks.mawndbbsrc import check_value
 #from validation_checks.mawndbsrc import mawndb_srccols_torecord

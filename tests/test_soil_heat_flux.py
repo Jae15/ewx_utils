@@ -31,3 +31,5 @@ def test_sflux_edge_case_above_max():
 def test_sflux_with_none_value():
     sflux_obj = SoilHeatFlux(None)
     assert sflux_obj.is_valid() is False
+
+    

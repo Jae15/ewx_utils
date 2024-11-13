@@ -1,6 +1,4 @@
 from typing import List, Dict, Any
-from logging.handlers import TimedRotatingFileHandler
-from datetime import datetime, timedelta
 import ewx_utils.ewx_config as ewx_config 
 from logs.ewx_utils_logs_config import ewx_utils_logger
 
@@ -8,7 +6,7 @@ from logs.ewx_utils_logs_config import ewx_utils_logger
 my_validation_logger = ewx_utils_logger(path = ewx_config.ewx_log_file)
 
 # Import database connection functions
-from db_files.dbconnection import (
+from ewx_utils.db_files.dbs_connections import (
     connect_to_mawn_dbh11,
     connect_to_mawnqc_dbh11,
     connect_to_rtma_dbh11,
@@ -17,11 +15,15 @@ from db_files.dbconnection import (
     rtma_dbh11_cursor_connection,
 )
 
-
 def fetch_station_list(cursor, query: str) -> List[Dict[str, Any]]:
     """Fetches the list of stations from the database."""
     cursor.execute(query)
     return cursor.fetchall()
+
+def get_all_stations(cursor, query: str) -> List[str]:
+    """Fetches all stations from the mawndb database based on the provided query."""
+    stations = fetch_station_list(cursor, query)
+    return [dict(row)["table_name"] for row in stations]  
 
 def get_db_connections():
     """Establish connections to the databases and return connection and cursor objects."""
@@ -72,6 +74,10 @@ def main():
         mawndbqc_stations = fetch_station_list(mawndbqc_cursor, select_stations_query)
         rtma_stations = fetch_station_list(rtma_cursor, select_stations_query)
 
+        # Fetch all stations from mawndb
+        all_mawndb_stations = get_all_stations(mawndb_cursor)
+        my_validation_logger.debug(f"All Mawndb stations: {all_mawndb_stations}")
+
         # Commit the transactions
         mawndb_connection.commit()
         mawndbqc_connection.commit()
@@ -100,13 +106,9 @@ def main():
                 stndb for stndb in mawndb_station_list if stndb not in mawndbqc_station_list
             ]
             my_validation_logger.debug(f"Stations not in QC: {stations_not_in_qc}")
-            return stations_not_in_qc
-
-        extra_stations_list = extra_stations()
-        my_validation_logger.debug(f"Extra Stations: {extra_stations_list}")
 
     except Exception as e:
-        my_validation_logger.error(f"An error occurred: {str(e)}")
+        my_validation_logger.error(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
