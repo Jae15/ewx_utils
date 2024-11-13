@@ -29,25 +29,23 @@ from .variables_list import (
     wstdv_vars,
     volt_vars
 )
+from ewx_utils.mawndb_classes.voltage import Voltage
 from ewx_utils.mawndb_classes.humidity import Humidity
 from ewx_utils.mawndb_classes.dew_point import DewPoint
-from ewx_utils.mawndb_classes.windspeed import WindSpeed
-from ewx_utils.mawndb_classes.leafwetness import LeafWetness
+from ewx_utils.mawndb_classes.wind_speed import WindSpeed
+from ewx_utils.mawndb_classes.leaf_wetness import LeafWetness
 from ewx_utils.mawndb_classes.temperature import Temperature
-from ewx_utils.mawndb_classes.precipitation import Precipitation
-from ewx_utils.mawndb_classes.winddirection import WindDirection
-from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
-from ewx_utils.mawndb_classes.dew_point import DewPoint
-from ewx_utils.mawndb_classes.vapor_pressure import VaporPressure
-from ewx_utils.mawndb_classes.solar_radiation import SolarRadiation
 from ewx_utils.mawndb_classes.soil_moisture import SoilMoisture
 from ewx_utils.mawndb_classes.net_radiation import NetRadiation
 from ewx_utils.mawndb_classes.soil_heat_flux import SoilHeatFlux
+from ewx_utils.mawndb_classes.precipitation import Precipitation
+from ewx_utils.mawndb_classes.wind_direction import WindDirection
+from ewx_utils.mawndb_classes.vapor_pressure import VaporPressure
+from ewx_utils.mawndb_classes.solar_radiation import SolarRadiation
+from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
 from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
-from ewx_utils.mawndb_classes.voltage import Voltage
 from typing import List, Dict, Tuple
-from .validation_logsconfig import validations_logger
-from .timeloop import generate_list_of_hours
+from .time_utils import generate_list_of_hours
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize the logger
@@ -69,10 +67,6 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         return rh.is_in_range() and rh.is_valid()
     if k in pcpn_vars:
         pn = Precipitation(v, "hourly", "MM", d)
-        #print(pn.is_valid())
-        #print(pn.pcpnMM)
-        #print(pn.pcpnMM + pn.is_valid())
-
         return pn.is_valid()
     if k in rpet_vars:
         rp = Evapotranspiration(v, "hourly", "MM", d)
@@ -101,7 +95,7 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     if k in nrad_vars:
         nr = NetRadiation(v, d)
         return nr.is_valid()
-    if k in srad_vars:
+    if k in srad_vars:                                      
         sr = SolarRadiation(v, d)
         return sr.is_valid()
     if k in sflux_vars:
@@ -113,6 +107,9 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     if k in volt_vars:
         vt = Voltage(v,d)
         return vt.is_valid()
+    if k in dwpt_vars:
+        dp = DewPoint(v, "C", d)
+        return dp.calculate_dew_point()
     return False
 
 def combined_datetime(record: dict) -> datetime.datetime:
@@ -202,15 +199,22 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
 
 def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) -> dict:
     if 'dwpt' in rtma_record.keys():
-        #dwpt_key_rtma = rtma_record['dwpt']
         if rtma_record['dwpt'] is None:
-            # get the atmp and use it to create a temp object
-            # get the relh
-            temp = Temperature(rtma_record['atmp'], 'C', combined_datetime)
-            relh = Humidity(rtma_record['relh'], 'PCT',combined_datetime)
-            dwpt = DewPoint(temp, relh, combined_datetime)
-            dwptC = dwpt.calculate_dew_point()
-            rtma_record['dwpt'] = dwptC
+            # Get the atmp and use it to create a temp object
+            temp = Temperature(rtma_record['atmp'], 'C', combined_datetime) if rtma_record['atmp'] is not None else None
+            # Get the relh and use it to create a relh object
+            relh = Humidity(rtma_record['relh'], 'PCT', combined_datetime) if rtma_record['relh'] is not None else None
+            
+            # Check if both temp and relh are not None
+            if temp is not None and relh is not None:
+                # Create dwpt object from temp and relh
+                dwpt = DewPoint(temp, relh, combined_datetime)
+                # Calculate the dwpt value using temp and relh
+                dwptC = dwpt.calculate_dew_point()
+                rtma_record['dwpt'] = dwptC
+            else:
+                # Set dwpt to None if either temp or relh is None
+                rtma_record['dwpt'] = None
     return rtma_record
 
 def replace_none_with_rtmarecord(

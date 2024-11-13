@@ -9,14 +9,12 @@ sys.path.append(ewx_base_path)
 import psycopg2
 import psycopg2.extras
 from psycopg2 import OperationalError
-import ewx_utils.ewx_config as ewx_config
-from ewx_utils.ewx_config import (
-    ewx_base_path, ewx_log_file)
+from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 my_dbfiles_logger = ewx_utils_logger(log_path = ewx_log_file) 
 
-from ewx_utils.db_files.configfile import (
+from ewx_utils.db_files.dbs_configfile import (
     config_mawn_dbh11,
     config_mawn_supercell,
     config_mawnqc_dbh11,

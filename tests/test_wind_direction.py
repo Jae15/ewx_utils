@@ -1,4 +1,4 @@
-from ewx_utils.mawndb_classes.winddirection import WindDirection
+from ewx_utils.mawndb_classes.wind_direction import WindDirection
 
 def test_winddir_within_valid_range():
     winddir_obj = WindDirection(198, "DEGREES")
