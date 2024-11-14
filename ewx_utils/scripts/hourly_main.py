@@ -5,8 +5,6 @@ import argparse
 import datetime as datetime
 from datetime import datetime, timedelta
 from psycopg2 import OperationalError
-import dotenv
-dotenv.load_dotenv()
 from dotenv import load_dotenv
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -335,9 +333,9 @@ def main():
     # parser.add_argument('-f', '--forcedelete', action='store_true', help="Force delete old records")
     # parser.add_argument('-c', '--clearoverride', action='store_true', help="Clear override active flag")
 
-    # group = parser.add_mutually_exclusive_group(required=True)
-    # group.add_argument('-x', '--execute', action='store_true', help='Execute SQL and change data in QC database')
-    # group.add_argument('-d', '--dryrun', action='store_true', help='Do not execute SQL, just write to stdout/store data in test database')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-x', '--execute', action='store_true', help='Execute SQL and change data in QC database')
+    group.add_argument('-d', '--dryrun', action='store_true', help='Do not execute SQL, just write to stdout/store data in test database')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-s', '--stations', nargs='*', type=str, help='Run for specific stations (list station names)')
