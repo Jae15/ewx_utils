@@ -1,8 +1,8 @@
 import os
 import sys
-import dotenv
 import math
-dotenv.load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_base_path, ewx_database_configfile, ewx_log_file

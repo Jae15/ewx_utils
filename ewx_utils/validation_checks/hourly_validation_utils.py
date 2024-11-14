@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 import os
 import sys
-import dotenv
-dotenv.load_dotenv()
 from dotenv import load_dotenv
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
