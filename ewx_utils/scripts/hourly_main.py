@@ -290,6 +290,37 @@ def insert_or_update_records(cursor, station, records):
         my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
         raise
 
+def get_all_stations_list(cursor) -> List[str]:
+    """
+    Fetch station names from the database and log them.
+    """
+    query = """SELECT table_name FROM information_schema.tables
+               WHERE table_schema = 'public' AND table_name LIKE '%hourly'
+               ORDER BY table_name ASC"""
+    
+    try:
+        if cursor is None:
+            my_logger.error("Cursor is not valid.")
+            return []
+
+        cursor.execute(query)
+        stations = cursor.fetchall()
+
+        if not stations:
+            my_logger.warning("No stations found.")
+            return []
+
+        # Creating a list of station names and logging them
+        stations_list = [dict(row)["table_name"] for row in stations]
+        my_logger.info(f"Fetched stations: {stations_list}")
+
+        return stations_list
+
+    except Exception as e:
+        my_logger.error(f"Error fetching stations: {e}")
+        raise
+
+
 def time_defaults(user_begin_date: str, user_end_date: str):
     """
     Set default begin and end dates if not provided, and ensure the dates are returned as strings.
@@ -363,10 +394,10 @@ def main():
         rtma_cursor = db_connections.get('rtma_dbh11_cursor')
         qc_cursor = db_connections.get('qctest_cursor') or db_connections.get('mawnqcl_cursor') or \
                     db_connections.get('mawnqc_dbh11_cursor') or db_connections.get('mawnqc_supercell_cursor')
-
-        # Process records for the specified stations
+        
+                # Process records for the specified stations
         if args.all:
-            stations = get_all_stations()  # Fetch all station names
+            stations = get_all_stations_list(mawn_cursor)  # Fetch all station names using mawndb_cursor
         else:
             stations = args.stations
 
