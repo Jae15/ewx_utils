@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
-from ewx_utils.ewx_config import (
-    ewx_base_path, ewx_log_file)
+from ewx_utils.ewx_config import ewx_log_file
 import datetime
 from datetime import timezone
 from zoneinfo import ZoneInfo
@@ -45,6 +44,7 @@ from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
 from typing import List, Dict, Tuple
 from .time_utils import generate_list_of_hours
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from typing import List, Dict, Any
 
 # Initialize the logger
 my_validation_logger = ewx_utils_logger(log_path = ewx_log_file)

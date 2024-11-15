@@ -290,9 +290,9 @@ def insert_or_update_records(cursor, station, records):
         my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
         raise
 
-def get_all_stations_list(cursor) -> List[str]:
+def get_all_stations_list(cursor) -> list[str]:
     """
-    Fetch station names from the database and log them.
+    Fetch station names from the database and log them, excluding 'variables_hourly'.
     """
     query = """SELECT table_name FROM information_schema.tables
                WHERE table_schema = 'public' AND table_name LIKE '%hourly'
@@ -314,7 +314,14 @@ def get_all_stations_list(cursor) -> List[str]:
         stations_list = [dict(row)["table_name"] for row in stations]
         my_logger.info(f"Fetched stations: {stations_list}")
 
-        return stations_list
+        # Exclude the station named 'variables_hourly'
+        filtered_stations_list = [station for station in stations_list if station != 'variables_hourly']
+
+        return filtered_stations_list
+
+    except Exception as e:
+        my_logger.error(f"Error fetching stations: {e}")
+        raise
 
     except Exception as e:
         my_logger.error(f"Error fetching stations: {e}")
