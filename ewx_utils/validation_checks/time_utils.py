@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 import dotenv
@@ -7,8 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
-from ewx_utils.ewx_config import (
-    ewx_base_path, ewx_log_file)
+from ewx_utils.ewx_config import ewx_log_file
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil import tz

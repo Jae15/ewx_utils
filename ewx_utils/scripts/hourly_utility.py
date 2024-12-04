@@ -4,6 +4,7 @@ import sys
 import decimal
 import argparse
 import pprint
+from pprint import pprint
 import dotenv
 dotenv.load_dotenv()
 from dotenv import load_dotenv
@@ -11,8 +12,7 @@ load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from datetime import datetime
-from ewx_utils.ewx_config import (
-    ewx_base_path, ewx_log_file)
+from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize the logger
@@ -154,7 +154,7 @@ def main():
     parser.add_argument('-b', '--begin', type=str, required=True, help="Start date (YYYY-MM-DD)")
     parser.add_argument('-e', '--end', type=str, required=True, help="End date (YYYY-MM-DD)")
     parser.add_argument('-s', '--station', type=str, required=True, help="Station name (which is also the table name)")
-
+    
     args = parser.parse_args()
 
     try:
@@ -175,7 +175,7 @@ def main():
         # Report results
         if only_in_test:
             my_logger.error(f"Records found only in test database: {len(only_in_test)}")
-            pprint.pprintror(f"Records found only in test database: {len(only_in_test)}")
+            pprint.pprint(f"Records found only in test database: {len(only_in_test)}")
         if only_in_supercell:
             my_logger.error(f"Records found only in supercell database: {len(only_in_supercell)}")
             pprint.pprint(f"Records found only in supercell database: {len(only_in_supercell)}")
@@ -183,11 +183,11 @@ def main():
             my_logger.error(f"Mismatched records: {len(mismatches)}")
             for mismatch in mismatches:
                 my_logger.error(f"Test Record : {mismatch[0]}")
-                print(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
+                pprint.pprint(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
                 my_logger.error(f"Supercell Record: {mismatch[1]}")
-                print(f"Supercell Record: {mismatch[1]}")
+                pprint.pprint(f"Supercell Record: {mismatch[1]}")
                 my_logger.error(f"Details: {mismatch[2]}")
-                print(f"Details: {mismatch[2]}")
+                pprint.pprint(f"Details: {mismatch[2]}")
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
