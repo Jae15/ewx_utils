@@ -41,10 +41,9 @@ from ewx_utils.mawndb_classes.vapor_pressure import VaporPressure
 from ewx_utils.mawndb_classes.solar_radiation import SolarRadiation
 from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
 from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
-from typing import List, Dict, Tuple
+from typing import List, Dict, Any, Tuple
 from .time_utils import generate_list_of_hours
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
-from typing import List, Dict, Any
 
 # Initialize the logger
 my_validation_logger = ewx_utils_logger(log_path = ewx_log_file)
@@ -148,7 +147,7 @@ clean_records = []
 
 
 def creating_mawnsrc_record(
-    record: dict, combined_datetime: datetime.datetime, id_col_list: list
+    record: dict, combined_datetime: datetime.datetime, id_col_list: list, default_source: str
 ) -> dict:
     """
     Creates a MAWN source record by checking values and setting appropriate source indicators.
@@ -168,7 +167,7 @@ def creating_mawnsrc_record(
             else:
                 value_check = check_value(key, mawnsrc_record[key], combined_datetime)
                 if value_check is True:
-                    mawnsrc_record[key + "_src"] = "MAWN"
+                    mawnsrc_record[key + "_src"] = default_source
                 elif key in relh_vars:  # and value_check was not True
                     mawnsrc_record[key + "_src"] = "OOR"
                 else:
@@ -189,7 +188,7 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
     for key in mawnsrc_record:
         if key in relh_vars and (mawnsrc_record[key] is None or mawnsrc_record.get(key + "_src") == "EMPTY"):
             mawnsrc_record[key] = None
-        elif key in relh_vars and 100 <= mawnsrc_record[key] <= 105:
+        elif key in relh_vars and 100 < mawnsrc_record[key] <= 105:
             mawnsrc_record[key + "_src"] = "RELH_CAP"
             mawnsrc_record[key] = 100
 
@@ -285,6 +284,7 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
     for dt in datetime_list:
         matching_mawn_record = None
         matching_rtma_record = None
+        id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
 
         # Find the matching MAWN record for the current datetime
         for record in mawndb_records:
@@ -295,10 +295,10 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
         # Process the MAWN record if found
         if matching_mawn_record:
             combined_date = combined_datetime(matching_mawn_record)
-            id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
+            
 
             # Create and validate the MAWN source record
-            mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list)
+            mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list, 'MAWN')
             mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
 
             # Find the matching RTMA record for the same datetime
@@ -325,7 +325,7 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
                     rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
 
                     # Create a MAWN-like source record directly from the RTMA record
-                    mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_rtma_date, id_col_list=[])
+                    mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_rtma_date, id_col_list, 'RTMA')
                     mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
                     clean_records.append(mawnsrc_record)
                     break

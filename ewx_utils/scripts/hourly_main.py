@@ -4,7 +4,9 @@ import sys
 import argparse
 import datetime as datetime
 from datetime import datetime, timedelta
+from datetime import date
 from psycopg2 import OperationalError
+from pprint import pprint
 from dotenv import load_dotenv
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -21,6 +23,7 @@ from ewx_utils.db_files.dbs_connections import (
 )
 from ewx_utils.validation_checks.hourly_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from typing import List, Dict, Any
 
 load_dotenv()
 # Initialize the logger
@@ -78,7 +81,6 @@ def create_db_connections(args):
         close_connections(connections)
         raise
 
-
 def close_connections(connections):
     """
     Close all database connections and cursors.
@@ -95,23 +97,32 @@ def close_connections(connections):
         except Exception as e:
             my_logger.error(f"Error closing {name}: {e}")
 
-def commit_and_close(connection):
+def commit_and_rollback(connection, operations):
     """
-    Commit the transaction and close the database connection.
+    Commit the transaction after performing operations and close the database connection.
+    Parameters:
+    - connection: The database connection object.
+    - operations: A list of functions to execute as part of the transaction.
     """
     try:
+        # Begin transaction
+        connection.autocommit = False
+        # Execute all operations
+        for operation in operations:
+            operation()  
+        # Commit the transaction
         connection.commit()
-        connection.close()
         my_logger.info("Transaction committed and connection closed.")
     except Exception as e:
-        my_logger.error(f"Error committing transaction or closing connection: {e}")
-        raise
+        # Rollback the transaction in case of error
+        connection.rollback()
+        my_logger.error(f"Transaction failed and rolled back: {e}")
 
 def fetch_records(cursor, station, begin_date, end_date):
     """
     Fetch records from the specified station between begin_date and end_date.
     """
-    query = f"SELECT * FROM {station} WHERE date BETWEEN %s AND %s"
+    query = f"SELECT * FROM {station}_hourly WHERE date BETWEEN %s AND %s"
     my_logger.error(f"Executing query: {query} with parameters: {begin_date}, {end_date}")
     try:
         cursor.execute(query, (begin_date, end_date))
@@ -127,13 +138,15 @@ def get_insert_table_columns(cursor, station):
     """
     Fetch column names of the specified table and log them.
     """
+    # Try to get all columns for all stations and store them in a dictionary or something
+    # Then read them from above dictionary instead of executing a query
     query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = 'public' "
     try:
         if cursor is None:
             my_logger.error("Cursor is not valid.")
             return []
 
-        cursor.execute(query, (station,))
+        cursor.execute(query, (f"{station}_hourly",))
         columns = cursor.fetchall()
         #print(columns)
 
@@ -177,7 +190,7 @@ def record_exists(cursor, station, record):
     """
     Check if a record exists in the table for the specific station based on the date and time
     """
-    query = f"SELECT 1 FROM {station} WHERE date = %s AND time = %s"
+    query = f"SELECT 1 FROM {station}_hourly WHERE date = %s AND time = %s"
 
     try:
         cursor.execute(query, (record['date'], record['time']))
@@ -186,7 +199,7 @@ def record_exists(cursor, station, record):
         my_logger.error(f"Error checking existece of record in {station}: {e}")
         raise
 
-def update_records(cursor, station, records):
+def update_records(cursor, station, qc_columns, records):
     """
     Update existing records in the specified table.
     """
@@ -195,7 +208,7 @@ def update_records(cursor, station, records):
         return
 
     try:
-        qc_columns = get_insert_table_columns(cursor, station)
+        #qc_columns = get_insert_table_columns(cursor, station)
         if not qc_columns:
             my_logger.error(f"No valid columns found for table {station}. Cannot proceed with update.")
             return
@@ -210,7 +223,7 @@ def update_records(cursor, station, records):
             my_logger.error(f"No updatable keys found in the filtered records for {station}.")
             return
 
-        update_query = f"UPDATE {station} SET " + ", ".join([f"{col} = %s" for col in record_keys]) + " WHERE date = %s AND time = %s"
+        update_query = f"UPDATE {station}_hourly SET " + ", ".join([f"{col} = %s" for col in record_keys]) + " WHERE date = %s AND time = %s"
         
         for record in filtered_records:
             update_values = [record[key] for key in record_keys] + [record['date'], record['time']]
@@ -221,7 +234,7 @@ def update_records(cursor, station, records):
         my_logger.error(f"Error updating records in {station}: {e}")
         raise
 
-def insert_records(cursor, station, records):
+def insert_records(cursor, station, qc_columns, records):
     """
     Insert records into the specified table, filtered by the table's columns.
     """
@@ -230,8 +243,7 @@ def insert_records(cursor, station, records):
         return
     try:
         # Fetch allowed columns for the insert table
-        qc_columns = get_insert_table_columns(cursor, station)
-
+        # qc_columns = get_insert_table_columns(cursor, station)
         if not qc_columns:
             my_logger.error(f"No valid columns found for table {station}. Cannot proceed with insert.")
             return
@@ -263,7 +275,7 @@ def insert_records(cursor, station, records):
     # Prepare the INSERT query using only the filtered columns
     db_columns = ", ".join(record_keys)
     qc_values = ", ".join(["%s"] * len(record_keys))
-    query = f"INSERT INTO {station} ({db_columns}) VALUES ({qc_values})"
+    query = f"INSERT INTO {station}_hourly ({db_columns}) VALUES ({qc_values})"
 
     my_logger.error(f"Constructed INSERT query: {query}")
     
@@ -273,19 +285,26 @@ def insert_records(cursor, station, records):
             cursor.execute(query, record_vals)
         my_logger.error(f"Inserted {len(filtered_records)} records into {station}.")
     except Exception as e:
+        if query:
+            print(f"query: {query}")
+        if record_vals:
+            print(f" record_vals: {record_vals}")
         my_logger.error(f"Error inserting records into {station}: {e}")
         raise
     
-def insert_or_update_records(cursor, station, records):
+def insert_or_update_records(cursor, station, qc_columns, records):
     """
     Insert or update records based on existence in the table
+
     """
+    qc_columns = get_insert_table_columns(cursor, station)
+
     try:
         for record in records:
             if record_exists(cursor, station, record):
-                update_records(cursor, station, [record])
+                update_records(cursor, station, qc_columns, [record])
             else:
-                insert_records(cursor, station, [record])
+                insert_records(cursor, station, qc_columns, [record])
     except Exception as e:
         my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
         raise
@@ -317,21 +336,22 @@ def get_all_stations_list(cursor) -> list[str]:
         # Exclude the station named 'variables_hourly'
         filtered_stations_list = [station for station in stations_list if station != 'variables_hourly']
 
-        return filtered_stations_list
+        # Remove the '_hourly' suffix from each station name
+        cleaned_stations_list = [station.replace('_hourly', '') for station in filtered_stations_list]
+        #pprint(cleaned_stations_list)
+
+        return cleaned_stations_list
 
     except Exception as e:
-        my_logger.error(f"Error fetching stations: {e}")
-        raise
-
-    except Exception as e:
-        my_logger.error(f"Error fetching stations: {e}")
-        raise
+        my_logger.error(f"An error occurred: {e}")
+        return []
 
 
 def time_defaults(user_begin_date: str, user_end_date: str):
     """
     Set default begin and end dates if not provided, and ensure the dates are returned as strings.
     """
+
     try:
         if user_begin_date is None:
             user_begin_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
@@ -358,6 +378,121 @@ def time_defaults(user_begin_date: str, user_end_date: str):
         #print("An error occurred:", e)
     finally:
         my_logger.info("time_defaults function execution completed.")
+
+def get_station_data(cursor) -> dict:
+    """
+    Function to get station data including begin dates, end dates, and active status of the stations.
+
+    Args:
+        cursor: Database cursor to execute SQL queries.
+
+    Returns:
+        A dictionary containing station names as keys and their corresponding data (active status, bg_dates, ed_dates).
+    """
+    my_logger.info("Starting to fetch station data.")
+    
+    try:
+        # Query all the station names and their active status
+        station_status_query = "SELECT station_name, active from station_info"
+        cursor.execute(station_status_query)
+        station_info_columns = cursor.fetchall()
+
+        station_info_dict = {}
+        for row in station_info_columns:
+            station_name = row['station_name']
+            station_status = row['active']
+            station_info_dict[station_name] = {'active': station_status, 'bg_date': [], 'ed_date': []}
+        #pprint(f"station_info_dict: {station_info_dict}")
+        
+        # Prepare placeholders for the query
+        station_names_placeholders = ', '.join(f"'{name}'" for name in station_info_dict.keys())
+        #pprint(station_names_placeholders)
+
+        # Query to get bg dates and ed dates for all stations
+        date_info_query = f"""
+        SELECT station_name, bg_date, ed_date FROM hourly_info WHERE station_name IN ({station_names_placeholders});
+        """
+        cursor.execute(date_info_query)
+        date_info_columns = cursor.fetchall()
+        #pprint(f"Date Info Columns: {date_info_columns}")
+
+        for row in date_info_columns:
+            station_name = row['station_name']
+            bg_date = row['bg_date'].strftime('%Y-%m-%d') if row['bg_date'] else None
+            ed_date = row['ed_date'].strftime('%Y-%m-%d') if row['ed_date'] else None
+            
+            if bg_date:
+                station_info_dict[station_name]['bg_date'].append(bg_date)
+            if ed_date:
+                station_info_dict[station_name]['ed_date'].append(ed_date)
+
+        my_logger.info("Successfully fetched station data.")
+        #pprint(f"Station_info_dict: {station_info_dict}")
+        return station_info_dict
+
+    except Exception as e:
+        my_logger.error(f"An error occurred while fetching station data: {e}")
+        return {}
+
+def get_runtime_begin_date(process_begin_date: str, station_info: dict) -> dict:
+    """
+    Calculate the runtime begin date based on process begin date and station data.
+
+    Args:
+        process_begin_date: The date when the process begins, as a string.
+        station_info: A dictionary containing station information.
+
+    Returns:
+        A dictionary mapping station names to their respective runtime begin dates.
+    """
+    my_logger.info("Calculating runtime begin dates.")
+    
+    if process_begin_date is None:
+        my_logger.warning("Process begin date is None, returning None.")
+        return None
+    
+    runtime_begin_date = {}
+    for station_name, info in station_info.items():
+        station_begin_date = info['bg_date'][0] if info['bg_date'] else None
+        if station_begin_date:
+            runtime_begin_date[station_name] = max(process_begin_date, station_begin_date)
+            my_logger.debug(f"Station: {station_name}, Runtime Begin Date: {runtime_begin_date[station_name]}")
+    
+    my_logger.info("Runtime begin dates calculation completed.")
+    return runtime_begin_date
+
+def get_runtime_end_date(process_end_date: str, station_info: dict) -> dict:
+    """
+    Calculate runtime end date based on the process_end_date and station info.
+
+    Args:
+        process_end_date: The date when the process ends, as a string.
+        station_info: A dictionary containing station information.
+
+    Returns:
+        A dictionary mapping station names to their respective runtime end dates.
+    """
+    my_logger.info("Calculating runtime end dates.")
+    
+    if process_end_date is None:
+        my_logger.warning("Process end date is None, returning None.")
+        return None
+    
+    runtime_end_date = {}
+    for station_name, info in station_info.items():
+        station_end_date = info['ed_date'][0] if info['ed_date'] else None
+        active_status = info['active']
+        
+        if active_status and process_end_date == date.today().strftime('%Y-%m-%d'):
+            runtime_end_date[station_name] = process_end_date
+            my_logger.debug(f"Station: {station_name}, Runtime End Date: {runtime_end_date[station_name]}")
+        elif station_end_date:
+            runtime_end_date[station_name] = min(process_end_date, station_end_date)
+            my_logger.debug(f"Station: {station_name}, Runtime End Date: {runtime_end_date[station_name]}")
+    
+    my_logger.info("Runtime end dates calculation completed.")
+    return runtime_end_date
+
 
 def main():
     # Initialize argument parser
@@ -402,41 +537,57 @@ def main():
         qc_cursor = db_connections.get('qctest_cursor') or db_connections.get('mawnqcl_cursor') or \
                     db_connections.get('mawnqc_dbh11_cursor') or db_connections.get('mawnqc_supercell_cursor')
         
-                # Process records for the specified stations
+        # Process records for specified stations
         if args.all:
-            stations = get_all_stations_list(mawn_cursor)  # Fetch all station names using mawndb_cursor
+            stations = get_all_stations_list(mawn_cursor)
+            #pprint(stations)
         else:
             stations = args.stations
 
+        station_info = get_station_data(mawn_cursor)
+        #pprint(f"Station_info: {station_info}")
+
+        runtime_begin_dates = get_runtime_begin_date(begin_date, station_info)
+        #pprint(runtime_begin_dates)
+        runtime_end_dates = get_runtime_end_date(end_date, station_info)
+        #pprint(runtime_end_dates)
+
         for station in stations:
-            mawn_records = fetch_records(mawn_cursor, station, begin_date, end_date) if mawn_cursor else []
-            rtma_records = fetch_records(rtma_cursor, station, begin_date, end_date) if rtma_cursor else []
+            mawn_records = fetch_records(mawn_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
+            rtma_records = fetch_records(rtma_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
 
             # Process and clean the records
             cleaned_records = process_records(mawn_records, rtma_records, begin_date, end_date)
 
-            """
-             # Insert cleaned records if execution mode is set
-            if args.execute and qc_cursor:
-                insert_records(qc_cursor, station, cleaned_records)
-            """
+
             # If execution is requested and QC cursor is available, insert or update records in the QC database
             if args.execute and qc_cursor:
-                insert_or_update_records(qc_cursor, station, cleaned_records)
-
+                operations = [
+                    (insert_records, (qc_cursor, station, qc_columns, cleaned_records))
+                    (update_records, (qc_cursor, station, qc_columns, cleaned_records))
+                    (insert_or_update_records, (qc_cursor, station, qc_columns, cleaned_records))
+                    ]
     finally:
         # Commit and close only the open connections
         for conn_key, conn in db_connections.items():
             if 'connection' in conn_key:
-                commit_and_close(conn)
-        close_connections(db_connections)
+                commit_and_rollback(conn)
+        close_connections(db_connections, operations)
 
 if __name__ == "__main__":
     main()
 
+"""
+Change insert_records and update_records functions.
+Instead of running cursor.execute, create a list/dictionary containing:
+for each record the query and query parameters ie record_vals.
+In the insert_update_records, all the queries will be executed all at once
+I might need to create a transaction that queues all of those queries
 
 """
-python hourly_main.py --begin 2023-1-1 --end 2023-1-7 --station aetna_hourly -x
+
+"""
+python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x 
 
 hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
 [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]

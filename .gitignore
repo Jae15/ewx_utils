@@ -15,4 +15,4 @@ ewx_logs.log/
 *.log
 .env
 *.log.*
-
+.stations_utils.py/
