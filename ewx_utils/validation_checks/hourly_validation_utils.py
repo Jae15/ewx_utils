@@ -104,9 +104,6 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     if k in volt_vars:
         vt = Voltage(v,d)
         return vt.is_valid()
-    if k in dwpt_vars:
-        dp = DewPoint(v, "C", d)
-        return dp.calculate_dew_point()
     return False
 
 def combined_datetime(record: dict) -> datetime.datetime:
@@ -144,7 +141,6 @@ record_vals = []
 db_columns = []
 qc_values = []
 clean_records = []
-
 
 def creating_mawnsrc_record(
     record: dict, combined_datetime: datetime.datetime, id_col_list: list, default_source: str
@@ -191,7 +187,30 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
         elif key in relh_vars and 100 < mawnsrc_record[key] <= 105:
             mawnsrc_record[key + "_src"] = "RELH_CAP"
             mawnsrc_record[key] = 100
+        elif key in relh_vars and mawnsrc_record[key] > 105:  
+            mawnsrc_record[key + "_src"] = "OOR" 
+            mawnsrc_record[key] = None  
 
+    return mawnsrc_record
+
+def create_mawn_dwpt(mawnsrc_record: dict, combined_datetime: datetime.datetime) -> dict:
+    if 'dwpt' in mawnsrc_record.keys():
+        if mawnsrc_record['dwpt'] is None:
+            temp = Temperature(mawnsrc_record['atmp'], 'C', combined_datetime) if mawnsrc_record['atmp'] is not None else None
+            # Get the relh and use it to create a relh object
+            relh = Humidity(mawnsrc_record['relh'], 'PCT', combined_datetime) if mawnsrc_record['relh'] is not None else None
+            
+            # Check if both temp and relh are not None
+            if temp is not None and relh is not None:
+                # Create dew point object from temp and relh
+                dwpt_value = DewPoint(temp, relh, combined_datetime)
+                # Assign the calculated dew point value to the record
+                mawnsrc_record['dwpt'] = dwpt_value.dwptC 
+                mawnsrc_record['dwpt_src'] = "MAWN"
+            else:
+                # Set dwpt to None if either temp or relh is None
+                mawnsrc_record['dwpt'] = None
+                mawnsrc_record['dwpt_src'] = "EMPTY"
     return mawnsrc_record
 
 def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) -> dict:
@@ -204,14 +223,16 @@ def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) ->
             
             # Check if both temp and relh are not None
             if temp is not None and relh is not None:
-                # Create dwpt object from temp and relh
-                dwpt = DewPoint(temp, relh, combined_datetime)
-                # Calculate the dwpt value using temp and relh
-                dwptC = dwpt.calculate_dew_point()
-                rtma_record['dwpt'] = dwptC
+                # Create dew point object from temp and relh
+                dwpt_value = DewPoint(temp, relh, combined_datetime)
+                
+                # Assign the calculated dew point value to the record
+                rtma_record['dwpt'] = dwpt_value.dwptC 
+                rtma_record['dwpt_src'] = "RTMA"
             else:
                 # Set dwpt to None if either temp or relh is None
                 rtma_record['dwpt'] = None
+                rtma_record['dwpt_src'] = "EMPTY"
     return rtma_record
 
 def replace_none_with_rtmarecord(
@@ -241,7 +262,6 @@ def replace_none_with_rtmarecord(
                     clean_record[data_key] = None
                     clean_record[key] = "EMPTY"
     return clean_record
-
 
 def one_mawndb_record(mawndb_records: list) -> list:
     """
@@ -295,11 +315,10 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
         # Process the MAWN record if found
         if matching_mawn_record:
             combined_date = combined_datetime(matching_mawn_record)
-            
-
             # Create and validate the MAWN source record
             mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list, 'MAWN')
             mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
+            mawnsrc_record = create_mawn_dwpt(mawnsrc_record, combined_date)
 
             # Find the matching RTMA record for the same datetime
             for rtma_record in rtma_records:
@@ -332,13 +351,3 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
 
     return clean_records
 
-# Provide the functions needed for external scripts
-__all__ = [
-    "check_value",
-    "combined_datetime",
-    "creating_mawnsrc_record",
-    "relh_cap",
-    "create_rtma_dwpt",
-    "replace_none_with_rtmarecord",
-    "process_records"
-]

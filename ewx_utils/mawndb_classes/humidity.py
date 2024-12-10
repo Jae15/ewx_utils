@@ -32,9 +32,11 @@ class Humidity:
                           relh, units, record_date)
        
         self.record_date = record_date
-        if relh is None:
-            relh = -9999
         unitsU = units.upper()
+        if relh is None:
+            self.relhPCT = None
+            self.relhDEC = None
+
         if unitsU == "PCT":
             self.relhPCT = float(relh)
             self.relhDEC = float(relh) / 100
@@ -85,7 +87,7 @@ class Humidity:
             return (0, 'RELH_CAP')  # Cap at 0%
 
         # Checking if the humidity value is within the capped range
-        if 100 <= self.relhPCT <= self.RELH_CAP:
+        elif 100 < self.relhPCT <= self.RELH_CAP:
             self.logger.debug("relhPCT value: %s is within the range, returning (100, 'RELH_CAP')",
                             self.relhPCT, self.RELH_CAP)
             return (100, 'RELH_CAP')
@@ -93,10 +95,10 @@ class Humidity:
         # Checking if the humidity value is above the maximum threshold
         elif self.relhPCT > self.RELH_CAP:
             self.logger.debug("relhPCT value: %s is above RELH_CAP, returning None", self.relhPCT)
-            return None  # Return None for values above 105
+            return None  # Return None for values above RELH_CAP
 
         # Return the actual value for valid humidity below 100
-        self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'RELH')", self.relhPCT)
+        else: self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'RELH')", self.relhPCT)
         return (self.relhPCT, 'RELH')
-    
- 
+
+   
