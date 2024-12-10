@@ -97,26 +97,22 @@ def close_connections(connections):
         except Exception as e:
             my_logger.error(f"Error closing {name}: {e}")
 
-def commit_and_rollback(connection, operations):
-    """
-    Commit the transaction after performing operations and close the database connection.
-    Parameters:
-    - connection: The database connection object.
-    - operations: A list of functions to execute as part of the transaction.
-    """
+def commit_and_rollback(connection, station, qc_columns, records):
     try:
-        # Begin transaction
-        connection.autocommit = False
-        # Execute all operations
-        for operation in operations:
-            operation()  
-        # Commit the transaction
+        with connection.cursor() as cursor:
+            print("Cursor created")
+            insert_or_update_records(cursor, station, qc_columns, records)
+        print("Inserted/Updated records successfully")
+        my_logger.info("Inserted/Updated records successfully")
         connection.commit()
-        my_logger.info("Transaction committed and connection closed.")
+        print("Successfully committed transaction")
+        my_logger.info("Successfully committed transaction")
     except Exception as e:
+        print(f"Exception as {e}")
         # Rollback the transaction in case of error
         connection.rollback()
         my_logger.error(f"Transaction failed and rolled back: {e}")
+
 
 def fetch_records(cursor, station, begin_date, end_date):
     """
@@ -133,33 +129,42 @@ def fetch_records(cursor, station, begin_date, end_date):
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
-
+    
 def get_insert_table_columns(cursor, station):
     """
     Fetch column names of the specified table and log them.
     """
-    # Try to get all columns for all stations and store them in a dictionary or something
-    # Then read them from above dictionary instead of executing a query
-    query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = 'public' "
+    # Initialize a dictionary to store columns for this function call
+    station_columns = {}
+
+    # Query to select a sample row from the station's table
+    #query = f"SELECT * FROM {station}_hourly LIMIT 1"
+
+    query = f"SELECT * FROM aetna_hourly LIMIT 1"
+
     try:
         if cursor is None:
             my_logger.error("Cursor is not valid.")
             return []
 
-        cursor.execute(query, (f"{station}_hourly",))
-        columns = cursor.fetchall()
-        #print(columns)
+        cursor.execute(query)
+        # Fetch one row to get the column names
+        row = cursor.fetchone()
 
-        if not columns:
-            my_logger.warning(f"No columns found for table {station}.")
+        if row is None:
+            my_logger.warning(f"No data found for table {station}.")
             return []
 
-        # Creating a list of column names and logging them
-        columns_list = [row['column_name'] for row in columns]
+        # Extracting column names from cursor description
+        columns_list = [desc[0] for desc in cursor.description]
         my_logger.info(f"Fetched columns for table {station}: {columns_list}")
 
-        # Print and/ log the retrieved QC columns for verification
-        #print("QC Columns:", columns_list)  
+        # Store the columns in the dictionary for this function call
+        station_columns[station] = columns_list
+
+        #print(columns_list)
+
+        # logging the retrieved QC columns 
         my_logger.info(f"QC Columns retrieved: {columns_list}")
 
         return columns_list
@@ -167,7 +172,6 @@ def get_insert_table_columns(cursor, station):
     except Exception as e:
         my_logger.error(f"Error fetching columns for table {station}: {e}")
         raise
-
 
 def filter_records_by_columns(records, qc_columns):
     """
@@ -553,6 +557,7 @@ def main():
         #pprint(runtime_end_dates)
 
         for station in stations:
+            qc_columns = get_insert_table_columns(qc_cursor, station)
             mawn_records = fetch_records(mawn_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
             rtma_records = fetch_records(rtma_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
 
@@ -562,20 +567,36 @@ def main():
 
             # If execution is requested and QC cursor is available, insert or update records in the QC database
             if args.execute and qc_cursor:
-                operations = [
-                    (insert_records, (qc_cursor, station, qc_columns, cleaned_records))
-                    (update_records, (qc_cursor, station, qc_columns, cleaned_records))
+                commit_and_rollback(db_connections['qctest_connection'], station, qc_columns, cleaned_records)
+
+                """
+                                operations = [
+                    (insert_records, (qc_cursor, station, qc_columns, cleaned_records)),
+                    (update_records, (qc_cursor, station, qc_columns, cleaned_records)),
                     (insert_or_update_records, (qc_cursor, station, qc_columns, cleaned_records))
-                    ]
+                ]
+                commit_and_rollback(db_connections['qctest_connection'], operations)
+                """
+
+                    # Call commit_and_rollback with the operations
+            
+    except Exception as e:
+        my_logger.error(f"An error occurred: {e}")
+    finally:
+        # Close all database connections
+        close_connections(db_connections)
+
+if __name__ == "__main__":
+    main()
+
+"""
     finally:
         # Commit and close only the open connections
         for conn_key, conn in db_connections.items():
             if 'connection' in conn_key:
                 commit_and_rollback(conn)
-        close_connections(db_connections, operations)
-
-if __name__ == "__main__":
-    main()
+        close_connections(db_connections)
+"""
 
 """
 Change insert_records and update_records functions.
