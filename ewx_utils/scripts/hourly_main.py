@@ -569,15 +569,6 @@ def main():
             if args.execute and qc_cursor:
                 commit_and_rollback(db_connections['qctest_connection'], station, qc_columns, cleaned_records)
 
-                """
-                                operations = [
-                    (insert_records, (qc_cursor, station, qc_columns, cleaned_records)),
-                    (update_records, (qc_cursor, station, qc_columns, cleaned_records)),
-                    (insert_or_update_records, (qc_cursor, station, qc_columns, cleaned_records))
-                ]
-                commit_and_rollback(db_connections['qctest_connection'], operations)
-                """
-
                     # Call commit_and_rollback with the operations
             
     except Exception as e:
@@ -588,24 +579,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-"""
-    finally:
-        # Commit and close only the open connections
-        for conn_key, conn in db_connections.items():
-            if 'connection' in conn_key:
-                commit_and_rollback(conn)
-        close_connections(db_connections)
-"""
-
-"""
-Change insert_records and update_records functions.
-Instead of running cursor.execute, create a list/dictionary containing:
-for each record the query and query parameters ie record_vals.
-In the insert_update_records, all the queries will be executed all at once
-I might need to create a transaction that queues all of those queries
-
-"""
 
 """
 python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x 
