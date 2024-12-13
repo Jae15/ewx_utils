@@ -4,7 +4,7 @@ import sys
 import decimal
 import argparse
 import pprint
-from pprint import pprint
+#from pprint import pprint
 import dotenv
 dotenv.load_dotenv()
 from dotenv import load_dotenv
@@ -108,43 +108,65 @@ def is_within_margin(value1, value2):
 
 def compare_records(test_records, supercell_records):
     """
-    Comparing the two sets of records while ignoring the 'id' column.
-    Allows a tolerance of 0.005 for 'srad' column comparisons and uses
-    limit_to_max_digits only for 'srad' values.
+    Compare two sets of records, ignoring the 'id' column.
+    
+    Conditions:
+    - Tolerance of 0.005 for 'srad' comparisons using limit_to_max_digits function.
+    - 'relh' between 100 and 105 is considered a match to 100 in the qc database.
+    - Skip '_src' columns for years before 2017.
+    
+    Parameters:
+    test_records (list of dict): Test records with 'date', 'time', and other variables.
+    supercell_records (list of dict): Supercell records with 'date', 'time', and other variables.
+    
+    Returns:
+    tuple: (only_in_test, only_in_supercell, mismatches_details)
     """
     test_records_dict = {(rec['date'], rec['time']): rec for rec in test_records}
     supercell_records_dict = {(rec['date'], rec['time']): rec for rec in supercell_records}
-
     only_in_test = []
     only_in_supercell = []
-    mismatches = []
-
+    mismatches_details = []
+    
     for key in test_records_dict:
         if key not in supercell_records_dict:
             only_in_test.append(test_records_dict[key])
         else:
+            # Excluding 'id' from the records for comparison
             test_record = {k: v for k, v in test_records_dict[key].items() if k != 'id'}
             supercell_record = {k: v for k, v in supercell_records_dict[key].items() if k != 'id'}
-            if test_record != supercell_record:
-                details = []
-                for column_name in test_record.keys():
-                    if column_name in supercell_record:
-                        if column_name == 'srad':
-                            # Apply limit_to_max_digits for 'srad' and check within margin
-                            test_value = limit_to_max_digits(test_record[column_name])
-                            supercell_value = limit_to_max_digits(supercell_record[column_name])
-                            if not is_within_margin(test_value, supercell_value):
-                                details.append(column_name)
-                        else:
-                            # Direct comparison for other columns without limit_to_max_digits
+            # Extracting the year using the get method
+            year = test_record.get('year')
+            mismatches_details = []
+            
+            for column_name in test_record.keys():
+                if column_name in supercell_record:
+                    # For years before 2017, we skip comparison for '_src' columns
+                    if year < 2017:
+                        if column_name.endswith('_src'):
+                            continue
+                    
+                    # Defining conditions for the srad values
+                    if column_name == 'srad':
+                        test_value = limit_to_max_digits(test_record[column_name])
+                        supercell_value = limit_to_max_digits(supercell_record[column_name])
+                        if not is_within_margin(test_value, supercell_value):
+                            mismatches_details.append(column_name)
+                    # Defining conditions for the relh values
+                    if column_name == 'relh' and test_record.get('relh_src' == "RELH_CAP"):
+                        if not (100 < test_record[column_name] <= 105):
                             if test_record[column_name] != supercell_record[column_name]:
-                                details.append(column_name)
-                if details:
-                    mismatches.append((test_records_dict[key], supercell_records_dict[key], details))
+                                mismatches_details.append(column_name)
+                    else:
+                        # Comparing values for all other columns
+                        if test_record[column_name] != supercell_record[column_name]:
+                            mismatches_details.append(column_name)
+    
     for key in supercell_records_dict:
         if key not in test_records_dict:
             only_in_supercell.append(supercell_records_dict[key])
-    return only_in_test, only_in_supercell, mismatches
+    
+    return only_in_test, only_in_supercell, mismatches_details
 
 
 def main():
@@ -175,19 +197,19 @@ def main():
         # Report results
         if only_in_test:
             my_logger.error(f"Records found only in test database: {len(only_in_test)}")
-            pprint.pprint(f"Records found only in test database: {len(only_in_test)}")
+            print(f"Records found only in test database: {len(only_in_test)}")
         if only_in_supercell:
             my_logger.error(f"Records found only in supercell database: {len(only_in_supercell)}")
-            pprint.pprint(f"Records found only in supercell database: {len(only_in_supercell)}")
+            print(f"Records found only in supercell database: {len(only_in_supercell)}")
         if mismatches:
             my_logger.error(f"Mismatched records: {len(mismatches)}")
             for mismatch in mismatches:
                 my_logger.error(f"Test Record : {mismatch[0]}")
-                pprint.pprint(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
+                print(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
                 my_logger.error(f"Supercell Record: {mismatch[1]}")
-                pprint.pprint(f"Supercell Record: {mismatch[1]}")
+                print(f"Supercell Record: {mismatch[1]}")
                 my_logger.error(f"Details: {mismatch[2]}")
-                pprint.pprint(f"Details: {mismatch[2]}")
+                print(f"Details: {mismatch[2]}")
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
@@ -201,7 +223,7 @@ if __name__ == "__main__":
 
 
 """
-python hourly_utility.py --begin 2023-01-01 --end 2023-01-02 --station aetna_hourly  
+python hourly_utility.py --begin 2023-01-01 --end 2023-01-02 --station aetna_hourly
 
 """
 

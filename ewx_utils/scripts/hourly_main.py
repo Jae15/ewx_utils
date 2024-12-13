@@ -123,7 +123,7 @@ def fetch_records(cursor, station, begin_date, end_date):
     try:
         cursor.execute(query, (begin_date, end_date))
         records = cursor.fetchall()
-        my_logger.error(f"Fetched {len(records)} records from {station}.")
+        my_logger.error(f"Fetched {len(records)} records from {station} using {cursor}.")
         return [dict(record) for record in records]
     except Exception as e:
         my_logger.error(f"Error fetching records from {station}: {e}")
@@ -140,7 +140,7 @@ def get_insert_table_columns(cursor, station):
     # Query to select a sample row from the station's table
     #query = f"SELECT * FROM {station}_hourly LIMIT 1"
 
-    query = f"SELECT * FROM aetna_hourly LIMIT 1"
+    query = f"SELECT * FROM albion_hourly LIMIT 1"
 
     try:
         if cursor is None:
@@ -162,7 +162,7 @@ def get_insert_table_columns(cursor, station):
         # Store the columns in the dictionary for this function call
         station_columns[station] = columns_list
 
-        #print(columns_list)
+        # print(columns_list)
 
         # logging the retrieved QC columns 
         my_logger.info(f"QC Columns retrieved: {columns_list}")
@@ -263,6 +263,7 @@ def insert_records(cursor, station, qc_columns, records):
         # Use the first filtered record to get column names
         record_keys = list(filtered_records[0].keys())
         my_logger.info(f"Record Keys: {record_keys}")
+
 
         # Skip the 'id' column if it exists
         if 'id' in record_keys:
@@ -538,8 +539,8 @@ def main():
         # Use the necessary connections and cursors based on what is required
         mawn_cursor = db_connections.get('mawn_dbh11_cursor')
         rtma_cursor = db_connections.get('rtma_dbh11_cursor')
-        qc_cursor = db_connections.get('qctest_cursor') or db_connections.get('mawnqcl_cursor') or \
-                    db_connections.get('mawnqc_dbh11_cursor') or db_connections.get('mawnqc_supercell_cursor')
+        qctest_cursor = db_connections.get('qctest_cursor')
+        qcsupercell_cursor = db_connections.get('mawnqc_supercell_cursor')
         
         # Process records for specified stations
         if args.all:
@@ -557,7 +558,7 @@ def main():
         #pprint(runtime_end_dates)
 
         for station in stations:
-            qc_columns = get_insert_table_columns(qc_cursor, station)
+            qc_columns = get_insert_table_columns(qcsupercell_cursor, station)
             mawn_records = fetch_records(mawn_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
             rtma_records = fetch_records(rtma_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
 
@@ -566,7 +567,7 @@ def main():
 
 
             # If execution is requested and QC cursor is available, insert or update records in the QC database
-            if args.execute and qc_cursor:
+            if args.execute and qctest_cursor:
                 commit_and_rollback(db_connections['qctest_connection'], station, qc_columns, cleaned_records)
 
                     # Call commit_and_rollback with the operations

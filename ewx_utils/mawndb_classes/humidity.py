@@ -84,21 +84,21 @@ class Humidity:
         # Checking if the humidity value is below the minimum threshold
         if self.relhPCT < 0:
             self.logger.debug("relhPCT value: %s is below 0, returning (0, 'RELH_CAP')", self.relhPCT)
-            return (0, 'RELH_CAP')  # Cap at 0%
+            return (None, "EMPTY") # Cap relh values at 0%, set the values below 0 to None and source to "EMPTY"
 
         # Checking if the humidity value is within the capped range
         elif 100 < self.relhPCT <= self.RELH_CAP:
             self.logger.debug("relhPCT value: %s is within the range, returning (100, 'RELH_CAP')",
                             self.relhPCT, self.RELH_CAP)
-            return (100, 'RELH_CAP')
+            return (100, "RELH_CAP") # Cap relh values above 100 but below 105 to a 100 and set source to "RELH_CAP"
 
         # Checking if the humidity value is above the maximum threshold
         elif self.relhPCT > self.RELH_CAP:
             self.logger.debug("relhPCT value: %s is above RELH_CAP, returning None", self.relhPCT)
-            return None  # Return None for values above RELH_CAP
+            return (None, "OOR") # Return None for values above RELH_CAP and the source as "OOR"
 
         # Return the actual value for valid humidity below 100
-        else: self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'RELH')", self.relhPCT)
-        return (self.relhPCT, 'RELH')
+        else: self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'MAWN')", self.relhPCT)
+        return (self.relhPCT, "MAWN") # Return the relh values that are within the valid range and setting their source to "MAWN"
 
    
