@@ -70,6 +70,7 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         return rp.is_valid()
     if k in temp_vars:
         tp = Temperature(v, "C", d)
+        #print(k, v, d, tp.is_valid())
         return tp.is_valid()
     if k in wspd_vars:
         ws = WindSpeed(v, "MPS", d)
@@ -158,7 +159,6 @@ def creating_mawnsrc_record(
     for key in record.keys():
         if key not in id_col_list:
             if mawnsrc_record[key] is None:  # If there was no value originally
-                mawnsrc_record[key] = None
                 mawnsrc_record[key + "_src"] = "EMPTY"
             else:
                 value_check = check_value(key, mawnsrc_record[key], combined_datetime)
@@ -167,8 +167,7 @@ def creating_mawnsrc_record(
                 elif key in relh_vars:  # and value_check was not True
                     mawnsrc_record[key + "_src"] = "OOR"
                 else:
-                    mawnsrc_record[key] = None
-                    mawnsrc_record[key + "_src"] = "OOR"
+                    mawnsrc_record[key + "_src"] = "OOR" 
     return mawnsrc_record
 
 
@@ -194,28 +193,22 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
     return mawnsrc_record
 
 def create_mawn_dwpt(mawnsrc_record: dict, combined_datetime: datetime.datetime) -> dict:
-    if 'dwpt' in mawnsrc_record.keys():
-        if mawnsrc_record['dwpt'] is None:
-            temp = Temperature(mawnsrc_record['atmp'], 'C', combined_datetime) if mawnsrc_record['atmp'] is not None else None
-            # Get the relh and use it to create a relh object
-            relh = Humidity(mawnsrc_record['relh'], 'PCT', combined_datetime) if mawnsrc_record['relh'] is not None else None
-            
-            # Check if both temp and relh are not None
-            if temp is not None and relh is not None:
-                # Create dew point object from temp and relh
-                dwpt_value = DewPoint(temp, relh, combined_datetime)
-                # Assign the calculated dew point value to the record
-                mawnsrc_record['dwpt'] = dwpt_value.dwptC 
-                mawnsrc_record['dwpt_src'] = "MAWN"
-            else:
-                # Set dwpt to None if either temp or relh is None
-                mawnsrc_record['dwpt'] = None
-                mawnsrc_record['dwpt_src'] = "EMPTY"
+    if 'dwpt' in mawnsrc_record.keys() and mawnsrc_record['dwpt'] is None:
+        temp = Temperature(mawnsrc_record['atmp'], 'C', combined_datetime) if mawnsrc_record['atmp'] is not None else None
+        relh = Humidity(mawnsrc_record['relh'], 'PCT', combined_datetime) if mawnsrc_record['relh'] is not None else None
+        
+        if temp is not None and relh is not None:
+            dwpt_value = DewPoint(temp, relh, combined_datetime)
+            mawnsrc_record['dwpt'] = dwpt_value.dwptC 
+            mawnsrc_record['dwpt_src'] = "MAWN"
+        else:
+            mawnsrc_record['dwpt_src'] = "EMPTY"  
     return mawnsrc_record
 
+
+
 def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) -> dict:
-    if 'dwpt' in rtma_record.keys():
-        if rtma_record['dwpt'] is None:
+    if 'dwpt' in rtma_record.keys() and rtma_record['dwpt'] is None:
             # Get the atmp and use it to create a temp object
             temp = Temperature(rtma_record['atmp'], 'C', combined_datetime) if rtma_record['atmp'] is not None else None
             # Get the relh and use it to create a relh object
@@ -230,8 +223,7 @@ def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) ->
                 rtma_record['dwpt'] = dwpt_value.dwptC 
                 rtma_record['dwpt_src'] = "RTMA"
             else:
-                # Set dwpt to None if either temp or relh is None
-                rtma_record['dwpt'] = None
+                # Set source of dwpt to EMPTY since dwpt is None
                 rtma_record['dwpt_src'] = "EMPTY"
     return rtma_record
 
@@ -259,7 +251,6 @@ def replace_none_with_rtmarecord(
                     clean_record[data_key] = rtma_record[data_key]
                     clean_record[key] = "RTMA"
                 else:
-                    clean_record[data_key] = None
                     clean_record[key] = "EMPTY"
     return clean_record
 
