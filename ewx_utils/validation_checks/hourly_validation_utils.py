@@ -48,7 +48,6 @@ from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 # Initialize the logger
 my_validation_logger = ewx_utils_logger(log_path = ewx_log_file)
 
-
 def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     """
     Checks if a given value is valid based on its variable key and date.
@@ -70,13 +69,18 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         return rp.is_valid()
     if k in temp_vars:
         tp = Temperature(v, "C", d)
-        #print(k, v, d, tp.is_valid())
+        if isinstance(tp, Temperature):
+            print(f"Temperature object created: {tp}")
         return tp.is_valid()
+    else:
+        print("Failed to create a Temperature object.")
     if k in wspd_vars:
         ws = WindSpeed(v, "MPS", d)
+        #print(k, v, d, tp.is_valid())
         return ws.is_valid()
     if k in wdir_vars:
         wd = WindDirection(v, "DEGREES", d)
+        #print(k, v, d, tp.is_valid())
         return wd.is_valid()
     if k in leafwt_vars:
         lw = LeafWetness(v, "hourly", k, d)
@@ -158,18 +162,21 @@ def creating_mawnsrc_record(
     mawnsrc_record = record.copy()
     for key in record.keys():
         if key not in id_col_list:
-            if mawnsrc_record[key] is None:  # If there was no value originally
-                mawnsrc_record[key + "_src"] = "EMPTY"
-            else:
-                value_check = check_value(key, mawnsrc_record[key], combined_datetime)
-                if value_check is True:
-                    mawnsrc_record[key + "_src"] = default_source
-                elif key in relh_vars:  # and value_check was not True
-                    mawnsrc_record[key + "_src"] = "OOR"
+            try:
+                if mawnsrc_record[key] is None:  # If there was no value originally
+                    mawnsrc_record[key + "_src"] = "EMPTY"
                 else:
-                    mawnsrc_record[key + "_src"] = "OOR" 
+                    value_check = check_value(key, mawnsrc_record[key], combined_datetime)
+                    if value_check is True:
+                        mawnsrc_record[key + "_src"] = default_source
+                    elif key in relh_vars:  # and value_check was not True
+                        mawnsrc_record[key + "_src"] = "OOR"
+                    else:
+                        mawnsrc_record[key] = None
+                        mawnsrc_record[key + "_src"] = "OOR"
+            except Exception as e:
+                my_validation_logger.error(f"Key {key} was not able to be validated in value_check function: {e}")
     return mawnsrc_record
-
 
 def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
     """
