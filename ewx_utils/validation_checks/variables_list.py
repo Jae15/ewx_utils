@@ -129,15 +129,25 @@ else:
 
 """ Windspeed variables list - if the k - key - is in this list, treat the variable as 'wspd_vars' """
 
-wspd_vars = ["wspd", "wspd_10m", "wspd_20m", "wspd_max", "wspd_10m_max", "wspd_20m_max"]
+wspd_vars = ["wspd", 
+             "wspd_10m", 
+             "wspd_20m", 
+             "wspd_max", 
+             "wspd_10m_max", 
+             "wspd_20m_max"]
 
 """ Leaf wetness variables List - if the k - key - is in this list, treat the variable as 'leafwt_vars' """
 
-leafwt_vars = ["leaf0", "leaf1", "lws0_pwet", "lws1_pwet"]
+leafwt_vars = ["leaf0", 
+               "leaf1", 
+               "lws0_pwet", 
+               "lws1_pwet"]
 
 """ Net radiation variables List - if the k - key - is in this list, treat the variable as 'nrad-vars' """
 
-nrad_vars = ["nrad", "nrad_max", "nrad_min"]
+nrad_vars = ["nrad", 
+             "nrad_max", 
+             "nrad_min"]
 
 """ Solar radiation variables list - if the k - key - is in this list, treat the variable as 'srad_vars' """
 
@@ -145,11 +155,14 @@ srad_vars = ["srad"]
 
 """ Wind direction variables list - if the k - key - is in this list, treat the varible as srad_vars """
 
-wdir_vars = ["wdir", "wdir_10m", "wdir_20m"]
+wdir_vars = ["wdir", 
+             "wdir_10m", 
+             "wdir_20m"]
 
 """ Voltage variables list - if the k - key - is in this list, treat the variable as volt_vars """
 
-volt_vars = ["volt", "volt_min"]
+volt_vars = ["volt", 
+             "volt_min"]
 
 """ Soil Moisture variables list - if the k - key - is in this list, treat the variable as mstr_vars """
 

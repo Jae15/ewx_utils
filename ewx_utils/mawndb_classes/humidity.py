@@ -90,7 +90,7 @@ class Humidity:
         elif 100 < self.relhPCT <= self.RELH_CAP:
             self.logger.debug("relhPCT value: %s is within the range, returning (100, 'RELH_CAP')",
                             self.relhPCT, self.RELH_CAP)
-            return (100, "RELH_CAP") # Cap relh values above 100 but below 105 to a 100 and set source to "RELH_CAP"
+            return (100, "RELH_CAP") # Cap relh values above 100 but below 105 to 100 and set source to "RELH_CAP"
 
         # Checking if the humidity value is above the maximum threshold
         elif self.relhPCT > self.RELH_CAP:
