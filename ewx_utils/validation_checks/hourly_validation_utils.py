@@ -69,11 +69,19 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
         return rp.is_valid()
     if k in temp_vars:
         tp = Temperature(v, "C", d)
+        return tp.is_valid()
+    
+    """
+        if k in temp_vars:
+        tp = Temperature(v, "C", d)
         if isinstance(tp, Temperature):
             print(f"Temperature object created: {tp}")
         return tp.is_valid()
     else:
         print("Failed to create a Temperature object.")
+    
+    """
+
     if k in wspd_vars:
         ws = WindSpeed(v, "MPS", d)
         #print(k, v, d, tp.is_valid())

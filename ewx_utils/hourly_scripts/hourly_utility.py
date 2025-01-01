@@ -75,8 +75,8 @@ def is_within_margin(value1, value2):
             my_logger.error(f"Non-numeric values provided: value1: {value1}, value2: {value2}. Error: {e}")
             return False
 
-        # Calculating the margin as 0.005% of value2
-        margin = abs(value2_decimal) * decimal.Decimal('0.00005')  # 0.005% of value2
+        # Calculating the margin as 0.05% of value2
+        margin = abs(value2_decimal) * decimal.Decimal('0.0005')  # 0.05% of value2
 
         my_logger.info(f"Comparing value1: {value1_decimal} with value2: {value2_decimal}. Calculated margin: {margin}")
         

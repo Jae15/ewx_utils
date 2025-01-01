@@ -100,12 +100,12 @@ def close_connections(connections):
 def commit_and_rollback(connection, station, qc_columns, records):
     try:
         with connection.cursor() as cursor:
-            print("Cursor created as {cursor}")
+            #print("Cursor created as {cursor}")
             insert_or_update_records(cursor, station, qc_columns, records)
-        print("Inserted/Updated records successfully")
+        #print("Inserted/Updated records successfully")
         my_logger.info("Inserted/Updated records successfully")
         connection.commit()
-        print("Successfully committed transaction")
+        #print("Successfully committed transaction")
         my_logger.info("Successfully committed transaction")
     except Exception as e:
         print(f"Exception as {e}")
@@ -137,7 +137,6 @@ def get_insert_table_columns(cursor, station):
 
     # Query to get column names from the specified table
     query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = 'public'"
-
     try:
         if cursor is None:
             my_logger.error("Cursor is not valid.")
@@ -289,7 +288,7 @@ def insert_or_update_records(cursor, station, qc_columns, records):
 
     """
     qc_columns = get_insert_table_columns(cursor, station)
-    print(qc_columns)
+    #print(qc_columns)
 
     try:
         for record in records:
