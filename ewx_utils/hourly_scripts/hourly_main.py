@@ -6,7 +6,6 @@ import datetime as datetime
 from datetime import datetime, timedelta
 from datetime import date
 from psycopg2 import OperationalError
-from pprint import pprint
 from dotenv import load_dotenv
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -550,6 +549,8 @@ def main():
         #pprint(runtime_end_dates)
 
         for station in stations:
+            rtma_columns = get_insert_table_columns(rtma_cursor, station)
+            #print(f"rtma_columns: {rtma_columns}")
             qc_columns = get_insert_table_columns(qcsupercell_cursor, station)
             mawn_records = fetch_records(mawn_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
             rtma_records = fetch_records(rtma_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
@@ -573,7 +574,8 @@ if __name__ == "__main__":
     main()
 
 """
-python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x 
+python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x
+python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
 
 hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
 [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]

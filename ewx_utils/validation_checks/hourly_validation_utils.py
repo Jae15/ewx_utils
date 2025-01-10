@@ -26,6 +26,7 @@ from .variables_list import (
     wstdv_vars,
     volt_vars
 )
+from .variables_list import mawnsrc_keys
 from ewx_utils.mawndb_classes.voltage import Voltage
 from ewx_utils.mawndb_classes.humidity import Humidity
 from ewx_utils.mawndb_classes.dew_point import DewPoint
@@ -70,18 +71,6 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     if k in temp_vars:
         tp = Temperature(v, "C", d)
         return tp.is_valid()
-    
-    """
-        if k in temp_vars:
-        tp = Temperature(v, "C", d)
-        if isinstance(tp, Temperature):
-            print(f"Temperature object created: {tp}")
-        return tp.is_valid()
-    else:
-        print("Failed to create a Temperature object.")
-    
-    """
-
     if k in wspd_vars:
         ws = WindSpeed(v, "MPS", d)
         #print(k, v, d, tp.is_valid())
@@ -155,6 +144,7 @@ db_columns = []
 qc_values = []
 clean_records = []
 
+
 def creating_mawnsrc_record(
     record: dict, combined_datetime: datetime.datetime, id_col_list: list, default_source: str
 ) -> dict:
@@ -169,7 +159,7 @@ def creating_mawnsrc_record(
     """
     mawnsrc_record = record.copy()
     for key in record.keys():
-        if key not in id_col_list:
+        if key not in id_col_list and not key.endswith('_src'):
             try:
                 if mawnsrc_record[key] is None:  # If there was no value originally
                     mawnsrc_record[key + "_src"] = "EMPTY"
@@ -217,10 +207,9 @@ def create_mawn_dwpt(mawnsrc_record: dict, combined_datetime: datetime.datetime)
             mawnsrc_record['dwpt'] = dwpt_value.dwptC 
             mawnsrc_record['dwpt_src'] = "MAWN"
         else:
-            mawnsrc_record['dwpt_src'] = "EMPTY"  
+            mawnsrc_record['dwpt_src'] = "EMPTY" 
+        #print(f"mawn_dwpt: {mawnsrc_record['dwpt_src']}") 
     return mawnsrc_record
-
-
 
 def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) -> dict:
     if 'dwpt' in rtma_record.keys() and rtma_record['dwpt'] is None:
@@ -239,34 +228,50 @@ def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) ->
                 rtma_record['dwpt_src'] = "RTMA"
             else:
                 # Set source of dwpt to EMPTY since dwpt is None
+                rtma_record['dwpt'] = None
                 rtma_record['dwpt_src'] = "EMPTY"
+            #print(f"rtma_dwpt: {rtma_record['dwpt_src']}")
     return rtma_record
 
 def replace_none_with_rtmarecord(
-    mawnsrc_record: dict, rtma_record: dict, combined_datetime: datetime.datetime
+    mawnsrc_record: dict,
+    rtma_record: dict,
+    combined_datetime: datetime.datetime,
+    mawnsrc_keys: list,
 ) -> dict:
-    """
-    Replaces None values in a MAWN source record with corresponding values from an RTMA record.
-    Args:
-        mawnsrc_record (dict): The MAWN source record.
-        rtma_record (dict): The RTMA record.
-        combined_datetime (datetime.datetime): The combined datetime for validation.
-    Returns:
-        dict: The cleaned MAWN source record.
-    """
+    # Starting with a copy of the MAWN source record
     clean_record = mawnsrc_record.copy()
-    for key in clean_record.keys():
+
+    # Adding any missing keys from mawnsrc_keys
+    for key in mawnsrc_keys:
+        if key not in clean_record:
+            if key.endswith("_src"):
+                clean_record[key] = "EMPTY"  # Setting source keys to EMPTY if missing
+            else:
+                clean_record[key] = None  # Setting data keys to None if missing
+
+    # Performing RTMA value replacement
+    for key in mawnsrc_keys:
         if key.endswith("_src"):
             data_key = key[:-4]
-            if (
-                mawnsrc_record.get(data_key) is None
-                and rtma_record.get(data_key) is not None
-            ):
-                if check_value(data_key, rtma_record[data_key], combined_datetime):
-                    clean_record[data_key] = rtma_record[data_key]
-                    clean_record[key] = "RTMA"
-                else:
+            if data_key in rtma_record:
+                if clean_record.get(data_key) is None and rtma_record.get(data_key) is not None:
+                    if check_value(data_key, rtma_record[data_key], combined_datetime):
+                        clean_record[data_key] = rtma_record[data_key]
+                        clean_record[key] = "RTMA"
+                    else:
+                        clean_record[key] = "EMPTY"
+            else:
+                if clean_record.get(data_key) is None:
                     clean_record[key] = "EMPTY"
+    for key in mawnsrc_keys:
+        if key.endswith("_src"):
+            data_key = key[:-4]
+            if clean_record.get(key) is None:
+                clean_record[key] = "EMPTY"  # Explicitly mark missing _src keys as EMPTY
+            if data_key not in clean_record or clean_record[data_key] is None:
+                clean_record[data_key] = None  # Ensure missing data keys remain None
+
     return clean_record
 
 def one_mawndb_record(mawndb_records: list) -> list:
@@ -288,6 +293,7 @@ def one_rtma_record(rtma_records: list) -> list:
     Returns:
         list: List of dictionaries representing the RTMA records.
     """
+    #print([dict(rtma_record) for rtma_record in rtma_records])
     return [dict(rtma_record) for rtma_record in rtma_records]
 
 def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_date: str, end_date: str) -> List[Dict]:
@@ -325,16 +331,16 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
             mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list, 'MAWN')
             mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
             mawnsrc_record = create_mawn_dwpt(mawnsrc_record, combined_date)
-
             # Find the matching RTMA record for the same datetime
             for rtma_record in rtma_records:
                 if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
                     matching_rtma_record = rtma_record
                     combined_rtma_date = combined_datetime(rtma_record)
                     rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
-
                     # Replace None values in MAWN record with corresponding RTMA values
-                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date)
+                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date, mawnsrc_keys)
+                    #print(clean_record)
+                    #print(type(clean_record))
                     clean_records.append(clean_record)
                     break
 
@@ -352,7 +358,9 @@ def process_records(mawndb_records: List[Dict], rtma_records: List[Dict], begin_
                     # Create a MAWN-like source record directly from the RTMA record
                     mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_rtma_date, id_col_list, 'RTMA')
                     mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
-                    clean_records.append(mawnsrc_record)
+                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date, mawnsrc_keys)
+                    #print(f"RTMA After: {clean_record}")
+                    clean_records.append(clean_record)
                     break
 
     return clean_records

@@ -1,4 +1,4 @@
-from scripts.hourly_utility import limit_to_max_digits
+from ewx_utils.hourly_scripts.hourly_utility import limit_to_max_digits
 import decimal
 
 def test_limit_to_max_digits01():
