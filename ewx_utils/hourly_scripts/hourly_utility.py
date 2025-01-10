@@ -3,8 +3,7 @@ import os
 import sys
 import decimal
 import argparse
-import pprint
-#from pprint import pprint
+import csv
 import dotenv
 dotenv.load_dotenv()
 from dotenv import load_dotenv
@@ -14,21 +13,33 @@ sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
-
-# Initialize the logger
-my_logger = ewx_utils_logger(log_path = ewx_log_file)
 from ewx_utils.db_files.dbs_connections import (
     connect_to_mawnqc_test,
     connect_to_mawnqc_supercell,
     mawnqc_test_cursor_connection,
     mawn_supercell_cursor_connection,
 )
-# Initialize the logger
-my_logger = ewx_utils_logger()
+my_logger = ewx_utils_logger(log_path = ewx_log_file)
 
-import decimal
+def fetch_records_by_date(cursor, station, start_date, end_date):
 
-my_logger = ewx_utils_logger()
+    """
+    Fetching records from the specified table based on date range.
+    """
+    query = f"""
+    SELECT * FROM {station}
+    WHERE date BETWEEN '{start_date}' AND '{end_date}'
+    """
+    my_logger.error(f"Executing query: {query}")
+    try:
+        cursor.execute(query)
+        records = cursor.fetchall()
+        my_logger.error(f"Fetched {len(records)} records from {station} for date range {start_date} to {end_date}.")
+        return [dict(record) for record in records]
+    except Exception as e:
+        my_logger.error(f"Error fetching records from {station}: {e}")
+        raise
+
 
 def limit_to_max_digits(num, max_digits=None):
     try:
@@ -60,14 +71,14 @@ def limit_to_max_digits(num, max_digits=None):
     except Exception as e:
         my_logger.error(f"An unexpected error occurred for input num: {num}, max_digits: {max_digits}. Error: {e}")
         return None
-    
+
 def is_within_margin(value1, value2):
     try:
         if value1 is None or value2 is None:
             my_logger.error(f"One of the values is None: value1: {value1}, value2: {value2}.")
             return False
-        
-        # converting both values to Decimal
+
+        # Converting both values to Decimal
         try:
             value1_decimal = decimal.Decimal(value1)
             value2_decimal = decimal.Decimal(value2)
@@ -79,9 +90,33 @@ def is_within_margin(value1, value2):
         margin = abs(value2_decimal) * decimal.Decimal('0.0005')  # 0.05% of value2
 
         my_logger.info(f"Comparing value1: {value1_decimal} with value2: {value2_decimal}. Calculated margin: {margin}")
-        
+
         result = abs(value1_decimal - value2_decimal) <= margin
         my_logger.info(f"Result of comparison: {result}")
+
+        # Append the types and values to a CSV file in the specified directory
+        csv_file_path = r"C:\Users\mwangija\data_file\ewx_utils\ewx_utils\comparison_results.csv"
+        
+        # Check if the file exists to write headers only once
+        file_exists = os.path.isfile(csv_file_path)
+
+        with open(csv_file_path, mode="a", newline='') as file:
+            writer = csv.writer(file)
+
+            # Write headers if the file does not exist
+            if not file_exists:
+                writer.writerow(['Type of Value1', 'Value1', 'Type of Value2', 'Value2', 
+                                 'Type of Value1 Decimal', 'Value1 Decimal', 
+                                 'Type of Value2 Decimal', 'Value2 Decimal', 
+                                 'Margin', 'Result'])
+
+            writer.writerow([
+                type(value1).__name__, value1, 
+                type(value2).__name__, value2, 
+                type(value1_decimal).__name__, value1_decimal, 
+                type(value2_decimal).__name__, value2_decimal, 
+                margin, result
+            ])
 
         return result
 
@@ -89,91 +124,98 @@ def is_within_margin(value1, value2):
         my_logger.error(f"An error occurred while comparing values {value1} and {value2}. Error: {e}")
         return False
 
-
-def fetch_records_by_date(cursor, station, start_date, end_date):
-
-    """
-    Fetching records from the specified table based on date range.
-    """
-    query = f"""
-    SELECT * FROM {station}
-    WHERE date BETWEEN '{start_date}' AND '{end_date}'
-    """
-    my_logger.error(f"Executing query: {query}")
-    try:
-        cursor.execute(query)
-        records = cursor.fetchall()
-        my_logger.error(f"Fetched {len(records)} records from {station} for date range {start_date} to {end_date}.")
-        return [dict(record) for record in records]
-    except Exception as e:
-        my_logger.error(f"Error fetching records from {station}: {e}")
-        raise
-
 def compare_records(test_records, supercell_records):
-    """
-    Compare two sets of records, ignoring the 'id' column.
-    
-    Conditions:
-    - Tolerance of 0.005 for 'srad' comparisons using limit_to_max_digits function.
-    - 'relh' between 100 and 105 is considered a match to 100 in the qc database.
-    - Skip '_src' columns for years before 2017.
-    
-    Parameters:
-    test_records (list of dict): Test records with 'date', 'time', and other variables.
-    supercell_records (list of dict): Supercell records with 'date', 'time', and other variables.
-    
-    Returns:
-    tuple: (only_in_test, only_in_supercell, mismatches_details)
-    """
     test_records_dict = {(rec['date'], rec['time']): rec for rec in test_records}
     supercell_records_dict = {(rec['date'], rec['time']): rec for rec in supercell_records}
     only_in_test = []
     only_in_supercell = []
     mismatches_details = []
-    
-    for key in test_records_dict:
-        if key not in supercell_records_dict:
-            only_in_test.append(test_records_dict[key])
-        else:
-            # Excluding 'id' from the records for comparison
-            test_record = {k: v for k, v in test_records_dict[key].items() if k != 'id'}
-            supercell_record = {k: v for k, v in supercell_records_dict[key].items() if k != 'id'}
-            # Extracting the year using the get method
-            year = test_record.get('year')
-            mismatches_details = []
-            
-            for column_name in test_record.keys():
-                #print(column_name)
-                if column_name in supercell_record:
-                    # For years before 2017, we skip comparison for '_src' and 'volt' columns
-                    if year < 2017:
-                        if column_name.endswith('_src') or column_name == 'volt':
-                            continue
-                    
-                    # Defining conditions for the srad values
-                    if column_name == 'srad':
-                        test_value = limit_to_max_digits(test_record[column_name])
-                        #print(f"test_value: {test_value}")
-                        supercell_value = limit_to_max_digits(supercell_record[column_name])
-                        #print(f"supercell_value: {supercell_value}")
-                        if not is_within_margin(test_value, supercell_value):
-                            mismatches_details.append([test_record, supercell_record, column_name])
-                    # Defining conditions for the relh values
-                    if column_name == 'relh' and test_record.get('relh_src' == "RELH_CAP"):
-                        if not (100 < test_record[column_name] <= 105):
+
+    # Specify the full path for the CSV files
+    srad_csv_file_path = r"C:\Users\mwangija\data_file\ewx_utils\ewx_utils\srad_values.csv"
+    general_mismatch_csv_file_path = r"C:\Users\mwangija\data_file\ewx_utils\ewx_utils\general_mismatches.csv"
+
+    # Check if the srad file exists to write headers only once
+    srad_file_exists = os.path.isfile(srad_csv_file_path)
+    general_file_exists = os.path.isfile(general_mismatch_csv_file_path)
+
+    # Open the CSV file for srad values
+    with open(srad_csv_file_path, 'w', newline='') as srad_file:
+        writer = csv.writer(srad_file)
+
+        # Write headers if the file does not exist
+        if not srad_file_exists:
+            writer.writerow(['Test Value', 'Supercell Value'])
+
+        for key in test_records_dict:
+            if key not in supercell_records_dict:
+                only_in_test.append(test_records_dict[key])
+            else:
+                # Excluding 'id' from the records for comparison
+                test_record = {k: v for k, v in test_records_dict[key].items() if k != 'id'}
+                supercell_record = {k: v for k, v in supercell_records_dict[key].items() if k != 'id'}
+                # Extracting the year using the get method
+                year = test_record.get('year')
+                record_date = datetime.strftime(test_record['date'], '%m%d%Y')
+                for column_name in test_record.keys():
+                    if column_name in supercell_record:
+                        # For years before 2017, we skip comparison for '_src' and 'volt' columns
+                        if year < 2017:
+                            if column_name.endswith('_src') or column_name == 'volt':
+                                continue
+                        # Defining conditions for dwpt and dwpt_src where the values have been replaced from RTMA
+                        if column_name == 'dwpt':
+                            if test_record[column_name] is not None and supercell_record[column_name] is None:
+                                continue
+                        if column_name == 'dwpt_src':
+                            if test_record[column_name] is not None and supercell_record[column_name] == 'EMPTY':
+                                continue
+                        # Defining conditions for the srad values
+                        if column_name == 'srad':
+                            test_value = test_record[column_name]
+                            supercell_value = supercell_record[column_name]
+                            test_source = test_record.get(f"{column_name}_src")
+                            supercell_source = supercell_record.get(f"{column_name}_src")
+                            if test_value is None and test_source == "EMPTY" and supercell_value is None and supercell_source == "EMPTY":
+                                continue
+                            
+                            test_value = limit_to_max_digits(test_record[column_name])
+                            supercell_value = limit_to_max_digits(supercell_record[column_name])
+                            if not is_within_margin(test_value, supercell_value):
+                                mismatches_details.append([test_record, supercell_record, column_name])
+                                writer.writerow([test_value, supercell_value])
+                        
+                        # Defining conditions for the relh values
+                        elif column_name == 'relh' and test_record.get('relh_src') == "RELH_CAP":
+                            if not (100 < test_record[column_name] <= 105):
+                                if test_record[column_name] != supercell_record[column_name]:
+                                    mismatches_details.append([test_record, supercell_record, column_name])
+                                    # Write to general mismatches CSV
+                                    with open(general_mismatch_csv_file_path, 'a', newline='') as general_file:
+                                        general_writer = csv.writer(general_file)
+                                        if not general_file_exists:
+                                            general_writer.writerow(['Date', 'Time', 'Column Name', 'Test Value', 'Supercell Value'])
+                                        general_writer.writerow([test_record['date'], test_record['time'], column_name, test_record[column_name], supercell_record[column_name]])
+                        
+                        elif column_name == 'vapr' and record_date < datetime(2024,9,1):
+                            if column_name.endswith('_src'):
+                                continue
+                        else:
+                            # Comparing values for all other columns
                             if test_record[column_name] != supercell_record[column_name]:
                                 mismatches_details.append([test_record, supercell_record, column_name])
-                    else:
-                        # Comparing values for all other columns
-                        if test_record[column_name] != supercell_record[column_name]:
-                            mismatches_details.append([test_record, supercell_record, column_name])
-    
+                                # Write to general mismatches CSV
+                                with open(general_mismatch_csv_file_path, 'a', newline='') as general_file:
+                                    general_writer = csv.writer(general_file)
+                                    if not general_file_exists:
+                                        general_writer.writerow(['Date', 'Time', 'Column Name', 'Test Value', 'Supercell Value'])
+                                    general_writer.writerow([test_record['date'], test_record['time'], column_name, test_record[column_name], supercell_record[column_name]])
+
     for key in supercell_records_dict:
         if key not in test_records_dict:
             only_in_supercell.append(supercell_records_dict[key])
     
     return only_in_test, only_in_supercell, mismatches_details
-
 
 def main():
     parser = argparse.ArgumentParser(

@@ -16,3 +16,4 @@ ewx_logs.log/
 .env
 *.log.*
 .stations_utils.py/
+*.csv*

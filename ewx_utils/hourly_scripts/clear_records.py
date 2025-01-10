@@ -38,8 +38,10 @@ def create_db_connections(args):
     connections = {}
 
     try:
+        my_logger.info('args.qcwrite')
+        print(f"args.qcwrite: {args.qcwrite}")
         # Connect to the appropriate QC database based on the args.qcwrite value
-        if args.qcwrite == 'mawnqc_test:local':
+        if args.qcwrite.strip() == 'mawnqc_test:local':
             my_logger.info("Connecting to QC Test database (local).")
             connections['qctest_connection'] = connect_to_mawnqc_test()
             connections['qctest_cursor'] = mawnqc_test_cursor_connection(connections['qctest_connection'])
@@ -55,6 +57,9 @@ def create_db_connections(args):
             my_logger.info("Connecting to MAWNQC Supercell database.")
             connections['mawnqc_supercell_connection'] = connect_to_mawnqc_supercell()
             connections['mawnqc_supercell_cursor'] = mawnqc_supercell_cursor_connection(connections['mawnqc_supercell_connection'])
+        else:
+            raise ValueError(f" No match for argument qcwrite")
+        
 
         my_logger.info("Database connections created successfully for clearing records.")
         return connections
@@ -159,7 +164,7 @@ def main():
     group.add_argument('-a', '--all', action='store_true', default=False, help='Run for all stations')
 
     parser.add_argument('-q', '--qcwrite', type=str, default='mawnqc_test:local',
-                        choices=['mawnqc_test:local', 'mawnqcl:local', 'mawnqc:dbh11', 'mawnqc:supercell'],
+                        choices=['mawnqc_test:local', 'mawnqcl:local'],
                         help='Modify data in a specific database')
 
     args = parser.parse_args()
@@ -179,7 +184,7 @@ def main():
 
         # Clear records for specified stations
         for station in stations:
-            if args.execute:
+            if args.execute and qctest_cursor:
                 clear_and_commit(db_connections['qctest_connection'], station)
             else:
                 my_logger.info(f"Dry run: Would clear records for station {station}")
