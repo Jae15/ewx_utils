@@ -116,9 +116,11 @@ def clear_records(cursor, station):
     """
     try:
         delete_query = f"DELETE FROM {station}_hourly"
+        print(f"Executing query: {delete_query}")
         cursor.execute(delete_query)
         my_logger.info(f"Deleted all records from {station}.")
     except Exception as e:
+        print(f"Error during deletion: {e}")
         my_logger.error(f"Error deleting records from {station}: {e}")
         raise
 
@@ -168,28 +170,35 @@ def main():
                         help='Modify data in a specific database')
 
     args = parser.parse_args()
+    print(f"Parsed Arguments: {args}")
 
     # Establish database connections based on args
     db_connections = create_db_connections(args)
+    print(f"Database Connections: {db_connections}")
 
     try:
         # Use the necessary cursor for the QC database
         qctest_cursor = db_connections.get('qctest_cursor')
+        print(f"Cursor Obtained: {qctest_cursor}")
 
         # Determine the list of stations to clear
         if args.all:
             stations = get_all_stations_list(qctest_cursor)
         else:
             stations = args.stations
+            print(f"Stations to clear: {stations}")
 
         # Clear records for specified stations
         for station in stations:
+            print(f"Processing station: {station}")
             if args.execute and qctest_cursor:
                 clear_and_commit(db_connections['qctest_connection'], station)
             else:
                 my_logger.info(f"Dry run: Would clear records for station {station}")
+                print(f"Dry run for station: {station}")
 
     except Exception as e:
+        print(f"Exception occurred: {e}")
         my_logger.error(f"An error occurred: {e}")
     finally:
         # Close all database connections
@@ -199,6 +208,7 @@ if __name__ == "__main__":
     main()
 
 """
+python clear_records.py -x -s arlene -q mawnqc_test:local
 usage: clear_records [-h] (-x | -d) [-s [STATIONS ...] | -a] [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}]
 clear_records: error: one of the arguments -x/--execute -d/--dryrun is required
 # To clear records from all the stations

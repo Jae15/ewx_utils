@@ -215,12 +215,13 @@ wstdv_vars = [
 
 """
 mawnsrc_keys = [
+
     "year", "day", "hour", "rpt_time", "date", "time", "atmp", "relh", "dwpt", "pcpn", "lws0_pwet", "lws1_pwet",
     "wspd", "wdir", "wspd_max", "srad", "stmp_05cm", "stmp_10cm", "stmp_20cm", "stmp_50cm", "smst_05cm",
     "smst_10cm", "smst_20cm", "smst_50cm", "rpet", "id", "dwpt_src", "wstdv", "wspd_maxt", "volt", "atmp_src",
     "relh_src", "pcpn_src", "lws0_pwet_src", "lws1_pwet_src", "wspd_src", "wdir_src", "wstdv_src", "wspd_max_src", 
     "wspd_maxt_src", "srad_src", "stmp_05cm_src", "stmp_10cm_src", "stmp_20cm_src", "stmp_50cm_src", "smst_05cm_src", 
-    "smst_10cm_src", "smst_20cm_src", "smst_50cm_src", "volt_src", "rpet_src"
+    "smst_10cm_src", "smst_20cm_src", "smst_50cm_src", "volt_src", "rpet_src", "ctmp00ft", "ctmp00ft_src", "ctmp02ft", "ctmp02ft_src"
 ]
 
 rtma_record_cols = [
@@ -230,3 +231,5 @@ rtma_record_cols = [
 ]
 
 """
+
+
