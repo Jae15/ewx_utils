@@ -5,6 +5,7 @@ import decimal
 import argparse
 import csv
 import dotenv
+from datetime import date
 dotenv.load_dotenv()
 from dotenv import load_dotenv
 load_dotenv()
@@ -156,7 +157,12 @@ def compare_records(test_records, supercell_records):
                 supercell_record = {k: v for k, v in supercell_records_dict[key].items() if k != 'id'}
                 # Extracting the year using the get method
                 year = test_record.get('year')
-                record_date = datetime.strftime(test_record['date'], '%m%d%Y')
+                record_date = test_record['date']
+                #rint(f"record_date_type:{type(record_date)}")
+                start_of_vapr = date(2024,9,1) 
+               #print(f"start_of_vapr: {type(start_of_vapr)}")print(type(f"record_date_type:{record_date}"))
+
+                
                 for column_name in test_record.keys():
                     if column_name in supercell_record:
                         # For years before 2017, we skip comparison for '_src' and 'volt' columns
@@ -169,6 +175,9 @@ def compare_records(test_records, supercell_records):
                                 continue
                         if column_name == 'dwpt_src':
                             if test_record[column_name] is not None and supercell_record[column_name] == 'EMPTY':
+                                continue
+                        if column_name == 'wstdv_src':
+                            if test_record[column_name] == "EMPTY" and supercell_record[column_name] == "OOR":
                                 continue
                         # Defining conditions for the srad values
                         if column_name == 'srad':
@@ -197,9 +206,13 @@ def compare_records(test_records, supercell_records):
                                             general_writer.writerow(['Date', 'Time', 'Column Name', 'Test Value', 'Supercell Value'])
                                         general_writer.writerow([test_record['date'], test_record['time'], column_name, test_record[column_name], supercell_record[column_name]])
                         
-                        elif column_name == 'vapr' and record_date < datetime(2024,9,1):
+                        elif column_name == 'vapr' and record_date < date(2024,9,1):
                             if column_name.endswith('_src'):
                                 continue
+                        elif column_name in ["vapr_src", "vapr_3m_src", "vapr_45cm_src"]:
+                            if test_record[column_name] == "EMPTY" and supercell_record[column_name] == None:
+                                continue
+
                         else:
                             # Comparing values for all other columns
                             if test_record[column_name] != supercell_record[column_name]:

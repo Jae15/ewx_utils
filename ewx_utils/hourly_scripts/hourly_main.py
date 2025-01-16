@@ -49,24 +49,24 @@ def create_db_connections(args):
             my_logger.info("Connecting to RTMA database (dbh11).")
             connections['rtma_dbh11_connection'] = connect_to_rtma_dbh11()
             connections['rtma_dbh11_cursor'] = rtma_dbh11_cursor_connection(connections['rtma_dbh11_connection'])
-
+        
         # Connect to the appropriate QC database based on the args.qcwrite value
         if args.qcwrite == 'mawnqc_test:local':
             my_logger.info("Connecting to QC Test database (local).")
-            connections['qctest_connection'] = connect_to_mawnqc_test()
-            connections['qctest_cursor'] = mawnqc_test_cursor_connection(connections['qctest_connection'])
+            connections['qcwrite_connection'] = connect_to_mawnqc_test()
+            connections['qcwrite_cursor'] = mawnqc_test_cursor_connection(connections['qcwrite_connection'])
         elif args.qcwrite == 'mawnqcl:local':
             my_logger.info("Connecting to MAWNQCL database (local).")
-            connections['mawnqcl_connection'] = connect_to_mawnqcl()
-            connections['mawnqcl_cursor'] = mawnqcl_cursor_connection(connections['mawnqcl_connection'])
+            connections['qcwrite_connection'] = connect_to_mawnqcl()
+            connections['qcwrite_cursor'] = mawnqcl_cursor_connection(connections['mawnqcl_connection'])
         elif args.qcwrite == 'mawnqc:dbh11':
             my_logger.info("Connecting to MAWNQC DBH11 database.")
-            connections['mawnqc_dbh11_connection'] = connect_to_mawnqc_dbh11()
-            connections['mawnqc_dbh11_cursor'] = mawnqc_dbh11_cursor_connection(connections['mawnqc_dbh11_connection'])
+            connections['qcwrite_connection'] = connect_to_mawnqc_dbh11()
+            connections['qcwrite_cursor'] = mawnqc_dbh11_cursor_connection(connections['mawnqc_dbh11_connection'])
         elif args.qcwrite == 'mawnqc:supercell':
             my_logger.info("Connecting to MAWNQC Supercell database.")
-            connections['mawnqc_supercell_connection'] = connect_to_mawnqc_supercell()
-            connections['mawnqc_supercell_cursor'] = mawnqc_supercell_cursor_connection(connections['mawnqc_supercell_connection'])
+            connections['qcwrite_connection'] = connect_to_mawnqc_supercell()
+            connections['qcwrite_cursor'] = mawnqc_supercell_cursor_connection(connections['mawnqc_supercell_connection'])
 
         my_logger.info("Database connections created successfully based on the required databases.")
         return connections
@@ -96,11 +96,11 @@ def close_connections(connections):
         except Exception as e:
             my_logger.error(f"Error closing {name}: {e}")
 
-def commit_and_rollback(connection, station, qc_columns, records):
+def commit_and_rollback(connection, station, records):
     try:
         with connection.cursor() as cursor:
             #print("Cursor created as {cursor}")
-            insert_or_update_records(cursor, station, qc_columns, records)
+            insert_or_update_records(cursor, station, records)
         #print("Inserted/Updated records successfully")
         my_logger.info("Inserted/Updated records successfully")
         connection.commit()
@@ -134,30 +134,30 @@ def get_insert_table_columns(cursor, station):
     """
     my_logger.info(f"Processing station: {station}")
 
-    # Query to get column names from the specified table
-    query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = %s AND TABLE_SCHEMA = 'public'"
+    # Query to fetch a sample row from the specified table
+    query = f"SELECT * FROM {station}_hourly LIMIT 1"
     try:
         if cursor is None:
             my_logger.error("Cursor is not valid.")
             return []
 
-        # Append '_hourly' to the station name when executing the query
-        cursor.execute(query, (f"{station}_hourly",))
-        columns = cursor.fetchall()
+        # Execute the query to fetch a sample row
+        cursor.execute(query)
+        
+        # Fetch the cursor description to get column names
+        columns = [desc[0] for desc in cursor.description]  # Accessing the first element of each tuple
 
         if not columns:
             my_logger.warning(f"No columns found for table {station}_hourly.")
             return []
 
-        # Creating a list of column names
-        columns_list = [row[0] for row in columns]  # Accessing the first element of each tuple
-        my_logger.info(f"Fetched columns for table {station}_hourly: {columns_list}")
+        my_logger.info(f"Fetched columns for table {station}_hourly: {columns}")
+        #print(f"Insert Columns: {columns}")
 
-        return columns_list
+        return columns
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
         return []
-
     
 def filter_records_by_columns(records, qc_columns):
     """
@@ -181,122 +181,13 @@ def record_exists(cursor, station, record):
     Check if a record exists in the table for the specific station based on the date and time
     """
     query = f"SELECT 1 FROM {station}_hourly WHERE date = %s AND time = %s"
-
+    #print(f"Record date and time: {record['date']}, {record['time']}")
     try:
         cursor.execute(query, (record['date'], record['time']))
+
         return cursor.fetchone() is not None
     except Exception as e:
-        my_logger.error(f"Error checking existece of record in {station}: {e}")
-        raise
-
-def update_records(cursor, station, qc_columns, records):
-    """
-    Update existing records in the specified table.
-    """
-    if not records:
-        my_logger.error(f"No records to update in {station}.")
-        return
-
-    try:
-        #qc_columns = get_insert_table_columns(cursor, station)
-        if not qc_columns:
-            my_logger.error(f"No valid columns found for table {station}. Cannot proceed with update.")
-            return
-
-        filtered_records = filter_records_by_columns(records, qc_columns)
-        if not filtered_records:
-            my_logger.error(f"No valid columns to update for table {station}.")
-            return
-
-        record_keys = [key for key in filtered_records[0].keys() if key not in ['date', 'time']]
-        if not record_keys:
-            my_logger.error(f"No updatable keys found in the filtered records for {station}.")
-            return
-
-        update_query = f"UPDATE {station}_hourly SET " + ", ".join([f"{col} = %s" for col in record_keys]) + " WHERE date = %s AND time = %s"
-        
-        for record in filtered_records:
-            update_values = [record[key] for key in record_keys] + [record['date'], record['time']]
-            cursor.execute(update_query, update_values)
-
-        my_logger.info(f"Updated {len(filtered_records)} records in {station}.")
-    except Exception as e:
-        my_logger.error(f"Error updating records in {station}: {e}")
-        raise
-
-def insert_records(cursor, station, qc_columns, records):
-    """
-    Insert records into the specified table, filtered by the table's columns.
-    """
-    if not records:
-        my_logger.error(f"No records to insert into {station}.")
-        return
-    try:
-        # Fetch allowed columns for the insert table
-        # qc_columns = get_insert_table_columns(cursor, station)
-        if not qc_columns:
-            my_logger.error(f"No valid columns found for table {station}. Cannot proceed with insert.")
-            return
-
-        # Filter the records by the allowed columns
-        filtered_records = filter_records_by_columns(records, qc_columns)
-        my_logger.info(f"Filtered Records: {filtered_records}")
-
-        if not filtered_records:
-            my_logger.error(f"No valid columns to insert after filtering for table {station}.")
-            return
-
-        # Use the first filtered record to get column names
-        record_keys = list(filtered_records[0].keys())
-        my_logger.info(f"Record Keys: {record_keys}")
-        # Skip the 'id' column if it exists
-        if 'id' in record_keys:
-            record_keys.remove('id')
-
-        if not record_keys:
-            my_logger.error(f"No keys found in the filtered records for {station}.")
-            return
-
-    except (IndexError, AttributeError, KeyError) as e:
-        my_logger.error(f"Error accessing record keys: {e}")
-        return
-
-    # Prepare the INSERT query using only the filtered columns
-    db_columns = ", ".join(record_keys)
-    qc_values = ", ".join(["%s"] * len(record_keys))
-    query = f"INSERT INTO {station}_hourly ({db_columns}) VALUES ({qc_values})"
-
-    my_logger.error(f"Constructed INSERT query: {query}")
-    
-    try:
-        for record in filtered_records:
-            record_vals = [record[key] for key in record_keys]
-            cursor.execute(query, record_vals)
-        my_logger.error(f"Inserted {len(filtered_records)} records into {station}.")
-    except Exception as e:
-        if query:
-            print(f"query: {query}")
-        if record_vals:
-            print(f" record_vals: {record_vals}")
-        my_logger.error(f"Error inserting records into {station}: {e}")
-        raise
-    
-def insert_or_update_records(cursor, station, qc_columns, records):
-    """
-    Insert or update records based on existence in the table
-
-    """
-    qc_columns = get_insert_table_columns(cursor, station)
-    #print(qc_columns)
-
-    try:
-        for record in records:
-            if record_exists(cursor, station, record):
-                update_records(cursor, station, qc_columns, [record])
-            else:
-                insert_records(cursor, station, qc_columns, [record])
-    except Exception as e:
-        my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
+        my_logger.error(f"Error checking existence of record in {station}: {e}")
         raise
 
 def get_all_stations_list(cursor) -> list[str]:
@@ -308,10 +199,6 @@ def get_all_stations_list(cursor) -> list[str]:
                ORDER BY table_name ASC"""
     
     try:
-        if cursor is None:
-            my_logger.error("Cursor is not valid.")
-            return []
-
         cursor.execute(query)
         stations = cursor.fetchall()
 
@@ -328,13 +215,13 @@ def get_all_stations_list(cursor) -> list[str]:
 
         # Remove the '_hourly' suffix from each station name
         cleaned_stations_list = [station.replace('_hourly', '') for station in filtered_stations_list]
-        #pprint(cleaned_stations_list)
 
         return cleaned_stations_list
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
         return []
+
 
 
 def time_defaults(user_begin_date: str, user_end_date: str):
@@ -483,6 +370,90 @@ def get_runtime_end_date(process_end_date: str, station_info: dict) -> dict:
     my_logger.info("Runtime end dates calculation completed.")
     return runtime_end_date
 
+def update_records(cursor, station, records):
+    """
+    Update existing records in the specified table.
+    """
+    if not records:
+        my_logger.error(f"No records to update in {station}.")
+        return
+
+    try:
+        record_keys = [key for key in records[0].keys() if key not in ['date', 'time']]
+        if not record_keys:
+            my_logger.error(f"No updatable keys found in the records for {station}.")
+            return
+
+        update_query = f"UPDATE {station}_hourly SET " + ", ".join([f"{col} = %s" for col in record_keys]) + " WHERE date = %s AND time = %s"
+        
+        for record in records:
+            update_values = [record[key] for key in record_keys] + [record['date'], record['time']]
+            cursor.execute(update_query, update_values)
+
+        my_logger.info(f"Updated {len(records)} records in {station}.")
+    except Exception as e:
+        my_logger.error(f"Error updating records in {station}: {e}")
+        raise
+
+def insert_records(cursor, station, records):
+    """
+    Insert records into the specified table.
+    """
+    if not records:
+        my_logger.error(f"No records to insert into {station}.")
+        return
+
+    try:
+        # Use the first record to get column names
+        record_keys = list(records[0].keys())
+        my_logger.info(f"Record Keys: {record_keys}")
+        # Skip the 'id' column if it exists
+        if 'id' in record_keys:
+            record_keys.remove('id')
+
+        if not record_keys:
+            my_logger.error(f"No keys found in the records for {station}.")
+            return
+
+    except (IndexError, AttributeError, KeyError) as e:
+        my_logger.error(f"Error accessing record keys: {e}")
+        return
+
+    # Prepare the INSERT query using only the available columns
+    db_columns = ", ".join(record_keys)
+    values_placeholder = ", ".join(["%s"] * len(record_keys))
+    query = f"INSERT INTO {station}_hourly ({db_columns}) VALUES ({values_placeholder})"
+
+    my_logger.info(f"Constructed INSERT query: {query}")
+    
+    try:
+        for record in records:
+            record_vals = [record[key] for key in record_keys]
+            cursor.execute(query, record_vals)
+        my_logger.info(f"Inserted {len(records)} records into {station}.")
+    except Exception as e:
+        if query:
+            print(f"query: {query}")
+        if 'record_vals' in locals():
+            print(f"record_vals: {record_vals}")
+        my_logger.error(f"Error inserting records into {station}: {e}")
+        raise
+
+def insert_or_update_records(cursor, station, records):
+    """
+    Insert or update records based on existence in the table.
+    """
+    #print(f"Records: {records}")
+    try:
+        for record in records:
+            if record_exists(cursor, station, record):
+                update_records(cursor, station, [record])  
+            else:
+                insert_records(cursor, station, [record])  
+    except Exception as e:
+        my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
+        raise
+
 
 def main():
     # Initialize argument parser
@@ -524,14 +495,14 @@ def main():
         # Use the necessary connections and cursors based on what is required
         mawn_cursor = db_connections.get('mawn_dbh11_cursor')
         rtma_cursor = db_connections.get('rtma_dbh11_cursor')
-        qctest_cursor = db_connections.get('qctest_cursor')
-        qcsupercell_cursor = db_connections.get('mawnqc_supercell_cursor')
+        qcwrite_cursor = db_connections.get('qcwrite_cursor')
+        #qcsupercell_cursor = db_connections.get('qcwrite_cursor')
 
             # Log cursor status
-        my_logger.info(f"mawn_cursor: {mawn_cursor}")
-        my_logger.info(f"rtma_cursor: {rtma_cursor}")
-        my_logger.info(f"qctest_cursor: {qctest_cursor}")
-        my_logger.info(f"qcsupercell_cursor: {qcsupercell_cursor}")
+        my_logger.error(f"mawn_cursor: {mawn_cursor}")
+        my_logger.error(f"rtma_cursor: {rtma_cursor}")
+        my_logger.error(f"qctest_cursor: {qcwrite_cursor}")
+        #my_logger.error(f"qcsupercell_cursor: {qcsupercell_cursor}")
         
         # Process records for specified stations
         if args.all:
@@ -549,20 +520,21 @@ def main():
         #pprint(runtime_end_dates)
 
         for station in stations:
-            rtma_columns = get_insert_table_columns(rtma_cursor, station)
+            #rtma_columns = get_insert_table_columns(rtma_cursor, station)
             #print(f"rtma_columns: {rtma_columns}")
-            qc_columns = get_insert_table_columns(qcsupercell_cursor, station)
+            qc_columns = get_insert_table_columns(qcwrite_cursor, station)
             mawn_records = fetch_records(mawn_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
             rtma_records = fetch_records(rtma_cursor, station, runtime_begin_dates[station], runtime_end_dates[station])
 
             # Process and clean the records
-            cleaned_records = process_records(mawn_records, rtma_records, begin_date, end_date)
-
+            #print(f"Qc columns: {qc_columns}")
+    
+            cleaned_records = process_records(qc_columns, mawn_records, rtma_records, begin_date, end_date)
 
             # If execution is requested and QC cursor is available, insert or update records in the QC database
-            if args.execute and qctest_cursor:
+            if args.execute and qcwrite_cursor:
                 # Call commit_and_rollback with the operations
-                commit_and_rollback(db_connections['qctest_connection'], station, qc_columns, cleaned_records)  
+                commit_and_rollback(db_connections['qcwrite_connection'], station, cleaned_records)  
             
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
