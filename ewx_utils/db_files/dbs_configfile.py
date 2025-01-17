@@ -1,6 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
+
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -9,17 +10,16 @@ from configparser import ConfigParser
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize custom logger
-my_dbfiles_logger = ewx_utils_logger(log_path = ewx_log_file) 
+my_dbfiles_logger = ewx_utils_logger(log_path=ewx_log_file)
 
 
 def config_mawn_dbh11(
-    filename: str = ewx_database_configfile,
-    section: str = "mawn_dbh11" ) -> dict:
-
+    filename: str = ewx_database_configfile, section: str = "mawn_dbh11"
+) -> dict:
     """
     Reads database configuration credentials for mawndb from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawn_dbh11 credentials.
 
@@ -44,6 +44,7 @@ def config_mawn_dbh11(
     my_dbfiles_logger.debug("mawn_dbh11 login credentials returned successfully")
     return db_info
 
+
 def config_mawn_supercell(
     filename: str = ewx_database_configfile,
     section: str = "mawn_supercell",
@@ -51,7 +52,7 @@ def config_mawn_supercell(
     """
     Reads database configuration credentials for mawndb from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawn_supercell credentials.
 
@@ -78,13 +79,13 @@ def config_mawn_supercell(
 
 
 def config_mawnqc_dbh11(
-    filename: str =ewx_database_configfile,
+    filename: str = ewx_database_configfile,
     section: str = "mawnqc_dbh11",
 ) -> dict:
     """
     Reads database configuration credentials for mawnqc_dbh11 from the specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawndbqc credentials.
 
@@ -111,14 +112,15 @@ def config_mawnqc_dbh11(
     my_dbfiles_logger.info("mawnqc_dbh11 login information returned successfully")
     return db_info2
 
+
 def config_mawnqc_supercell(
-    filename: str =ewx_database_configfile,
+    filename: str = ewx_database_configfile,
     section: str = "mawnqc_supercell",
 ) -> dict:
     """
     Reads database configuration credentials for mawnqc_supercell from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawndb_qcl credentials.
 
@@ -145,14 +147,15 @@ def config_mawnqc_supercell(
     my_dbfiles_logger.info("mawnqc_supercell login information returned successfully")
     return db_info3
 
+
 def config_rtma_dbh11(
-    filename: str =ewx_database_configfile,
+    filename: str = ewx_database_configfile,
     section: str = "rtma_dbh11",
 ) -> dict:
     """
     Reads database configuration credentials for rtma_dbh11 from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing rtma_dbh11 credentials.
 
@@ -181,13 +184,13 @@ def config_rtma_dbh11(
 
 
 def config_rtma_supercell(
-    filename: str =ewx_database_configfile,
+    filename: str = ewx_database_configfile,
     section: str = "rtma_supercell",
 ) -> dict:
     """
     Reads database configuration credentials for mawndb_rtma from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawndb_rtma credentials.
 
@@ -216,13 +219,13 @@ def config_rtma_supercell(
 
 
 def config_mawnqc_test(
-    filename: str =ewx_database_configfile,
+    filename: str = ewx_database_configfile,
     section: str = "mawnqc_test",
 ) -> dict:
     """
     Reads database configuration credentials for mawnqc_test from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawnqc_test credentials.
 
@@ -249,14 +252,15 @@ def config_mawnqc_test(
     my_dbfiles_logger.info("QCTEST login credentials returned successfully")
     return db_info6
 
+
 def config_mawnqcl(
-    filename: str =ewx_database_configfile,
+    filename: str = ewx_database_configfile,
     section: str = "mawnqcl",
 ) -> dict:
     """
     Reads database configuration credentials for mawnqc_test from a specified ini file.
 
-    Args:
+    Parameters:
         filename (str): Path to the ini file containing database configurations.
         section (str): Section in the ini file containing mawnqc_test credentials.
 
@@ -282,6 +286,7 @@ def config_mawnqcl(
 
     my_dbfiles_logger.info("QCL login credentials returned successfully")
     return db_info7
+
 
 def main():
     """
