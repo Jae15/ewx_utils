@@ -1,6 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
+
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -10,7 +11,7 @@ from psycopg2 import OperationalError
 from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
-my_dbfiles_logger = ewx_utils_logger(log_path = ewx_log_file) 
+my_dbfiles_logger = ewx_utils_logger(log_path=ewx_log_file)
 
 from ewx_utils.db_files.dbs_configfile import (
     config_mawn_dbh11,
@@ -20,8 +21,9 @@ from ewx_utils.db_files.dbs_configfile import (
     config_rtma_dbh11,
     config_rtma_supercell,
     config_mawnqcl,
-    config_mawnqc_test
+    config_mawnqc_test,
 )
+
 
 def connect_to_mawn_dbh11():
     """
@@ -42,6 +44,7 @@ def connect_to_mawn_dbh11():
         my_dbfiles_logger.error(f"Error Connecting to Mawn dbh11 Database: {e}")
 
     return mawn_dbh11_connection
+
 
 def connect_to_mawn_supercell():
     """
@@ -84,6 +87,7 @@ def connect_to_mawnqc_dbh11():
 
     return mawnqc_dbh11_connection
 
+
 def connect_to_mawnqc_supercell():
     """
     Establishes a connection to the mawnqc database.
@@ -103,6 +107,7 @@ def connect_to_mawnqc_supercell():
         my_dbfiles_logger.error("Error connecting to database", exc_info=True)
 
     return mawnqc_supercell_connection
+
 
 def connect_to_rtma_dbh11():
     """
@@ -124,6 +129,7 @@ def connect_to_rtma_dbh11():
 
     return rtma_dbh11_connection
 
+
 def connect_to_rtma_supercell():
     """
     Establishes a connection to the rtma database.
@@ -144,6 +150,7 @@ def connect_to_rtma_supercell():
 
     return rtma_supercell_connection
 
+
 def connect_to_mawnqcl():
     """
     Establishes a connection to the mawnqcl database.
@@ -163,6 +170,7 @@ def connect_to_mawnqcl():
         my_dbfiles_logger.error(f"Error Connecting to QCL Database: {e}")
 
     return mawnqcl_connection
+
 
 def connect_to_mawnqc_test():
     """
@@ -189,7 +197,7 @@ def mawn_dbh11_cursor_connection(mawn_dbh11_connection):
     """
     Establishes a cursor connection for the mawndb database.
 
-    Args:
+    Parameters:
         mawndb_dbh11_connection (psycopg2.extensions.connection): Connection object for the mawndb database.
 
     Returns:
@@ -199,7 +207,9 @@ def mawn_dbh11_cursor_connection(mawn_dbh11_connection):
         mawn_dbh11_cursor = mawn_dbh11_connection.cursor(
             cursor_factory=psycopg2.extras.RealDictCursor
         )
-        my_dbfiles_logger.info("Mawndb dbh11 cursor connection successfully established")
+        my_dbfiles_logger.info(
+            "Mawndb dbh11 cursor connection successfully established"
+        )
 
     except (Exception, psycopg2.DatabaseError) as MawnDbh11CursorError:
         my_dbfiles_logger.error(
@@ -209,11 +219,12 @@ def mawn_dbh11_cursor_connection(mawn_dbh11_connection):
 
     return mawn_dbh11_cursor
 
+
 def mawn_supercell_cursor_connection(mawn_supercell_connection):
     """
     Establishes a cursor connection for the mawndb database.
 
-    Args:
+    Parameters:
         mawndb_connection (psycopg2.extensions.connection): Connection object for the mawndb database.
 
     Returns:
@@ -233,11 +244,12 @@ def mawn_supercell_cursor_connection(mawn_supercell_connection):
 
     return mawn_supercell_cursor
 
+
 def mawnqc_dbh11_cursor_connection(mawnqc_dbh11_connection):
     """
     Establishes a cursor connection for the mawnqc database.
 
-    Args:
+    Parameters:
         mawnqc_connection (psycopg2.extensions.connection): Connection object for the mawnqc database.
 
     Returns:
@@ -257,11 +269,12 @@ def mawnqc_dbh11_cursor_connection(mawnqc_dbh11_connection):
 
     return mawnqc_dbh11_cursor
 
+
 def mawnqc_supercell_cursor_connection(mawnqc_supercell_connection):
     """
     Establishes a cursor connection for the mawnqc supercell database.
 
-    Args:
+    Parameters:
         mawndbqc_connection (psycopg2.extensions.connection): Connection object for the mawndb_qc database.
 
     Returns:
@@ -270,15 +283,15 @@ def mawnqc_supercell_cursor_connection(mawnqc_supercell_connection):
     try:
         mawnqc_supercell_cursor = mawnqc_supercell_connection.cursor(
             cursor_factory=psycopg2.extras.RealDictCursor
-            )
+        )
         my_dbfiles_logger.info("Mawnqcl cursor connection successfully established")
-        
+
     except (Exception, psycopg2.DatabaseError) as MawnqcCursorError:
         my_dbfiles_logger.error(
             "Error establishing mawnqc dbh11 cursor connection: %s", MawnqcCursorError
         )
-        raise                           
-    
+        raise
+
     return mawnqc_supercell_cursor
 
 
@@ -286,7 +299,7 @@ def rtma_dbh11_cursor_connection(rtma_dbh11_connection):
     """
     Establishes a cursor connection for the rtma database.
 
-    Args:
+    Parameters:
         rtma_connection (psycopg2.extensions.connection): Connection object for the rtma database.
 
     Returns:
@@ -305,12 +318,13 @@ def rtma_dbh11_cursor_connection(rtma_dbh11_connection):
         raise
 
     return rtma_dbh11_cursor
+
 
 def rtma_supercell_cursor_connection(rtma_dbh11_connection):
     """
     Establishes a cursor connection for the rtma database.
 
-    Args:
+    Parameters:
         rtma_connection (psycopg2.extensions.connection): Connection object for the rtma database.
 
     Returns:
@@ -330,11 +344,12 @@ def rtma_supercell_cursor_connection(rtma_dbh11_connection):
 
     return rtma_dbh11_cursor
 
+
 def mawnqcl_cursor_connection(connect_to_mawnqcl):
     """
     Establishes a cursor connection for the rtma database.
 
-    Args:
+    Parameters:
         mawnqcl_connection (psycopg2.extensions.connection): Connection object for the rtma database.
 
     Returns:
@@ -354,11 +369,12 @@ def mawnqcl_cursor_connection(connect_to_mawnqcl):
 
     return mawnqcl_cursor
 
+
 def mawnqc_test_cursor_connection(qctest_connection):
     """
     Establishes a cursor connection for the qctest database.
 
-    Args:
+    Parameters:
         qctest_connection (psycopg2.extensions.connection): Connection object for the qctest database.
 
     Returns:
