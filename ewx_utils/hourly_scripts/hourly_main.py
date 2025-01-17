@@ -149,17 +149,21 @@ def commit_and_rollback(connection, station, records):
 
 def fetch_records(cursor, station, begin_date, end_date):
     """
-    Fetch records from a station within a date range.
+    Fetch records from the specified database table for a given date range.
 
     Parameters:
-    cursor (object): Database cursor for executing queries.
-    station (str): Specified weather station
-    begin_date (str): Start date for the query.
-    end_date (str): End date for the query.
+        cursor: Database cursor object to execute queries.
+        station (str): Name of the table (station) to query.
+        start_date (str): Start date of the query in YYYY-MM-DD format.
+        end_date (str): End date of the query in YYYY-MM-DD format.
 
     Returns:
-    list: List of records as dictionaries.
+        list: A list of dictionaries containing the fetched records.
+
+    Raises:
+        Exception: If the query fails or another error occurs.
     """
+    
     query = f"SELECT * FROM {station}_hourly WHERE date BETWEEN %s AND %s"
     my_logger.error(
         f"Executing query: {query} with parameters: {begin_date}, {end_date}"
