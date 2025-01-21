@@ -200,6 +200,9 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
             mawnsrc_record[key] is None or mawnsrc_record.get(key + "_src") == "EMPTY"
         ):
             mawnsrc_record[key] = None
+        elif key in relh_vars and mawnsrc_record[key] == -7999:
+            mawnsrc_record[key] = None
+            mawnsrc_record[key + "_src"] = "EMPTY"
         elif key in relh_vars and 100 < mawnsrc_record[key] <= 105:
             mawnsrc_record[key + "_src"] = "RELH_CAP"
             mawnsrc_record[key] = 100
@@ -208,7 +211,6 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
             mawnsrc_record[key] = None
 
     return mawnsrc_record
-
 
 def create_mawn_dwpt(
     mawnsrc_record: dict, combined_datetime: datetime.datetime
@@ -241,7 +243,6 @@ def create_mawn_dwpt(
             mawnsrc_record["dwpt_src"] = "MAWN"
         else:
             mawnsrc_record["dwpt_src"] = "EMPTY"
-        # print(f"mawn_dwpt: {mawnsrc_record['dwpt_src']}")
     return mawnsrc_record
 
 
@@ -434,8 +435,12 @@ def process_records(
 
         # Find the matching MAWN record for the current datetime
         for record in mawndb_records:
-            if record["date"] == dt.date() and record["time"] == dt.time():
+            if(
+                record["date"] == dt.date() 
+                and record["time"] == dt.time()
+            ):
                 matching_mawn_record = record
+             
                 break
 
         # Process the MAWN record if found
