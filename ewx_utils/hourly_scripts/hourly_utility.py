@@ -267,7 +267,7 @@ def compare_records(test_records, supercell_records):
                 # Extracting the year using the get method
                 year = test_record.get("year")
                 record_date = test_record["date"]
-                # rint(f"record_date_type:{type(record_date)}")
+                # print(f"record_date_type:{type(record_date)}")
                 start_of_vapr = date(2024, 9, 1)
                 # print(f"start_of_vapr: {type(start_of_vapr)}")print(type(f"record_date_type:{record_date}"))
 
@@ -276,6 +276,9 @@ def compare_records(test_records, supercell_records):
                         # For years before 2017, we skip comparison for '_src' and 'volt' columns
                         if year < 2017:
                             if column_name.endswith("_src") or column_name == "volt":
+                                continue
+                        if test_record[column_name] == -7999 and test_record.get(f"{column_name}_src") == "OOR":
+                            if supercell_record[column_name] is None and supercell_record.get(f"{column_name}_src") == "OOR":
                                 continue
                         # Defining conditions for dwpt and dwpt_src where the values have been replaced from RTMA
                         if column_name == "dwpt":
