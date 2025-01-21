@@ -146,7 +146,6 @@ db_columns = []
 qc_values = []
 clean_records = []
 
-
 def creating_mawnsrc_record(
     record: dict,
     combined_datetime: datetime.datetime,
@@ -165,9 +164,13 @@ def creating_mawnsrc_record(
     mawnsrc_record = record.copy()
     for key in record.keys():
         if key not in id_col_list and not key.endswith("_src"):
-            try:
-                if mawnsrc_record[key] is None:  # If there was no value originally
-                    mawnsrc_record[key + "_src"] = "EMPTY"
+            if mawnsrc_record[key] is None:  # If there was no value originally
+                mawnsrc_record[key + "_src"] = "EMPTY"
+            else:
+                # Check for the specific condition of -7999
+                if mawnsrc_record[key] == -7999:
+                    mawnsrc_record[key] = None  # Set value to None
+                    mawnsrc_record[key + "_src"] = "OOR"  # Set source to "OOR"
                 else:
                     value_check = check_value(
                         key, mawnsrc_record[key], combined_datetime
@@ -179,12 +182,7 @@ def creating_mawnsrc_record(
                     else:
                         mawnsrc_record[key] = None
                         mawnsrc_record[key + "_src"] = "OOR"
-            except Exception as e:
-                my_validation_logger.error(
-                    f"Key {key} was not able to be validated in value_check function: {e}"
-                )
     return mawnsrc_record
-
 
 def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
     """
