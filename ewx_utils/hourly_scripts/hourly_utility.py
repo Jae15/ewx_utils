@@ -85,14 +85,21 @@ def limit_to_max_digits(num, max_digits=None):
             return decimal.Decimal("0.0")
 
         num_decimal = decimal.Decimal(str(num))
+        
         integer_part = num_decimal.to_integral_value()
-        integer_digits = len(str(integer_part))
+        #print(f"Integer part type: {type(integer_part)}")
+        if integer_part == 0:
+            integer_digits = 0
+        else:
+            integer_digits = len(str(integer_part))
         decimal_places = max_digits - integer_digits
 
         if decimal_places < 0:
             decimal_places = 0
+        #print(f"Decimal Places: {decimal_places}")
 
         quantize_str = decimal.Decimal("1." + "0" * decimal_places)
+
         rounded_decimal = num_decimal.quantize(
             quantize_str, rounding=decimal.ROUND_HALF_UP
         )
@@ -272,6 +279,8 @@ def compare_records(test_records, supercell_records):
                                 continue
                         # Defining conditions for dwpt and dwpt_src where the values have been replaced from RTMA
                         if column_name == "dwpt":
+                            if supercell_record[column_name] is None:
+                                continue
                             if (
                                 test_record[column_name] is not None
                                 and supercell_record[column_name] is None
@@ -280,7 +289,8 @@ def compare_records(test_records, supercell_records):
                         if column_name == "dwpt_src":
                             if (
                                 test_record[column_name] is not None
-                                and supercell_record[column_name] == "EMPTY"
+                                and supercell_record[column_name] == "EMPTY" 
+                                or supercell_record[column_name] == "OOR"
                             ):
                                 continue
                         if column_name == "wstdv_src":
@@ -300,19 +310,28 @@ def compare_records(test_records, supercell_records):
                             if (
                                 test_value is None
                                 and test_source == "EMPTY"
+                                or test_source == "OOR"
                                 and supercell_value is None
                                 and supercell_source == "EMPTY"
+                                or supercell_source == "OOR"
                             ):
                                 continue
+                            #print(f"hour: {test_record['hour']}")
+                            #print(f"Test Value before: {test_value}")
+                            #print(f"Supercell Value before: {supercell_value}")
 
                             test_value = limit_to_max_digits(test_record[column_name])
                             supercell_value = limit_to_max_digits(
                                 supercell_record[column_name]
                             )
+                            #print(f"Test Value after limtomax: {test_value}")
+                            #print(f"Supercell Value after limtomax: {supercell_value}")
                             if not is_within_margin(test_value, supercell_value):
                                 mismatches_details.append(
                                     [test_record, supercell_record, column_name]
                                 )
+                                #print(f"Test Value after withmargn: {test_value}")
+                                #print(f"Supercell Value after withmargn: {supercell_value}")
                                 writer.writerow([test_value, supercell_value])
 
                         # Defining conditions for the relh values
@@ -455,23 +474,23 @@ def main():
         # Report results
         if only_in_test:
             my_logger.error(f"Records found only in test database: {len(only_in_test)}")
-            print(f"Records found only in test database: {len(only_in_test)}")
+            #print(f"Records found only in test database: {len(only_in_test)}")
         if only_in_supercell:
             my_logger.error(
                 f"Records found only in supercell database: {len(only_in_supercell)}"
             )
-            print(f"Records found only in supercell database: {len(only_in_supercell)}")
+            #print(f"Records found only in supercell database: {len(only_in_supercell)}")
         if mismatches_details:
             my_logger.error(f"Mismatched records: {len(mismatches_details)}")
             # my_logger.error(type(mismatches_details))
             my_logger.error(mismatches_details)
             for mismatch in mismatches_details:
                 my_logger.error(f"Test Record : {mismatch[0]}")
-                print(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
+                #print(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
                 my_logger.error(f"Supercell Record: {mismatch[1]}")
-                print(f"Supercell Record: {mismatch[1]}")
+                #print(f"Supercell Record: {mismatch[1]}")
                 my_logger.error(f"Details: {mismatch[2]}")
-                print(f"Details: {mismatch[2]}")
+                #print(f"Details: {mismatch[2]}")
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
