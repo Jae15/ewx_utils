@@ -125,7 +125,7 @@ def combined_datetime(record: dict) -> datetime.datetime:
     return None
 
 
-def month_abbrv(record: dict) -> str:
+def month_abbrv(record: Dict[str, str]) -> str:
     """
     Extracts the abbreviated month from a record's combined datetime.
     Parameters:

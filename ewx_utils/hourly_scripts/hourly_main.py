@@ -599,7 +599,24 @@ def get_runtime_end_date(process_end_date: str, station_info: Dict[str, Dict[str
     return runtime_end_date
 
 
-def main():
+def main() -> None:
+    """
+    Main function to check and update data from hourly_main in mawndb_qc.
+
+    Initializes an argument parser for date ranges, execution modes, and database connections. 
+    Processes records for specified stations and updates the QC database if execution is requested.
+
+    Command-line arguments:
+    -b, --begin: Start date (no time accepted)
+    -e, --end: End date (no time accepted)
+    -x, --execute: Execute SQL and change data in QC database
+    -d, --dryrun: Do not execute SQL, just write to stdout/store data in test database
+    -s, --stations: Run for specific stations (list station names)
+    -a, --all: Run for all stations
+    -q, --qcwrite: Modify data in a specific database
+    --mawn: Read mawndb data from a specific database
+    --rtma: Read rtma data from a specific database
+    """
     # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="hourly_main",
