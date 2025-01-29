@@ -295,5 +295,4 @@ python clear_records.py -x -a -q mawnqc_test:local
 python clear_records.py -x -s station1 station2 -q mawnqc_test:local
 # For a dry-run
 python clear_records.py -d -a -q mawnqc_test:local
-
 """
