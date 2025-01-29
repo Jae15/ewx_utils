@@ -147,51 +147,60 @@ qc_values = []
 clean_records = []
 
 def creating_mawnsrc_record(
-    record: dict,
+    record: Dict[str, Any],
     combined_datetime: datetime.datetime,
-    id_col_list: list,
+    id_col_list: List[str],
     default_source: str,
-) -> dict:
+) -> Dict[str, Any]:
     """
-    Creates a MAWN source record by checking values and setting appropriate source indicators.
+    Create a MAWN source record with appropriate source indicators.
+    Checks values and sets source indicators based on conditions.
+
     Parameters:
-        record (dict): The original record.
-        combined_datetime (datetime.datetime): The combined datetime for validation.
-        id_col_list (list): List of ID columns to exclude from validation.
+    record : Dict[str, Any]
+        The original record.
+    combined_datetime : datetime.datetime
+        The combined datetime for validation.
+    id_col_list : List[str]
+        List of ID columns to exclude from validation.
+
     Returns:
-        dict: The MAWN source record with source indicators.
+    Dict[str, Any]
+        The MAWN source record with source indicators.
     """
     mawnsrc_record = record.copy()
     for key in record.keys():
         if key not in id_col_list and not key.endswith("_src"):
-            if mawnsrc_record[key] is None:  # If there was no value originally
+            if mawnsrc_record[key] is None:
                 mawnsrc_record[key + "_src"] = "EMPTY"
             else:
-                # Check for the specific condition of -7999
                 if mawnsrc_record[key] == -7999:
-                    mawnsrc_record[key] = None  # Set value to None
-                    mawnsrc_record[key + "_src"] = "OOR"  # Set source to "OOR"
+                    mawnsrc_record[key] = None
+                    mawnsrc_record[key + "_src"] = "OOR"
                 else:
-                    value_check = check_value(
-                        key, mawnsrc_record[key], combined_datetime
-                    )
+                    value_check = check_value(key, mawnsrc_record[key], combined_datetime)
                     if value_check is True:
                         mawnsrc_record[key + "_src"] = default_source
-                    elif key in relh_vars:  # and value_check was not True
+                    elif key in relh_vars:
                         mawnsrc_record[key + "_src"] = "OOR"
                     else:
                         mawnsrc_record[key] = None
                         mawnsrc_record[key + "_src"] = "OOR"
     return mawnsrc_record
 
-def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
+def relh_cap(mawnsrc_record: Dict[str, Any], relh_vars: List[str]) -> Dict[str, Any]:
     """
     Processes relative humidity values in the record, capping them at 100 and handling invalid values.
+
     Parameters:
-        mawnsrc_record (dict): The MAWN source record.
-        relh_vars (list): List of relative humidity variables.
+    mawnsrc_record : Dict[str, Any]
+        The MAWN source record, where keys are strings and values can be of any type.
+    relh_vars : List[str]
+        List of relative humidity variable names to process.
+
     Returns:
-        dict: The processed MAWN source record.
+    Dict[str, Any]
+        The processed MAWN source record with updated relative humidity values.
     """
     for key in mawnsrc_record:
         if key in relh_vars and (
@@ -207,105 +216,34 @@ def relh_cap(mawnsrc_record: dict, relh_vars: list) -> dict:
         elif key in relh_vars and mawnsrc_record[key] > 105:
             mawnsrc_record[key + "_src"] = "OOR"
             mawnsrc_record[key] = None
+        elif key in relh_vars and mawnsrc_record[key] < 0:
+            mawnsrc_record[key + "_src"] = "EMPTY"
+            mawnsrc_record[key] = None
 
-    return mawnsrc_record
-
-def create_mawn_dwpt(
-    mawnsrc_record: dict, combined_datetime: datetime.datetime
-) -> dict:
-    """
-    Update the input record with dew point value if conditions are met.
-
-    Parameters:
-    mawnsrc_record (dict): Record containing temperature and humidity data.
-    combined_datetime (datetime.datetime): Timestamp for the data.
-
-    Returns:
-    dict: Updated record with dew point and source information.
-    """
-    if "dwpt" in mawnsrc_record.keys() and mawnsrc_record["dwpt"] is None:
-        temp = (
-            Temperature(mawnsrc_record["atmp"], "C", combined_datetime)
-            if mawnsrc_record["atmp"] is not None
-            else None
-        )
-        relh = (
-            Humidity(mawnsrc_record["relh"], "PCT", combined_datetime)
-            if mawnsrc_record["relh"] is not None
-            else None
-        )
-
-        if temp is not None and relh is not None:
-            dwpt_value = DewPoint(temp, relh, combined_datetime)
-            mawnsrc_record["dwpt"] = dwpt_value.dwptC
-            mawnsrc_record["dwpt_src"] = "MAWN"
-        else:
-            mawnsrc_record["dwpt_src"] = "EMPTY"
-    return mawnsrc_record
-
-
-def create_rtma_dwpt(rtma_record: dict, combined_datetime: datetime.datetime) -> dict:
-    """
-    Update the input record with dew point value if conditions are met.
-
-    Parameters:
-    rtma_record (dict): Record containing temperature and humidity data.
-    combined_datetime (datetime.datetime): Timestamp for the data.
-
-    Returns:
-    dict: Updated record with dew point and source information.
-    """
-    if "dwpt" in rtma_record.keys() and rtma_record["dwpt"] is None:
-        # Get the atmp and use it to create a temp object
-        temp = (
-            Temperature(rtma_record["atmp"], "C", combined_datetime)
-            if rtma_record["atmp"] is not None
-            else None
-        )
-        # Get the relh and use it to create a relh object
-        relh = (
-            Humidity(rtma_record["relh"], "PCT", combined_datetime)
-            if rtma_record["relh"] is not None
-            else None
-        )
-
-        # Check if both temp and relh are not None
-        if temp is not None and relh is not None:
-            # Create dew point object from temp and relh
-            dwpt_value = DewPoint(temp, relh, combined_datetime)
-
-            # Assign the calculated dew point value to the record
-            rtma_record["dwpt"] = dwpt_value.dwptC
-            rtma_record["dwpt_src"] = "RTMA"
-        else:
-            # Set source of dwpt to EMPTY since dwpt is None
-            rtma_record["dwpt"] = None
-            rtma_record["dwpt_src"] = "EMPTY"
-        # print(f"rtma_dwpt: {rtma_record['dwpt_src']}")
-    return rtma_record
-
+    return mawnsrc_record 
 
 def replace_none_with_rtmarecord(
-    mawnsrc_record: dict,
-    rtma_record: dict,
+    mawnsrc_record: Dict[str, Any],
+    rtma_record: Dict[str, Any],
     combined_datetime: datetime.datetime,
-    qc_columns: list,
-) -> dict:
+    qc_columns: List[str],
+) -> Dict[str, Any]:
     """
     Replace None values in the MAWN source record with values from the RTMA record.
 
-    This function checks for missing keys in the MAWN source record and fills them
-    with None or "EMPTY" as appropriate. It then replaces None values in the MAWN
-    record with corresponding values from the RTMA record if they pass quality checks.
-
     Parameters:
-    mawnsrc_record (dict): The MAWN source record containing data.
-    rtma_record (dict): The RTMA record containing data to replace missing values.
-    combined_datetime (datetime.datetime): Timestamp for the data.
-    qc_columns (list): List of keys to check for quality control.
+    mawnsrc_record : Dict[str, Any]
+        MAWN source record.
+    rtma_record : Dict[str, Any]
+        RTMA record for value replacement.
+    combined_datetime : datetime.datetime
+        Timestamp for the data.
+    qc_columns : List[str]
+        Keys for quality control checks.
 
     Returns:
-    dict: Updated MAWN source record with values replaced from RTMA where applicable.
+    Dict[str, Any]
+        Updated MAWN source record with RTMA values where applicable.
     """
     # Starting with a copy of the MAWN source record
     clean_record = mawnsrc_record.copy()
@@ -357,6 +295,79 @@ def replace_none_with_rtmarecord(
     return clean_record
 
 
+def create_mawn_dwpt(mawnsrc_record: Dict[str, Any], combined_datetime: datetime.datetime) -> Dict[str, Any]:
+    """
+    Update the MAWN source record with dew point value if conditions are met.
+    Calculates the dew point using temperature and humidity data if missing.
+
+    Parameters:
+    mawnsrc_record : Dict[str, Any]
+        Record containing temperature and humidity data.
+    combined_datetime : datetime.datetime
+        Timestamp for the data.
+
+    Returns:
+    Dict[str, Any]
+        Updated record with dew point and source information.
+    """
+    if "dwpt" in mawnsrc_record.keys() and mawnsrc_record["dwpt"] is None:
+        temp = (
+            Temperature(mawnsrc_record["atmp"], "C", combined_datetime)
+            if mawnsrc_record["atmp"] is not None
+            else None
+        )
+        relh = (
+            Humidity(mawnsrc_record["relh"], "PCT", combined_datetime)
+            if mawnsrc_record["relh"] is not None
+            else None
+        )
+
+        if temp is not None and relh is not None:
+            dwpt_value = DewPoint(temp, relh, combined_datetime)
+            mawnsrc_record["dwpt"] = dwpt_value.dwptC
+            mawnsrc_record["dwpt_src"] = "MAWN"
+        else:
+            mawnsrc_record["dwpt_src"] = "EMPTY"
+    return mawnsrc_record
+
+
+def create_rtma_dwpt(rtma_record: Dict[str, Any], combined_datetime: datetime.datetime) -> Dict[str, Any]:
+    """
+    Update the RTMA record with dew point value if conditions are met.
+    If the dew point is missing, it calculates it using temperature and humidity data.
+
+    Parameters:
+    rtma_record : Dict[str, Any]
+        Record containing temperature and humidity data.
+    combined_datetime : datetime.datetime
+        Timestamp for the data.
+
+    Returns:
+    Dict[str, Any]
+        Updated record with dew point and source information.
+    """
+    if "dwpt" in rtma_record.keys() and rtma_record["dwpt"] is None:
+        temp = (
+            Temperature(rtma_record["atmp"], "C", combined_datetime)
+            if rtma_record["atmp"] is not None
+            else None
+        )
+        relh = (
+            Humidity(rtma_record["relh"], "PCT", combined_datetime)
+            if rtma_record["relh"] is not None
+            else None
+        )
+
+        if temp is not None and relh is not None:
+            dwpt_value = DewPoint(temp, relh, combined_datetime)
+            rtma_record["dwpt"] = dwpt_value.dwptC
+            rtma_record["dwpt_src"] = "RTMA"
+        else:
+            rtma_record["dwpt"] = None
+            rtma_record["dwpt_src"] = "EMPTY"
+    return rtma_record
+
+
 def one_mawndb_record(mawndb_records: list) -> list:
     """
     Converts a list of MAWN DB records into a list of dictionaries.
@@ -380,47 +391,53 @@ def one_rtma_record(rtma_records: list) -> list:
     return [dict(rtma_record) for rtma_record in rtma_records]
 
 
-def filter_clean_record(clean_record: Dict, qc_columns: list) -> Dict:
+def filter_clean_record(clean_record: Dict[str, Any], qc_columns: List[str]) -> Dict[str, Any]:
     """
-    Filter the clean record to include only specified quality control columns.
-
-    This function creates a new dictionary containing only the keys from
-    the clean record that are specified in the qc_columns list.
+    Filter the clean record to retain specified quality control columns.
+    Returns a new dictionary containing only the keys from the clean record 
+    that are listed in qc_columns.
 
     Parameters:
-    clean_record (Dict): The dictionary containing the clean record data.
-    qc_columns (list): A list of keys to retain in the filtered record.
+    clean_record : Dict[str, Any]
+        The clean record data.
+    qc_columns : List[str]
+        Keys to retain.
 
     Returns:
-    Dict: A new dictionary containing only the specified quality control columns.
+    Dict[str, Any]
+        A dictionary with the specified quality control columns.
     """
-    # Create a new dictionary with only the keys present in qc_columns
     return {key: clean_record[key] for key in qc_columns if key in clean_record}
 
 
 def process_records(
-    qc_columns: list,
-    mawndb_records: List[Dict],
-    rtma_records: List[Dict],
+    qc_columns: List[str],
+    mawndb_records: List[Dict[str, Any]],
+    rtma_records: List[Dict[str, Any]],
     begin_date: str,
     end_date: str,
-) -> List[Dict]:
+) -> List[Dict[str, Any]]:
     """
     Process MAWN and RTMA records within a specified date range.
 
-    This function iterates through a list of datetime values, matching MAWN
-    and RTMA records based on date and time. It creates clean records by
-    replacing missing values and filtering based on specified quality control columns.
+    This function matches MAWN and RTMA records based on date and time, 
+    creating clean records by filtering and replacing missing values.
 
     Parameters:
-    qc_columns (list): List of keys for quality control filtering.
-    mawndb_records (List[Dict]): List of MAWN database records.
-    rtma_records (List[Dict]): List of RTMA records.
-    begin_date (str): Start date for processing records.
-    end_date (str): End date for processing records.
+    qc_columns : List[str]
+        Keys for quality control filtering.
+    mawndb_records : List[Dict[str, Any]]
+        MAWN database records.
+    rtma_records : List[Dict[str, Any]]
+        RTMA records.
+    begin_date : str
+        Start date for processing.
+    end_date : str
+        End date for processing.
 
     Returns:
-    List[Dict]: A list of processed clean records.
+    List[Dict[str, Any]]
+        A list of processed clean records.
     """
     clean_records = []
     datetime_list = generate_list_of_hours(begin_date, end_date)
@@ -467,11 +484,13 @@ def process_records(
                     )
                     clean_record = filter_clean_record(clean_record, qc_columns)
                     clean_records.append(clean_record)
+                    #print(f"Clean Record: {clean_record}")
                     break
 
             # If no matching RTMA record is found, keep the MAWN record as is
             if not matching_rtma_record:
                 clean_record = filter_clean_record(mawnsrc_record, qc_columns)
+                #print(f"Clean Record: {clean_record}")
                 clean_records.append(clean_record)
 
         else:
@@ -493,6 +512,7 @@ def process_records(
                         mawnsrc_record, rtma_record, combined_date, qc_columns
                     )
                     clean_record = filter_clean_record(clean_record, qc_columns)
+                    #print(f"Clean Record: {clean_record}")
                     clean_records.append(clean_record)
                     break
 

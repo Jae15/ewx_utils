@@ -2,6 +2,7 @@
 import os
 import sys
 import argparse
+from argparse import Namespace
 import datetime as datetime
 from datetime import datetime, timedelta
 from datetime import date
@@ -31,7 +32,7 @@ from ewx_utils.db_files.dbs_connections import (
 )
 from ewx_utils.validation_checks.hourly_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 load_dotenv()
 # Initialize the logger
@@ -39,11 +40,27 @@ my_logger = ewx_utils_logger(log_path=ewx_log_file)
 
 
 # Function to create necessary database connections based on user-specified arguments
-def create_db_connections(args):
+def create_db_connections(args: Namespace) -> Dict[str, Any]:
     """
-    Creating and returning only the necessary database connections and cursors for mawndb, rtma, qctest, etc.,
-    based on the user-specified arguments.
+    Create and return necessary database connections and cursors based on user-specified arguments.
+
+    Parameters:
+    args : Namespace
+        An object containing user-specified arguments for database connections, 
+        including attributes like 'mawn', 'rtma', and 'qcwrite'.
+
+    Returns:
+    Dict[str, Any]
+        A dictionary containing the created database connections and cursors, 
+        where keys are connection/cursor names and values are the corresponding connection/cursor objects.
+
+    Raises:
+    OperationalError
+        If there is an operational error while connecting to the database.
+    Exception
+        For any unexpected errors that occur during the connection process.
     """
+
     my_logger.info("Creating only necessary database connections.")
     connections = {}
 
@@ -104,13 +121,14 @@ def create_db_connections(args):
         close_connections(connections)
         raise
 
-
-def close_connections(connections):
+def close_connections(connections: Dict[str, Any]) -> None:
     """
     Close all provided database connections and cursors.
 
     Parameters:
-    connections (dict): Dictionary of connection and cursor objects.
+    connections : Dict[str, Any]
+        Dictionary of connection and cursor objects, where keys are the names of the connections/cursors
+        and values are the corresponding connection/cursor objects.
     """
     my_logger.info("Closing database connections.")
     for name, conn in connections.items():
@@ -125,36 +143,14 @@ def close_connections(connections):
             my_logger.error(f"Error closing {name}: {e}")
 
 
-def commit_and_rollback(connection, station, records):
-    """
-    Commit records for a station; rollback on error.
-
-    Parameters:
-    connection (object): Database connection.
-    station (str): Specified weather station.
-    records (list): Records to insert/update.
-    """
-    try:
-        with connection.cursor() as cursor:
-            insert_or_update_records(cursor, station, records)
-        my_logger.info("Inserted/Updated records successfully")
-        connection.commit()
-        my_logger.info("Successfully committed transaction")
-    except Exception as e:
-        print(f"Exception as {e}")
-        # Rollback the transaction in case of error
-        connection.rollback()
-        my_logger.error(f"Transaction failed and rolled back: {e}")
-
-
-def fetch_records(cursor, station, begin_date, end_date):
+def fetch_records(cursor: Any, station: str, begin_date: str, end_date: str) -> List[Dict[str, Any]]:
     """
     Fetch records from the specified database table for a given date range.
 
     Parameters:
         cursor: Database cursor object to execute queries.
         station (str): Name of the table (station) to query.
-        start_date (str): Start date of the query in YYYY-MM-DD format.
+        begin_date (str): Start date of the query in YYYY-MM-DD format.
         end_date (str): End date of the query in YYYY-MM-DD format.
 
     Returns:
@@ -180,7 +176,7 @@ def fetch_records(cursor, station, begin_date, end_date):
         raise
 
 
-def get_insert_table_columns(cursor, station):
+def get_insert_table_columns(cursor: Any, station: str) -> List[str]:
     """
     Retrieve and log column names from the specified station's table.
 
@@ -220,13 +216,13 @@ def get_insert_table_columns(cursor, station):
         return []
 
 
-def record_exists(cursor, station, record):
+def record_exists(cursor: Any, station: str, record: Dict[str, str]) -> bool:
     """
     Check if a record exists for the specified weather station.
 
     Parameters:
     cursor (object): Database cursor for executing queries.
-    station (str): Specified weather station
+    station (str): Specified weather station.
     record (dict): Record containing 'date' and 'time' to check.
 
     Returns:
@@ -242,7 +238,7 @@ def record_exists(cursor, station, record):
         raise
 
 
-def get_all_stations_list(cursor) -> list[str]:
+def get_all_stations_list(cursor: Any) -> List[str]:
     """
     Fetch and return station names from the database, excluding 'variables_hourly'.
 
@@ -284,58 +280,155 @@ def get_all_stations_list(cursor) -> list[str]:
         my_logger.error(f"An error occurred: {e}")
         return []
 
-
-def time_defaults(user_begin_date: str, user_end_date: str):
+def update_records(cursor: Any, station: str, records: List[Dict[str, Any]]) -> None:
     """
-    Set default begin and end dates if not provided.
+    Update existing records in the specified station's table.
 
     Parameters:
-    user_begin_date (str): User-provided begin date (format: 'YYYY-MM-DD').
-    user_end_date (str): User-provided end date (format: 'YYYY-MM-DD').
+    cursor : Any
+        Database cursor for executing queries.
+    station : str
+        Specified weather station.
+    records : List[Dict[str, Any]]
+        List of records to update, where each record is a dictionary with string keys and values of any type.
+    """
+    if not records:
+        my_logger.error(f"No records to update in {station}.")
+        return
 
-    Returns:
-    tuple: A tuple containing the begin and end dates as strings.
+    try:
+        record_keys = [key for key in records[0].keys() if key not in ["date", "time"]]
+        if not record_keys:
+            my_logger.error(f"No updatable keys found in the records for {station}.")
+            return
+
+        update_query = (
+            f"UPDATE {station}_hourly SET "
+            + ", ".join([f"{col} = %s" for col in record_keys])
+            + " WHERE date = %s AND time = %s"
+        )
+
+        for record in records:
+            update_values = [record[key] for key in record_keys] + [
+                record["date"],
+                record["time"],
+            ]
+            cursor.execute(update_query, update_values)
+
+        my_logger.info(f"Updated {len(records)} records in {station}.")
+    except Exception as e:
+        my_logger.error(f"Error updating records in {station}: {e}")
+        raise
+
+
+def insert_records(cursor: Any, station: str, records: List[Dict[str, Any]]) -> None:
+    """
+    Insert records into the specified station's table.
+
+    Parameters:
+    cursor : Any
+        Database cursor for executing queries.
+    station : str
+        Specified weather station.
+    records : List[Dict[str, Any]]
+        List of records to insert, where each record is a dictionary with string keys and values of any type.
+    """
+    if not records:
+        my_logger.error(f"No records to insert into {station}.")
+        return
+
+    try:
+        # Use the first record to get column names
+        record_keys = list(records[0].keys())
+        my_logger.info(f"Record Keys: {record_keys}")
+        # Skip the 'id' column if it exists
+        if "id" in record_keys:
+            record_keys.remove("id")
+
+        if not record_keys:
+            my_logger.error(f"No keys found in the records for {station}.")
+            return
+
+    except (IndexError, AttributeError, KeyError) as e:
+        my_logger.error(f"Error accessing record keys: {e}")
+        return
+
+    # Prepare the INSERT query using only the available columns
+    db_columns = ", ".join(record_keys)
+    values_placeholder = ", ".join(["%s"] * len(record_keys))
+    query = f"INSERT INTO {station}_hourly ({db_columns}) VALUES ({values_placeholder})"
+
+    my_logger.info(f"Constructed INSERT query: {query}")
+
+    try:
+        for record in records:
+            record_vals = [record[key] for key in record_keys]
+            cursor.execute(query, record_vals)
+        my_logger.info(f"Inserted {len(records)} records into {station}.")
+    except Exception as e:
+        if query:
+            print(f"query: {query}")
+        if "record_vals" in locals():
+            print(f"record_vals: {record_vals}")
+        my_logger.error(f"Error inserting records into {station}: {e}")
+        raise
+
+
+def insert_or_update_records(cursor: Any, station: str, records: List[Dict[str, Any]]) -> None:
+    """
+    Insert or update records in the specified station's table.
+
+    Parameters:
+    cursor : Any
+        Database cursor for executing queries.
+    station : str
+        Specified weather station.
+    records : List[Dict[str, Any]]
+        List of records to insert or update, where each record is a dictionary with string keys and values of any type.
     """
     try:
-        if user_begin_date is None:
-            user_begin_date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-        else:
-            user_begin_date = datetime.strptime(user_begin_date, "%Y-%m-%d").strftime(
-                "%Y-%m-%d"
-            )
-
-        # Default end_date is 7 days from begin_date if not provided
-        if user_end_date is None:
-            user_end_date = (
-                datetime.strptime(user_begin_date, "%Y-%m-%d") + timedelta(days=7)
-            ).strftime("%Y-%m-%d")
-        else:
-            user_end_date = datetime.strptime(user_end_date, "%Y-%m-%d").strftime(
-                "%Y-%m-%d"
-            )
-
-        # Validate that the begin_date comes before the end_date
-        if user_begin_date > user_end_date:
-            raise ValueError("Begin date should come before end date.")
-
-        return user_begin_date, user_end_date
-
-    except ValueError as ve:
-        my_logger.error(f"ValueError occurred: {ve}")
+        for record in records:
+            if record_exists(cursor, station, record):
+                update_records(cursor, station, [record])
+            else:
+                insert_records(cursor, station, [record])
     except Exception as e:
-        my_logger.error(f"An error occurred: {e}")
-    finally:
-        my_logger.info("time_defaults function execution completed.")
+        my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
+        raise
+    
+
+def commit_and_rollback(connection: Any, station: str, records: List[Dict[str, Any]]) -> None:
+    """
+    Commit records for a station; rollback on error.
+
+    Parameters:
+    connection (object): Database connection.
+    station (str): Specified weather station.
+    records (list): Records to insert/update, where each record is a dictionary.
+    """
+    try:
+        with connection.cursor() as cursor:
+            insert_or_update_records(cursor, station, records)
+        my_logger.info("Inserted/Updated records successfully")
+        connection.commit()
+        my_logger.info("Successfully committed transaction")
+    except Exception as e:
+        print(f"Exception as {e}")
+        # Rollback the transaction in case of error
+        connection.rollback()
+        my_logger.error(f"Transaction failed and rolled back: {e}")
 
 
-def get_station_data(cursor) -> dict:
+def get_station_data(cursor: Any) -> Dict[str, Dict[str, Any]]:
     """
     Function to get station data including begin dates, end dates, and active status of the stations.
 
     Parameters:
-        cursor: Database cursor to execute SQL queries.
+    cursor : Any
+        Database cursor to execute SQL queries.
 
     Returns:
+    Dict[str, Dict[str, Any]]
         A dictionary containing station names as keys and their corresponding data (active status, bg_dates, ed_dates).
     """
     my_logger.info("Starting to fetch station data.")
@@ -386,15 +479,62 @@ def get_station_data(cursor) -> dict:
         return {}
 
 
-def get_runtime_begin_date(process_begin_date: str, station_info: dict) -> dict:
+def time_defaults(user_begin_date: str, user_end_date: str) -> Tuple[str, str]:
+    """
+    Set default begin and end dates if not provided.
+
+    Parameters:
+    user_begin_date (str): User-provided begin date (format: 'YYYY-MM-DD').
+    user_end_date (str): User-provided end date (format: 'YYYY-MM-DD').
+
+    Returns:
+    tuple: A tuple containing the begin and end dates as strings.
+    """
+    try:
+        if user_begin_date is None:
+            user_begin_date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+        else:
+            user_begin_date = datetime.strptime(user_begin_date, "%Y-%m-%d").strftime(
+                "%Y-%m-%d"
+            )
+
+        # Default end_date is 7 days from begin_date if not provided
+        if user_end_date is None:
+            user_end_date = (
+                datetime.strptime(user_begin_date, "%Y-%m-%d") + timedelta(days=7)
+            ).strftime("%Y-%m-%d")
+        else:
+            user_end_date = datetime.strptime(user_end_date, "%Y-%m-%d").strftime(
+                "%Y-%m-%d"
+            )
+
+        # Validate that the begin_date comes before the end_date
+        if user_begin_date > user_end_date:
+            raise ValueError("Begin date should come before end date.")
+
+        return user_begin_date, user_end_date
+
+    except ValueError as ve:
+        my_logger.error(f"ValueError occurred: {ve}")
+    except Exception as e:
+        my_logger.error(f"An error occurred: {e}")
+    finally:
+        my_logger.info("time_defaults function execution completed.")
+
+
+def get_runtime_begin_date(process_begin_date: str, station_info: Dict[str, Dict[str, Any]]) -> Dict[str, str]:
     """
     Calculate the runtime begin date based on process begin date and station data.
 
     Parameters:
-        process_begin_date: The date when the process begins, as a string.
-        station_info: A dictionary containing station information.
+    process_begin_date : str
+        The date when the process begins, as a string.
+    station_info : Dict[str, Dict[str, Any]]
+        A dictionary containing station information, where each key is a station name and each value is a dictionary
+        that includes at least a key "bg_date" which is a list of background dates.
 
     Returns:
+    Dict[str, str]
         A dictionary mapping station names to their respective runtime begin dates.
     """
     my_logger.info("Calculating runtime begin dates.")
@@ -418,15 +558,19 @@ def get_runtime_begin_date(process_begin_date: str, station_info: dict) -> dict:
     return runtime_begin_date
 
 
-def get_runtime_end_date(process_end_date: str, station_info: dict) -> dict:
+def get_runtime_end_date(process_end_date: str, station_info: Dict[str, Dict[str, Any]]) -> Dict[str, str]:
     """
     Calculate runtime end date based on the process_end_date and station info.
 
     Parameters:
-        process_end_date: The date when the process ends, as a string.
-        station_info: A dictionary containing station information.
+    process_end_date : str
+        The date when the process ends, as a string.
+    station_info : Dict[str, Dict[str, Any]]
+        A dictionary containing station information, where each key is a station name and each value is a dictionary
+        that includes at least keys "ed_date" (a list of end dates) and "active" (a boolean status).
 
     Returns:
+    Dict[str, str]
         A dictionary mapping station names to their respective runtime end dates.
     """
     my_logger.info("Calculating runtime end dates.")
@@ -453,115 +597,6 @@ def get_runtime_end_date(process_end_date: str, station_info: dict) -> dict:
 
     my_logger.info("Runtime end dates calculation completed.")
     return runtime_end_date
-
-
-def update_records(cursor, station, records):
-    """
-    Update existing records in the specified station's table.
-
-    Parameters:
-    cursor (object): Database cursor for executing queries.
-    station (str): Specified weather station
-    records (list[dict]): List of records to update.
-    """
-    if not records:
-        my_logger.error(f"No records to update in {station}.")
-        return
-
-    try:
-        record_keys = [key for key in records[0].keys() if key not in ["date", "time"]]
-        if not record_keys:
-            my_logger.error(f"No updatable keys found in the records for {station}.")
-            return
-
-        update_query = (
-            f"UPDATE {station}_hourly SET "
-            + ", ".join([f"{col} = %s" for col in record_keys])
-            + " WHERE date = %s AND time = %s"
-        )
-
-        for record in records:
-            update_values = [record[key] for key in record_keys] + [
-                record["date"],
-                record["time"],
-            ]
-            cursor.execute(update_query, update_values)
-
-        my_logger.info(f"Updated {len(records)} records in {station}.")
-    except Exception as e:
-        my_logger.error(f"Error updating records in {station}: {e}")
-        raise
-
-
-def insert_records(cursor, station, records):
-    """
-    Insert records into the specified station's table.
-
-    Parameters:
-    cursor (object): Database cursor for executing queries.
-    station (str): Specified weather station
-    records (list[dict]): List of records to insert.
-    """
-
-    if not records:
-        my_logger.error(f"No records to insert into {station}.")
-        return
-
-    try:
-        # Use the first record to get column names
-        record_keys = list(records[0].keys())
-        my_logger.info(f"Record Keys: {record_keys}")
-        # Skip the 'id' column if it exists
-        if "id" in record_keys:
-            record_keys.remove("id")
-
-        if not record_keys:
-            my_logger.error(f"No keys found in the records for {station}.")
-            return
-
-    except (IndexError, AttributeError, KeyError) as e:
-        my_logger.error(f"Error accessing record keys: {e}")
-        return
-
-    # Prepare the INSERT query using only the available columns
-    db_columns = ", ".join(record_keys)
-    values_placeholder = ", ".join(["%s"] * len(record_keys))
-    query = f"INSERT INTO {station}_hourly ({db_columns}) VALUES ({values_placeholder})"
-
-    my_logger.info(f"Constructed INSERT query: {query}")
-
-    try:
-        for record in records:
-            record_vals = [record[key] for key in record_keys]
-            cursor.execute(query, record_vals)
-        my_logger.info(f"Inserted {len(records)} records into {station}.")
-    except Exception as e:
-        if query:
-            print(f"query: {query}")
-        if "record_vals" in locals():
-            print(f"record_vals: {record_vals}")
-        my_logger.error(f"Error inserting records into {station}: {e}")
-        raise
-
-
-def insert_or_update_records(cursor, station, records):
-    """
-    Insert or update records in the specified station's table.
-
-    Parameters:
-    cursor (object): Database cursor for executing queries.
-    station (str): Specified weather station
-    records (list[dict]): List of records to insert or update.
-    """
-    try:
-        for record in records:
-            if record_exists(cursor, station, record):
-                update_records(cursor, station, [record])
-            else:
-                insert_records(cursor, station, [record])
-    except Exception as e:
-        my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
-        raise
 
 
 def main():

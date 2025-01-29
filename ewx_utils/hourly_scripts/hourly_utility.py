@@ -280,6 +280,39 @@ def compare_records(test_records, supercell_records):
                         if test_record[column_name] == -7999 and test_record.get(f"{column_name}_src") == "OOR":
                             if supercell_record[column_name] is None and supercell_record.get(f"{column_name}_src") == "OOR":
                                 continue
+                        columns = ['stmp_05cm_src', 'stmp_10cm_src', 'stmp_20cm_src', 'stmp_50cm_src', 
+                                   'smst_05cm_src', 'smst_10cm_src', 'smst_20cm_src', 'smst_50cm_src']
+                        if column_name in columns:
+                            if (
+                                test_record[column_name] == "EMPTY"
+                                and supercell_record[column_name] is None
+                                ):
+                                continue
+                        poly_cols = ["polyatmp_src", "polystmp1_src", "polystmp2_src"]
+                        if column_name in poly_cols:
+                            if(
+                              test_record[column_name] == "EMPTY"
+                              and supercell_records[column_name] == "OOR"  
+                            ):
+                                continue
+
+                        # Defining conditions for relh when the value has been capped to 100 and source set to RELH_CAP
+                        if column_name == "relh_src":
+                            if (
+                            test_record[column_name] == "RELH_CAP"
+                            and supercell_record[column_name] == "MAWN"
+                        ):
+                                continue
+                        if column_name == "relh":
+                            if (test_record[column_name] == 100
+                                and 100 <= supercell_record[column_name] <= 105
+                            ):
+                                continue
+                        if column_name == "relh_src":
+                            if (test_record[column_name] == "OOR"
+                                and supercell_record[column_name] == "EMPTY"
+                            ):
+                                continue
                         # Defining conditions for dwpt and dwpt_src where the values have been replaced from RTMA
                         if column_name == "dwpt":
                             if supercell_record[column_name] is None:
@@ -296,14 +329,28 @@ def compare_records(test_records, supercell_records):
                                 or supercell_record[column_name] == "OOR"
                             ):
                                 continue
-                        if column_name == "wstdv_src":
+                        if column_name == "dwpt_src":
+                                if(
+                                    test_record[column_name] == "RTMA"
+                                    and supercell_record[column_name] is None
+                                ):
+                                    continue
+                        wstdv_cols = ["wstdv_src", "wstdv_20m_src"]
+                        if column_name in wstdv_cols:
                             if (
                                 test_record[column_name] == "EMPTY"
                                 and supercell_record[column_name] == "OOR"
                             ):
                                 continue
+                        if column_name == "volt_src":
+                            if(
+                                test_record[column_name] == "EMPTY"
+                                and supercell_record[column_name] == "OOR"
+                            ):
+                                continue
                         # Defining conditions for the srad values
-                        if column_name == "srad":
+                        limit_cols = ["srad", "relh", "soil0", "soil1", "atmp"]
+                        if column_name in limit_cols:
                             test_value = test_record[column_name]
                             supercell_value = supercell_record[column_name]
                             test_source = test_record.get(f"{column_name}_src")
@@ -336,6 +383,7 @@ def compare_records(test_records, supercell_records):
                                 #print(f"Test Value after withmargn: {test_value}")
                                 #print(f"Supercell Value after withmargn: {supercell_value}")
                                 writer.writerow([test_value, supercell_value])
+                            
 
                         # Defining conditions for the relh values
                         elif (
