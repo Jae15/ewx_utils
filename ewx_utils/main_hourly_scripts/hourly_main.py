@@ -30,7 +30,7 @@ from ewx_utils.db_files.dbs_connections import (
     rtma_supercell_cursor_connection,
     mawnqc_test_cursor_connection,
 )
-from ewx_utils.validation_checks.hourly_validation_utils import process_records
+from ewx_utils.validation_checks.main_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any, Tuple
 
@@ -748,6 +748,7 @@ if __name__ == "__main__":
     main()
 
 """
+python hourly_main.py -a -x
 python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x
 python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
 

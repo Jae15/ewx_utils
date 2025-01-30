@@ -30,7 +30,7 @@ from ewx_utils.db_files.dbs_connections import (
     rtma_supercell_cursor_connection,
     mawnqc_test_cursor_connection,
 )
-from ewx_utils.validation_checks.hourly_validation_utils import process_records
+from ewx_utils.validation_checks.main_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any
 
