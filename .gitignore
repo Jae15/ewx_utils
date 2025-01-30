@@ -17,4 +17,4 @@ ewx_logs.log/
 *.log.*
 .stations_utils.py/
 *.csv*
-daily_scripts
+main_daily_scripts
