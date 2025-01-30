@@ -558,4 +558,7 @@ if __name__ == "__main__":
 """
 python hourly_utility.py --begin 2023-01-01 --end 2023-01-02 --station aetna_hourly
 
+usage: hourly_utility.py [-h] -b BEGIN -e END -s STATION
+required: -b/--begin, -e/--end, -s/--station
+
 """
