@@ -1,6 +1,6 @@
-# EWX_UTILS Project
+# ewx_utils Project
 
-# The process of running this EWX_UTILS project in another machine
+# The process of running this ewx_utils project in another machine
 - The first step needed to run this project is to create an SSH key through a tool such as PuTTYgen
 - This project requires a key to set up sftp.geo.msu.edu SSH tunnel
 - Use the sftp tunnel to connect to the databases of choice eg supercell and dbh11
@@ -15,7 +15,7 @@
 pip install -r requirements.txt
 ```
 
-## How to run the main script (project entry script)
+## How to run the hourly_main.py script (project entry script)
 - The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
 - The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
 ```
@@ -26,7 +26,7 @@ python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
 hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
 [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]
 ```
-## How to run the ewx_utils main utility script
+## How to run the hourly_utility.py script
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
 - This script is used to compare records in the source database to the records in the destination database.
 - A test database is used to mimick the destination database - records from the source database are stored here and compared to the destination database.
