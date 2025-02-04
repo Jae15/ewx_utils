@@ -42,6 +42,42 @@ and write-access to the file path in `EWX_LOG_FILE`
 Note that these environment variables can be set prior to running the python
 scripts and the `load_dotenv()` function will use the currently set values. 
 
+### Database configuration
+
+- It requires a postgres database and uses pyscopg2 to connect python with the database
+- It requires a database connection configuration file, using the file path 
+  indicated by the configuration value `DATABASE_CONFIG_FILE` in .env
+  There is no default value so you must set this, but typically set to `database.ini` 
+- The database connection configuration file follows the syntax outline in the 
+  [ConfigParser](https://docs.python.org/3/library/configparser.html) python
+  library, or "ini" format (and usually has an 'ini' extension). 
+- This file is to have a section as defined in each function in the file
+  `ewx_utils/db_files/dbs_configfile.py` which is based on which databases are 
+  currently available from Enviroweather servers.  When the names and servers of
+  the main Enviroweather databases change, you must edit both the file 
+  `ewx_utils/db_files/dbs_configfile.py` and the database ini file in
+   `DATABASE_CONFIG_FILE` (often `database.ini` but not necessarily)
+- An example section would look like:
+
+
+```
+[mawnqc_dbh11]
+host = 12.34.56.78
+port = 5432
+dbname = mawndb_qc
+user = mydbusername
+password = mydbpassword
+```
+
+> When running on your own computer, you may use ssh-tunnel to connect to the 
+> Enviroweather database server, and the host may be `127.0.0.1` and port the one
+> used by the tunnel.   See the Enviroweather system administrator for connection
+> details
+
+- Two of the database entries are required for testing.  You can run either create
+  these on an remote server, or run a Postgresql server 
+  on your local computer.  Create an empty databases using the schema file for the 
+  `mawn_qc` database. 
 
 ## How to run the hourly_main.py script (project entry script)
 
