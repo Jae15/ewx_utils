@@ -1,24 +1,54 @@
 # ewx_utils Project
 
-# The process of running this ewx_utils project in another machine
+## The process of running this ewx_utils project in another machine
+
 - The first step needed to run this project is to create an SSH key through a tool such as PuTTYgen
 - This project requires a key to set up sftp.geo.msu.edu SSH tunnel
 - Use the sftp tunnel to connect to the databases of choice eg supercell and dbh11
 - To set up/configure the ports, databases and the SSH tunnel, one could use a tool such as PuTTy
 
-## How to install packages for the project
-- The project packages are located in the requirements.txt file
-- This project works with python 3.12
-- It requires a postgres database and uses pyscopg2 to connect python with the database
+## Setup
+
+### How to install packages for the project
+- This project is tested and known to work with Python version 3.12
+
+- The project requires external python packages, listed in located in the requirements.txt file
+   To install them, run 
 
 ```
 pip install -r requirements.txt
 ```
 
+### Configuration
+
+Configuration values for the scripts are in the file `.env` which uses the 
+format defined by the package `python-dotenv`.  For details about this file, 
+see https://pypi.org/project/python-dotenv/#getting-started.    An example `.env`
+file is in the main direction, called `example-dot-env.txt`   Copy this file to 
+a new file name `.env` and edit the values.   
+
+The `.env` file contains three variables: 
+
+- `EWX_BASE_PATH`=the absolute path to the top folder of this project. 
+- `DATABASE_CONFIG_FILE`=the absolute path to the file containing the database 
+   connection information (database name, use, and passwords)
+- `EWX_LOG_FILE`=the absolute path to the file used by the program to write 
+   logging information.   
+
+There are no restrictions on these files but they must be defined for the 
+scripts to run properly and this program must read access to all of them, 
+and write-access to the file path in `EWX_LOG_FILE`
+
 ## How to run the hourly_main.py script (project entry script)
-- The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
-- The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
+
+The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
+
+The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
+
+
 ```
+cd ewx_utils/main_hourly_scripts
+
 python hourly_main.py -a -x
 python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x
 python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
@@ -26,6 +56,7 @@ python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
 hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
 [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]
 ```
+
 ## How to run the hourly_utility.py script
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
 - This script is used to compare records in the source database to the records in the destination database.
