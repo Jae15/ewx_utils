@@ -32,12 +32,16 @@ The `.env` file contains three variables:
 - `EWX_BASE_PATH`=the absolute path to the top folder of this project. 
 - `DATABASE_CONFIG_FILE`=the absolute path to the file containing the database 
    connection information (database name, use, and passwords)
-- `EWX_LOG_FILE`=the absolute path to the file used by the program to write 
-   logging information.   
+- `EWX_LOG_FILE`=the absolute path to a folder that will contain log files. the
+   folder must exist on your system
 
 There are no restrictions on these files but they must be defined for the 
 scripts to run properly and this program must read access to all of them, 
 and write-access to the file path in `EWX_LOG_FILE`
+
+Note that these environment variables can be set prior to running the python
+scripts and the `load_dotenv()` function will use the currently set values. 
+
 
 ## How to run the hourly_main.py script (project entry script)
 
