@@ -371,7 +371,7 @@ def create_rtma_dwpt(rtma_record: Dict[str, Any], combined_datetime: datetime.da
 def one_mawndb_record(mawndb_records: list) -> list:
     """
     Converts a list of MAWN DB records into a list of dictionaries.
-    Args:
+    Parameters:
         mawndb_records (list): List of mawndb records.
     Returns:
         list: List of dictionaries representing the mawndb records.
@@ -382,7 +382,7 @@ def one_mawndb_record(mawndb_records: list) -> list:
 def one_rtma_record(rtma_records: list) -> list:
     """
     Converts a list of RTMA records into a list of dictionaries.
-    Args:
+    Parameters:
         rtma_records (list): List of RTMA records.
     Returns:
         list: List of dictionaries representing the RTMA records.
@@ -408,7 +408,6 @@ def filter_clean_record(clean_record: Dict[str, Any], qc_columns: List[str]) -> 
         A dictionary with the specified quality control columns.
     """
     return {key: clean_record[key] for key in qc_columns if key in clean_record}
-
 
 def process_records(
     qc_columns: List[str],
