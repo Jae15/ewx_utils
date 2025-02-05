@@ -16,6 +16,7 @@ sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from typing import List, Dict, Any, Tuple, Optional, Union
 from ewx_utils.db_files.dbs_connections import (
     connect_to_mawnqc_test,
     connect_to_mawnqc_supercell,
@@ -26,7 +27,7 @@ from ewx_utils.db_files.dbs_connections import (
 my_logger = ewx_utils_logger(log_path=ewx_log_file)
 
 
-def fetch_records_by_date(cursor, station, start_date, end_date):
+def fetch_records_by_date(cursor: Any, station: str, start_date: str, end_date: str) -> List[dict]:
     """
     Fetch records from the specified database table for a given date range.
 
@@ -58,8 +59,7 @@ def fetch_records_by_date(cursor, station, start_date, end_date):
         my_logger.error(f"Error fetching records from {station}: {e}")
         raise
 
-
-def limit_to_max_digits(num, max_digits=None):
+def limit_to_max_digits(num: Optional[float], max_digits: Optional[int] = None) -> Optional[decimal.Decimal]:
     """
     Limit the number of digits in a decimal number to a specified maximum.
 
@@ -117,7 +117,7 @@ def limit_to_max_digits(num, max_digits=None):
         return None
 
 
-def is_within_margin(value1, value2):
+def is_within_margin(value1: Union[float, str], value2: Union[float, str]) -> bool:
     """
     Check if the difference between two numbers is within a 0.05% margin of the second number.
 
@@ -160,7 +160,7 @@ def is_within_margin(value1, value2):
 
         # Append the types and values to a CSV file in the specified directory
         csv_file_path = (
-            r"C:\Users\mwangija\data_file\ewx_utils\ewx_utils\comparison_results.csv"
+            "comparison_results.csv"
         )
 
         # Check if the file exists to write headers only once
@@ -210,7 +210,7 @@ def is_within_margin(value1, value2):
         return False
 
 
-def compare_records(test_records, supercell_records):
+def compare_records(test_records: List[dict], supercell_records: List[dict]) -> Tuple[List[dict], List[dict], List[Any]]:
     """
     Compare records between test and supercell databases and identify mismatches or missing records.
 
@@ -224,6 +224,7 @@ def compare_records(test_records, supercell_records):
     Logs:
         Mismatched details and writes them to CSV files.
     """
+    # Function implementation goes here
 
     test_records_dict = {(rec["date"], rec["time"]): rec for rec in test_records}
     supercell_records_dict = {
@@ -235,10 +236,10 @@ def compare_records(test_records, supercell_records):
 
     # Specify the full path for the CSV files
     srad_csv_file_path = (
-        r"C:\Users\mwangija\data_file\ewx_utils\ewx_utils\srad_values.csv"
+        "srad_values.csv"
     )
     general_mismatch_csv_file_path = (
-        r"C:\Users\mwangija\data_file\ewx_utils\ewx_utils\general_mismatches.csv"
+        "general_mismatches.csv"
     )
 
     # Check if the srad file exists to write headers only once
@@ -478,7 +479,19 @@ def compare_records(test_records, supercell_records):
     return only_in_test, only_in_supercell, mismatches_details
 
 
-def main():
+def main() -> None:
+    """
+    Main function to compare records between test and supercell databases.
+
+    Initializes an argument parser for date ranges and station names, establishes database connections,
+    fetches records for the specified date range, and compares the records to identify mismatches or
+    missing records. Logs the results and any errors encountered during the process.
+
+    Command-line arguments:
+    -b, --begin: Start date (YYYY-MM-DD)
+    -e, --end: End date (YYYY-MM-DD)
+    -s, --station: Station name (which is also the table name)
+    """
     parser = argparse.ArgumentParser(
         description="Utility script to compare records between test and supercell databases"
     )
@@ -518,30 +531,21 @@ def main():
         only_in_test, only_in_supercell, mismatches_details = compare_records(
             test_records, supercell_records
         )
-        # my_logger.error(type(only_in_test))
-        # my_logger.error(type(only_in_supercell))
-        # my_logger.error(type(mismatches_details))
 
         # Report results
         if only_in_test:
             my_logger.error(f"Records found only in test database: {len(only_in_test)}")
-            #print(f"Records found only in test database: {len(only_in_test)}")
         if only_in_supercell:
             my_logger.error(
                 f"Records found only in supercell database: {len(only_in_supercell)}"
             )
-            #print(f"Records found only in supercell database: {len(only_in_supercell)}")
         if mismatches_details:
             my_logger.error(f"Mismatched records: {len(mismatches_details)}")
-            # my_logger.error(type(mismatches_details))
             my_logger.error(mismatches_details)
             for mismatch in mismatches_details:
                 my_logger.error(f"Test Record : {mismatch[0]}")
-                #print(f"Test Record Pre Truncation/Rounding: {mismatch[0]}")
                 my_logger.error(f"Supercell Record: {mismatch[1]}")
-                #print(f"Supercell Record: {mismatch[1]}")
                 my_logger.error(f"Details: {mismatch[2]}")
-                #print(f"Details: {mismatch[2]}")
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
@@ -553,8 +557,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
+    
 """
 python hourly_utility.py --begin 2023-01-01 --end 2023-01-02 --station aetna_hourly
 

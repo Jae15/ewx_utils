@@ -101,7 +101,7 @@ hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...]
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
 - This script is used to compare records in the source database to the records in the destination database.
 - A test database is used to mimick the destination database - records from the source database are stored here and compared to the destination database.
-- Mismatches observed are stored in csv files for easier comparisons
+- Mismatches observed are stored in csv files for easier comparisons.
 - This script helps to ensure data accuracy and consistency across the board and an easy way to narrow down to problematic values in our database as well as identifying bugs in the project code.
 - Below is the command used to run the main utility script as well as the required arguments.
 
