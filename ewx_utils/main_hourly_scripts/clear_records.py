@@ -51,7 +51,7 @@ def create_db_connections(args):
         my_logger.info("args.qcwrite")
         print(f"args.qcwrite: {args.qcwrite}")
         # Connect to the appropriate QC database based on the args.qcwrite value
-        if args.qcwrite.strip() == "mawnqc_test:local":
+        if args.qcwrite == "mawnqc_test:local":
             my_logger.info("Connecting to QC Test database (local).")
             connections["qcwrite_connection"] = connect_to_mawnqc_test()
             connections["qcwrite_cursor"] = mawnqc_test_cursor_connection(
@@ -93,25 +93,21 @@ def create_db_connections(args):
         raise
 
 
-def get_all_stations_list(cursor) -> List[str]:
+def get_all_stations_list(cursor: Any) -> List[str]:
     """
-    Retrieve station names from the database, excluding 'variables_hourly'.
+    Fetch and return station names from the database, excluding 'variables_hourly'.
 
-    Args:
-        cursor: Database cursor for executing queries.
+    Parameters:
+    cursor (object): Database cursor for executing queries.
 
     Returns:
-        List of station names without '_hourly' suffix, or an empty list if an error occurs.
+    list[str]: List of station names without the '_hourly' suffix.
     """
     query = """SELECT table_name FROM information_schema.tables
                WHERE table_schema = 'public' AND table_name LIKE '%hourly'
                ORDER BY table_name ASC"""
 
     try:
-        if cursor is None:
-            my_logger.error("Cursor is not valid.")
-            return []
-
         cursor.execute(query)
         stations = cursor.fetchall()
 
@@ -120,16 +116,19 @@ def get_all_stations_list(cursor) -> List[str]:
             return []
 
         # Creating a list of station names and logging them
-        stations_list = [row[0] for row in stations]  # Assuming row is a tuple
+        stations_list = [dict(row)["table_name"] for row in stations]
         my_logger.info(f"Fetched stations: {stations_list}")
 
         # Exclude the station named 'variables_hourly'
-        excluded_stations = {"variables_hourly"}
-        cleaned_stations_list = [
-            station.replace("_hourly", "")
-            for station in stations_list
-            if station not in excluded_stations
+        filtered_stations_list = [
+            station for station in stations_list if station != "variables_hourly"
         ]
+
+        # Remove the '_hourly' suffix from each station name
+        cleaned_stations_list = [
+            station.replace("_hourly", "") for station in filtered_stations_list
+        ]
+
         return cleaned_stations_list
 
     except Exception as e:
@@ -150,11 +149,11 @@ def clear_records(cursor, station):
     """
     try:
         delete_query = f"DELETE FROM {station}_hourly"
-        print(f"Executing query: {delete_query}")
+        my_logger.error(f"Executing query: {delete_query}")
         cursor.execute(delete_query)
-        my_logger.info(f"Deleted all records from {station}.")
+        my_logger.error(f"Deleted all records from {station}.")
     except Exception as e:
-        print(f"Error during deletion: {e}")
+        #print(f"Error during deletion: {e}")
         my_logger.error(f"Error deleting records from {station}: {e}")
         raise
 
@@ -251,28 +250,30 @@ def main():
 
     # Establish database connections based on args
     db_connections = create_db_connections(args)
+    
     print(f"Database Connections: {db_connections}")
 
     try:
         # Use the necessary cursor for the QC database
         qcwrite_cursor = db_connections.get("qcwrite_cursor")
-        print(f"Cursor Obtained: {qcwrite_cursor}")
-
-        # Determine the list of stations to clear
+        my_logger.error(f"qctest_cursor: {qcwrite_cursor}")
+        #print(f"Cursor Obtained: {qcwrite_cursor}")
+        
         if args.all:
             stations = get_all_stations_list(qcwrite_cursor)
+            #print(f"Stations to clear: {stations}") 
         else:
             stations = args.stations
-            print(f"Stations to clear: {stations}")
+            #print(f"Stations to clear: {stations}")
 
         # Clear records for specified stations
         for station in stations:
-            print(f"Processing station: {station}")
+            #print(f"Processing station: {station}")
             if args.execute and qcwrite_cursor:
                 clear_and_commit(db_connections["qcwrite_connection"], station)
             else:
                 my_logger.info(f"Dry run: Would clear records for station {station}")
-                print(f"Dry run for station: {station}")
+                #print(f"Dry run for station: {station}")
 
     except Exception as e:
         print(f"Exception occurred: {e}")

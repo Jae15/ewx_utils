@@ -649,7 +649,11 @@ def main() -> None:
         help="Run for specific stations (list station names)",
     )
     group.add_argument(
-        "-a", "--all", action="store_true", default=False, help="Run for all stations"
+        "-a", 
+        "--all", 
+        action="store_true", 
+        default=False, 
+        help="Run for all stations"
     )
 
     parser.add_argument(

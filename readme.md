@@ -1,22 +1,22 @@
 # ewx_utils Project
 
 # The process of running this ewx_utils project in another machine
-- The first step needed to run this project is to create an SSH key through a tool such as PuTTYgen
-- This project requires a key to set up sftp.geo.msu.edu SSH tunnel
-- Use the sftp tunnel to connect to the databases of choice eg supercell and dbh11
-- To set up/configure the ports, databases and the SSH tunnel, one could use a tool such as PuTTy
+- The first step needed to run this project is to create an SSH key through a tool such as PuTTYgen.
+- This project requires a key to set up sftp.geo.msu.edu SSH tunnel.
+- Use the sftp tunnel to connect to the databases of choice eg supercell and dbh11.
+- To set up/configure the ports, databases and the SSH tunnel, one could use a tool such as PuTTy.
 
 ## How to install packages for the project
-- The project packages are located in the requirements.txt file
-- This project works with python 3.12
-- It requires a postgres database and uses pyscopg2 to connect python with the database
+- The project packages are located in the requirements.txt file.
+- This project works with python 3.12.
+- It requires a postgres database and uses pyscopg2 to connect python with the databases.
 
 ```
 pip install -r requirements.txt
 ```
 
 ## How to run the hourly_main.py script (project entry script)
-- The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
+- The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder..
 - The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
 ```
 python hourly_main.py -a -x
@@ -30,7 +30,7 @@ hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...]
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
 - This script is used to compare records in the source database to the records in the destination database.
 - A test database is used to mimick the destination database - records from the source database are stored here and compared to the destination database.
-- Mismatches observed are stored in csv files for easier comparisons
+- Mismatches observed are stored in csv files for easier comparisons.
 - This script helps to ensure data accuracy and consistency across the board and an easy way to narrow down to problematic values in our database as well as identifying bugs in the project code.
 - Below is the command used to run the main utility script as well as the required arguments.
 
