@@ -18,3 +18,5 @@ ewx_logs.log/
 .stations_utils.py/
 *.csv*
 main_daily_scripts
+daily_validation_checks
+
