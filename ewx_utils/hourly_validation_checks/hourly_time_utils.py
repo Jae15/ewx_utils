@@ -12,6 +12,7 @@ from ewx_utils.ewx_config import ewx_log_file
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil import tz
+
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize the logger
@@ -64,3 +65,6 @@ def generate_list_of_hours(begin_date: str, end_date: str) -> list:
         my_validation_logger.error(f"An error occurred: {e}")
 
     return datetime_list
+
+
+
