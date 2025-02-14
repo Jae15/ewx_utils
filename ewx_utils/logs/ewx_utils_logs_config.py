@@ -2,7 +2,6 @@ import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
 
-
 # Global variable to hold the logger instance
 logger_instance = None
 

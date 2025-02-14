@@ -8,9 +8,10 @@ ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
 import datetime
-from datetime import timezone
 from zoneinfo import ZoneInfo
-from .variables_list import (
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from .hourly_variables_list import (
     relh_vars,
     pcpn_vars,
     rpet_vars,
@@ -43,14 +44,14 @@ from ewx_utils.mawndb_classes.solar_radiation import SolarRadiation
 from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
 from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
 from typing import List, Dict, Any, Tuple
-from .time_utils import generate_list_of_hours
+from .hourly_time_utils import generate_list_of_hours
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize the logger
 my_validation_logger = ewx_utils_logger(log_path=ewx_log_file)
 
 
-def check_value(k: str, v: float, d: datetime.datetime) -> bool:
+def check_value(k: str, v: float, d: datetime) -> bool:
     """
     Checks if a given value is valid based on its variable key and date.
     Parameters:
@@ -110,7 +111,7 @@ def check_value(k: str, v: float, d: datetime.datetime) -> bool:
     return False
 
 
-def combined_datetime(record: dict) -> datetime.datetime:
+def combined_datetime(record: dict) -> datetime:
     """
     Combines the date and time from a record into a single datetime object.
     Parameters:
@@ -121,7 +122,7 @@ def combined_datetime(record: dict) -> datetime.datetime:
     date_value = record.get("date")
     time_value = record.get("time")
     if date_value and time_value:
-        return datetime.datetime.combine(date_value, time_value)
+        return datetime.combine(date_value, time_value)
     return None
 
 
@@ -146,9 +147,52 @@ db_columns = []
 qc_values = []
 clean_records = []
 
+def getYearDayHour(combined_date):
+    """
+    Extracts year, day of the year, hour, and formatted reporting time from a given datetime object.
+
+    Parameters:
+    combined_date (datetime): A datetime object representing the date and time to be processed.
+
+    Returns:
+    dict: A dictionary containing the year, day of the year, hour, and formatted reporting time.
+          Returns None if an error occurs during processing.
+    """
+    # Initialize a little dictionary for this data
+    required_id_fields = {
+        'year': None,
+        'day': None,
+        'hour': None,
+        'rpt_time': None
+    }
+
+    try:
+        # Set the timezone: combined_date is a naive datetime
+        combined_date = combined_date.replace(tzinfo=ZoneInfo("America/Detroit"))
+
+        MIDNIGHT = datetime.strptime("00:00", '%H:%M').time()
+        if combined_date.time() == MIDNIGHT:
+            represented_date = combined_date.date() + timedelta(days=-1)
+            hour = 24
+        else:
+            represented_date = combined_date.date()
+            hour = combined_date.hour
+
+        required_id_fields['year'] = represented_date.year
+        required_id_fields['day'] = represented_date.timetuple().tm_yday
+        required_id_fields['hour'] = hour
+        required_id_fields['rpt_time'] = str(hour) + '00'
+    except Exception as e:
+        # Do something more elegant here
+        print(f"Error in getYearDayHour with {combined_date}: {e}")
+        return None
+
+    return required_id_fields
+
+
 def creating_mawnsrc_record(
     record: Dict[str, Any],
-    combined_datetime: datetime.datetime,
+    combined_datetime: datetime,
     id_col_list: List[str],
     default_source: str,
 ) -> Dict[str, Any]:
@@ -225,7 +269,7 @@ def relh_cap(mawnsrc_record: Dict[str, Any], relh_vars: List[str]) -> Dict[str, 
 def replace_none_with_rtmarecord(
     mawnsrc_record: Dict[str, Any],
     rtma_record: Dict[str, Any],
-    combined_datetime: datetime.datetime,
+    combined_datetime: datetime,
     qc_columns: List[str],
 ) -> Dict[str, Any]:
     """
@@ -295,7 +339,7 @@ def replace_none_with_rtmarecord(
     return clean_record
 
 
-def create_mawn_dwpt(mawnsrc_record: Dict[str, Any], combined_datetime: datetime.datetime) -> Dict[str, Any]:
+def create_mawn_dwpt(mawnsrc_record: Dict[str, Any], combined_datetime: datetime) -> Dict[str, Any]:
     """
     Update the MAWN source record with dew point value if conditions are met.
     Calculates the dew point using temperature and humidity data if missing.
@@ -331,7 +375,7 @@ def create_mawn_dwpt(mawnsrc_record: Dict[str, Any], combined_datetime: datetime
     return mawnsrc_record
 
 
-def create_rtma_dwpt(rtma_record: Dict[str, Any], combined_datetime: datetime.datetime) -> Dict[str, Any]:
+def create_rtma_dwpt(rtma_record: Dict[str, Any], combined_datetime: datetime) -> Dict[str, Any]:
     """
     Update the RTMA record with dew point value if conditions are met.
     If the dew point is missing, it calculates it using temperature and humidity data.
@@ -409,6 +453,52 @@ def filter_clean_record(clean_record: Dict[str, Any], qc_columns: List[str]) -> 
     """
     return {key: clean_record[key] for key in qc_columns if key in clean_record}
 
+def inserting_empty_records(
+    mawndbsrc_record: Dict[str, Any],
+    rtma_record: Dict[str, Any],
+    combined_date: Any,
+    qc_columns: List[str],
+    id_col_list: List[str]
+) -> Dict[str, Any]:
+    """
+    Inserts empty records when both the mawn record and the rtma record are none.
+
+    Parameters:
+    mawndbsrc_record (Dict[str, Any]): A dictionary representing a record from the MAWN database.
+    rtma_record (Dict[str, Any]): A dictionary representing a record from the RTMA database.
+    combined_date (Any): A datetime object used to extract year, day, hour, and reporting time.
+    qc_columns (List[str]): A list of keys that are considered quality control columns.
+    id_col_list (List[str]): A list of keys that are considered identifier columns.
+
+    Returns:
+    Dict[str, Any]: A dictionary containing the processed data, including date, time,
+                    year, day, hour, reporting time, and source indicators.
+    """
+    empty_record = {"date": combined_date.date(), "time": combined_date.time()}
+
+    # Get year, day, hour, and rpt_time
+    datetime_fields = getYearDayHour(combined_date)
+    if datetime_fields:
+        empty_record.update(datetime_fields)
+
+    # Check qc_columns for None in both records and set "_src" to "EMPTY"
+    for key in qc_columns:
+        if key not in id_col_list:
+            if mawndbsrc_record.get(key) is None and rtma_record.get(key) is None:
+                empty_record[key] = None
+                if "_src" in key:
+                    empty_record[key] = "EMPTY"
+
+    # Add source columns for keys in mawndbsrc_record with None values in both records
+    for key in mawndbsrc_record.keys():
+        if key not in qc_columns and key not in id_col_list:  
+            if mawndbsrc_record.get(key) is None and rtma_record.get(key) is None:
+                empty_record[key] = None
+                if "_src" in key:
+                    empty_record[key] = "EMPTY"
+
+    return empty_record
+
 def process_records(
     qc_columns: List[str],
     mawndb_records: List[Dict[str, Any]],
@@ -416,103 +506,64 @@ def process_records(
     begin_date: str,
     end_date: str,
 ) -> List[Dict[str, Any]]:
-    """
-    Process MAWN and RTMA records within a specified date range.
-
-    This function matches MAWN and RTMA records based on date and time, 
-    creating clean records by filtering and replacing missing values.
-
-    Parameters:
-    qc_columns : List[str]
-        Keys for quality control filtering.
-    mawndb_records : List[Dict[str, Any]]
-        MAWN database records.
-    rtma_records : List[Dict[str, Any]]
-        RTMA records.
-    begin_date : str
-        Start date for processing.
-    end_date : str
-        End date for processing.
-
-    Returns:
-    List[Dict[str, Any]]
-        A list of processed clean records.
-    """
     clean_records = []
     datetime_list = generate_list_of_hours(begin_date, end_date)
+    id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]  
 
-    # Process each hour in the datetime list
     for dt in datetime_list:
         matching_mawn_record = None
         matching_rtma_record = None
-        id_col_list = ["year", "day", "hour", "rpt_time", "date", "time", "id"]
+        clean_record = None
 
-        # Find the matching MAWN record for the current datetime
+        # Process MAWN record if found
         for record in mawndb_records:
-            if(
-                record["date"] == dt.date() 
-                and record["time"] == dt.time()
-            ):
+            if record["date"] == dt.date() and record["time"] == dt.time():
                 matching_mawn_record = record
-             
                 break
 
-        # Process the MAWN record if found
         if matching_mawn_record:
             combined_date = combined_datetime(matching_mawn_record)
-            # Create and validate the MAWN source record
-            mawnsrc_record = creating_mawnsrc_record(
-                matching_mawn_record, combined_date, id_col_list, "MAWN"
-            )
+            mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, combined_date, id_col_list, "MAWN")
             mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
             mawnsrc_record = create_mawn_dwpt(mawnsrc_record, combined_date)
 
-            # Find the matching RTMA record for the same datetime
+            # Check for matching RTMA record
             for rtma_record in rtma_records:
-                if (
-                    rtma_record["date"] == dt.date()
-                    and rtma_record["time"] == dt.time()
-                ):
+                if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
                     matching_rtma_record = rtma_record
                     combined_rtma_date = combined_datetime(rtma_record)
                     rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
 
-                    # Replace None values in MAWN record with corresponding RTMA values
-                    clean_record = replace_none_with_rtmarecord(
-                        mawnsrc_record, rtma_record, combined_date, qc_columns
-                    )
+                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_date, qc_columns)
                     clean_record = filter_clean_record(clean_record, qc_columns)
                     clean_records.append(clean_record)
-                    #print(f"Clean Record: {clean_record}")
                     break
 
-            # If no matching RTMA record is found, keep the MAWN record as is
             if not matching_rtma_record:
                 clean_record = filter_clean_record(mawnsrc_record, qc_columns)
-                #print(f"Clean Record: {clean_record}")
                 clean_records.append(clean_record)
-
         else:
-            # If no MAWN record exists for this datetime, process RTMA records directly
+            # If no MAWN record, check for RTMA record
             for rtma_record in rtma_records:
-                if (
-                    rtma_record["date"] == dt.date()
-                    and rtma_record["time"] == dt.time()
-                ):
+                if rtma_record["date"] == dt.date() and rtma_record["time"] == dt.time():
+                    matching_rtma_record = rtma_record
                     combined_rtma_date = combined_datetime(rtma_record)
                     rtma_record = create_rtma_dwpt(rtma_record, combined_rtma_date)
 
-                    # Create a MAWN-like source record directly from the RTMA record
-                    mawnsrc_record = creating_mawnsrc_record(
-                        rtma_record, combined_rtma_date, id_col_list, "RTMA"
-                    )
+                    mawnsrc_record = creating_mawnsrc_record(rtma_record, combined_rtma_date, id_col_list, "RTMA")
                     mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
-                    clean_record = replace_none_with_rtmarecord(
-                        mawnsrc_record, rtma_record, combined_date, qc_columns
-                    )
+                    clean_record = replace_none_with_rtmarecord(mawnsrc_record, rtma_record, combined_rtma_date, qc_columns)
                     clean_record = filter_clean_record(clean_record, qc_columns)
-                    #print(f"Clean Record: {clean_record}")
                     clean_records.append(clean_record)
                     break
 
+        # If no matching records were found, create an empty record
+        if not clean_record:
+            combined_date = dt  
+            empty_record = inserting_empty_records({}, {}, combined_date, qc_columns, id_col_list)
+            clean_records.append(empty_record)
+
     return clean_records
+
+
+

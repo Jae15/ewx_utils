@@ -12,85 +12,21 @@ from dotenv import load_dotenv
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.db_files.dbs_connections import (
-    connect_to_mawn_dbh11,
-    connect_to_mawn_supercell,
-    connect_to_mawnqc_dbh11,
-    connect_to_mawnqc_supercell,
-    connect_to_mawnqcl,
-    connect_to_rtma_dbh11,
-    connect_to_rtma_supercell,
-    connect_to_mawnqc_test,
-    mawn_dbh11_cursor_connection,
-    mawn_supercell_cursor_connection,
-    mawnqc_dbh11_cursor_connection,
-    mawnqc_supercell_cursor_connection,
-    mawnqcl_cursor_connection,
-    rtma_dbh11_cursor_connection,
-    rtma_supercell_cursor_connection,
-    mawnqc_test_cursor_connection,
+from ewx_utils.db_files.dbs_configfile import get_ini_section_info
+from ewx_utils.db_files.dbs_connection import(
+    connect_to_db,
+    get_mawn_cursor,
+    get_rtma_cursor,
+    get_qcwrite_cursor,
+    create_db_connections
 )
-from ewx_utils.validation_checks.main_validation_utils import process_records
+from ewx_utils.hourly_validation_checks.hourly_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any
 
 load_dotenv()
 # Initialize the logger
 my_logger = ewx_utils_logger(log_path=ewx_log_file)
-
-
-def create_db_connections(args):
-    """
-    Creating and returning only the necessary database connections and cursors for the QC database,
-    based on the user-specified arguments.
-    """
-    my_logger.info("Creating necessary database connections for clearing records.")
-    connections = {}
-
-    try:
-        my_logger.info("args.qcwrite")
-        print(f"args.qcwrite: {args.qcwrite}")
-        # Connect to the appropriate QC database based on the args.qcwrite value
-        if args.qcwrite == "mawnqc_test:local":
-            my_logger.info("Connecting to QC Test database (local).")
-            connections["qcwrite_connection"] = connect_to_mawnqc_test()
-            connections["qcwrite_cursor"] = mawnqc_test_cursor_connection(
-                connections["qcwrite_connection"]
-            )
-        elif args.qcwrite == "mawnqcl:local":
-            my_logger.info("Connecting to MAWNQCL database (local).")
-            connections["qcwrite_connection"] = connect_to_mawnqcl()
-            connections["qcwrite_cursor"] = mawnqcl_cursor_connection(
-                connections["mawnqcl_connection"]
-            )
-        elif args.qcwrite == "mawnqc:dbh11":
-            my_logger.info("Connecting to MAWNQC DBH11 database.")
-            connections["qcwrite_connection"] = connect_to_mawnqc_dbh11()
-            connections["qcwrite_cursor"] = mawnqc_dbh11_cursor_connection(
-                connections["mawnqc_dbh11_connection"]
-            )
-        elif args.qcwrite == "mawnqc:supercell":
-            my_logger.info("Connecting to MAWNQC Supercell database.")
-            connections["qcwrite_connection"] = connect_to_mawnqc_supercell()
-            connections["qcwrite_cursor"] = mawnqc_supercell_cursor_connection(
-                connections["mawnqc_supercell_connection"]
-            )
-        else:
-            raise ValueError(f" No match for argument qcwrite")
-
-        my_logger.info(
-            "Database connections created successfully for clearing records."
-        )
-        return connections
-
-    except OperationalError as e:
-        my_logger.error(f"OperationalError: {e}")
-        close_connections(connections)
-        raise
-    except Exception as e:
-        my_logger.error(f"Unexpected error: {e}")
-        close_connections(connections)
-        raise
 
 
 def get_all_stations_list(cursor: Any) -> List[str]:
@@ -202,14 +138,26 @@ def clear_and_commit(connection, station):
         connection.rollback()  # Rollback in case of error
         my_logger.error(f"Transaction failed and rolled back: {e}")
 
-
 def main():
-    # Initialize argument parser
+    """
+    Main function to clear records from specified stations in the QC database.
+    
+    Command-line arguments:
+    -x, --execute: Execute SQL and clear data in QC database
+    -d, --dryrun: Do not execute SQL, just log the actions
+    -s, --stations: Run for specific stations (list station names)
+    -a, --all: Run for all stations
+    --write-to: Section name in INI file for the QC database to write to
+    """
+    section_info_help = get_ini_section_info("config.ini")
+    
     parser = argparse.ArgumentParser(
         prog="clear_records",
         description="Clear records from specified stations in the QC database.",
+        epilog=section_info_help
     )
 
+    # Execution mode group
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-x",
@@ -224,6 +172,7 @@ def main():
         help="Do not execute SQL, just log the actions",
     )
 
+    # Station selection group
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "-s",
@@ -233,60 +182,66 @@ def main():
         help="Run for specific stations (list station names)",
     )
     group.add_argument(
-        "-a", "--all", action="store_true", default=False, help="Run for all stations"
+        "-a", 
+        "--all", 
+        action="store_true", 
+        default=False, 
+        help="Run for all stations"
     )
 
+    # Database section argument
     parser.add_argument(
-        "-q",
-        "--qcwrite",
+        "--write-to",
         type=str,
-        default="mawnqc_test:local",
-        choices=["mawnqc_test:local", "mawnqcl:local"],
-        help="Modify data in a specific database",
+        required=True,
+        help="Section name in INI file for the QC database to write to",
     )
 
     args = parser.parse_args()
-    print(f"Parsed Arguments: {args}")
+    my_logger.info(f"Parsed Arguments: {args}")
 
     # Establish database connections based on args
     db_connections = create_db_connections(args)
-    
-    print(f"Database Connections: {db_connections}")
+    my_logger.info(f"Database Connections: {db_connections}")
 
     try:
         # Use the necessary cursor for the QC database
-        qcwrite_cursor = db_connections.get("qcwrite_cursor")
-        my_logger.error(f"qctest_cursor: {qcwrite_cursor}")
-        #print(f"Cursor Obtained: {qcwrite_cursor}")
+        write_cursor = db_connections.get("write_connection").cursor()
+        my_logger.info(f"Write cursor obtained: {write_cursor}")
         
         if args.all:
-            stations = get_all_stations_list(qcwrite_cursor)
-            #print(f"Stations to clear: {stations}") 
+            stations = get_all_stations_list(write_cursor)
+            my_logger.info(f"Clearing all stations: {stations}")
         else:
             stations = args.stations
-            #print(f"Stations to clear: {stations}")
+            my_logger.info(f"Clearing specific stations: {stations}")
 
         # Clear records for specified stations
         for station in stations:
-            #print(f"Processing station: {station}")
-            if args.execute and qcwrite_cursor:
-                clear_and_commit(db_connections["qcwrite_connection"], station)
+            my_logger.info(f"Processing station: {station}")
+            if args.execute:
+                clear_and_commit(db_connections["write_connection"], station)
+                my_logger.info(f"Cleared records for station {station}")
             else:
                 my_logger.info(f"Dry run: Would clear records for station {station}")
-                #print(f"Dry run for station: {station}")
 
     except Exception as e:
-        print(f"Exception occurred: {e}")
         my_logger.error(f"An error occurred: {e}")
+        raise
     finally:
         # Close all database connections
         close_connections(db_connections)
+        my_logger.info("Database connections closed")
 
 
 if __name__ == "__main__":
     main()
 
+
 """
+usage: clear_records [-h] (-x | -d) [-s [STATIONS ...] | -a] --write-to WRITE_TO
+
+
 python clear_records.py -x -s arlene -q mawnqc_test:local
 usage: clear_records [-h] (-x | -d) [-s [STATIONS ...] | -a] [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}]
 clear_records: error: one of the arguments -x/--execute -d/--dryrun is required

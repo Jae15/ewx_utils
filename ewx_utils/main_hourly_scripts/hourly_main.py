@@ -12,25 +12,16 @@ from dotenv import load_dotenv
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.db_files.dbs_connections import (
-    connect_to_mawn_dbh11,
-    connect_to_mawn_supercell,
-    connect_to_mawnqc_dbh11,
-    connect_to_mawnqc_supercell,
-    connect_to_mawnqcl,
-    connect_to_rtma_dbh11,
-    connect_to_rtma_supercell,
-    connect_to_mawnqc_test,
-    mawn_dbh11_cursor_connection,
-    mawn_supercell_cursor_connection,
-    mawnqc_dbh11_cursor_connection,
-    mawnqc_supercell_cursor_connection,
-    mawnqcl_cursor_connection,
-    rtma_dbh11_cursor_connection,
-    rtma_supercell_cursor_connection,
-    mawnqc_test_cursor_connection,
+from ewx_utils.db_files.dbs_configfile import get_ini_section_info
+from ewx_utils.db_files.dbs_connection import(
+    connect_to_db,
+    get_mawn_cursor,
+    get_rtma_cursor,
+    get_qcwrite_cursor,
+    create_db_connections
 )
-from ewx_utils.validation_checks.main_validation_utils import process_records
+from ewx_utils.db_files.dbs_configfile import get_db_config
+from ewx_utils.hourly_validation_checks.hourly_validation_utils import process_records
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any, Tuple
 
@@ -38,88 +29,6 @@ load_dotenv()
 # Initialize the logger
 my_logger = ewx_utils_logger(log_path=ewx_log_file)
 
-
-# Function to create necessary database connections based on user-specified arguments
-def create_db_connections(args: Namespace) -> Dict[str, Any]:
-    """
-    Create and return necessary database connections and cursors based on user-specified arguments.
-
-    Parameters:
-    args : Namespace
-        An object containing user-specified arguments for database connections, 
-        including attributes like 'mawn', 'rtma', and 'qcwrite'.
-
-    Returns:
-    Dict[str, Any]
-        A dictionary containing the created database connections and cursors, 
-        where keys are connection/cursor names and values are the corresponding connection/cursor objects.
-
-    Raises:
-    OperationalError
-        If there is an operational error while connecting to the database.
-    Exception
-        For any unexpected errors that occur during the connection process.
-    """
-
-    my_logger.info("Creating only necessary database connections.")
-    connections = {}
-
-    try:
-        # Connect to mawn database only if it's specified
-        if args.mawn == "mawn:dbh11":
-            my_logger.info("Connecting to MAWN database (dbh11).")
-            connections["mawn_dbh11_connection"] = connect_to_mawn_dbh11()
-            connections["mawn_dbh11_cursor"] = mawn_dbh11_cursor_connection(
-                connections["mawn_dbh11_connection"]
-            )
-
-        # Connect to rtma database only if it's specified
-        if args.rtma == "rtma:dbh11":
-            my_logger.info("Connecting to RTMA database (dbh11).")
-            connections["rtma_dbh11_connection"] = connect_to_rtma_dbh11()
-            connections["rtma_dbh11_cursor"] = rtma_dbh11_cursor_connection(
-                connections["rtma_dbh11_connection"]
-            )
-
-        # Connect to the appropriate QC database based on the args.qcwrite value
-        if args.qcwrite == "mawnqc_test:local":
-            my_logger.info("Connecting to QC Test database (local).")
-            connections["qcwrite_connection"] = connect_to_mawnqc_test()
-            connections["qcwrite_cursor"] = mawnqc_test_cursor_connection(
-                connections["qcwrite_connection"]
-            )
-        elif args.qcwrite == "mawnqcl:local":
-            my_logger.info("Connecting to MAWNQCL database (local).")
-            connections["qcwrite_connection"] = connect_to_mawnqcl()
-            connections["qcwrite_cursor"] = mawnqcl_cursor_connection(
-                connections["mawnqcl_connection"]
-            )
-        elif args.qcwrite == "mawnqc:dbh11":
-            my_logger.info("Connecting to MAWNQC DBH11 database.")
-            connections["qcwrite_connection"] = connect_to_mawnqc_dbh11()
-            connections["qcwrite_cursor"] = mawnqc_dbh11_cursor_connection(
-                connections["mawnqc_dbh11_connection"]
-            )
-        elif args.qcwrite == "mawnqc:supercell":
-            my_logger.info("Connecting to MAWNQC Supercell database.")
-            connections["qcwrite_connection"] = connect_to_mawnqc_supercell()
-            connections["qcwrite_cursor"] = mawnqc_supercell_cursor_connection(
-                connections["mawnqc_supercell_connection"]
-            )
-
-        my_logger.info(
-            "Database connections created successfully based on the required databases."
-        )
-        return connections
-
-    except OperationalError as e:
-        my_logger.error(f"OperationalError: {e}")
-        close_connections(connections)
-        raise
-    except Exception as e:
-        my_logger.error(f"Unexpected error: {e}")
-        close_connections(connections)
-        raise
 
 def close_connections(connections: Dict[str, Any]) -> None:
     """
@@ -599,6 +508,8 @@ def get_runtime_end_date(process_end_date: str, station_info: Dict[str, Dict[str
     return runtime_end_date
 
 
+
+
 def main() -> None:
     """
     Main function to check and update data from hourly_main in mawndb_qc.
@@ -617,6 +528,9 @@ def main() -> None:
     --mawn: Read mawndb data from a specific database
     --rtma: Read rtma data from a specific database
     """
+    ini_file_path = "path_to_ini_file.ini"
+    section_info_help = get_ini_section_info(ini_file_path)
+    #print(section_info_help)
     # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="hourly_main",
@@ -625,6 +539,8 @@ def main() -> None:
     )
     parser.add_argument("-b", "--begin", type=str, help="Start date (no time accepted)")
     parser.add_argument("-e", "--end", type=str, help="End date (no time accepted)")
+
+
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
@@ -657,31 +573,17 @@ def main() -> None:
     )
 
     parser.add_argument(
-        "-q",
-        "--qcwrite",
+        "--read-from",
         type=str,
-        default="mawnqc_test:local",
-        choices=[
-            "mawnqc_test:local",
-            "mawnqcl:local",
-            "mawnqc:dbh11",
-            "mawnqc:supercell",
-        ],
-        help="Modify data in a specific database",
+        nargs="+", 
+        required=True,
+        help="Section names in INI file for reading data (can specify multiple)",
     )
     parser.add_argument(
-        "--mawn",
+        "--write-to",
         type=str,
-        choices=["mawn:dbh11"],
-        default="mawn:dbh11",
-        help="Read mawndb data from a specific database",
-    )
-    parser.add_argument(
-        "--rtma",
-        type=str,
-        choices=["rtma:dbh11"],
-        default="rtma:dbh11",
-        help="Read rtma data from a specific database",
+        required=True,
+        help="Section name in INI file for writing data",
     )
 
     args = parser.parse_args()
@@ -691,12 +593,13 @@ def main() -> None:
 
     # Establish only necessary database connections based on args
     db_connections = create_db_connections(args)
+    print(f"db_connections: {db_connections}")
 
     try:
         # Use the necessary connections and cursors based on what is required
-        mawn_cursor = db_connections.get("mawn_dbh11_cursor")
-        rtma_cursor = db_connections.get("rtma_dbh11_cursor")
-        qcwrite_cursor = db_connections.get("qcwrite_cursor")
+        mawn_cursor = get_mawn_cursor(db_connections['mawn_connection'], 'mawn')
+        rtma_cursor = get_rtma_cursor(db_connections['rtma_connection'], 'rtma')
+        qcwrite_cursor = get_qcwrite_cursor(db_connections['qcwrite_connection'], 'qcwrite')
 
         # Log cursor status
         my_logger.error(f"mawn_cursor: {mawn_cursor}")
@@ -752,11 +655,12 @@ if __name__ == "__main__":
     main()
 
 """
-python hourly_main.py -a -x
-python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x
-python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
+usage: hourly_main [-h] [-b BEGIN] [-e END] (-x | -d) [-s [STATIONS ...] | -a] --read-from READ_FROM [READ_FROM ...] --write-to WRITE_TO
 
-hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
-[-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]
+python hourly_main.py -x -s aetna --read-from sample_section01 sample_section02 --write-to sample_section03
+
+python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_section sample_section01 --write-to sample_section02
+
+python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
 
 """
