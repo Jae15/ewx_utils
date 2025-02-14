@@ -1,325 +1,87 @@
 import os
 import sys
+import configparser
 from dotenv import load_dotenv
-
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
+from configparser import ConfigParser, Error as ConfigParserError
 from ewx_utils.ewx_config import ewx_database_configfile, ewx_log_file
-from configparser import ConfigParser
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 
 # Initialize custom logger
 my_dbfiles_logger = ewx_utils_logger(log_path=ewx_log_file)
 
-
-def config_mawn_dbh11(
-    filename: str = ewx_database_configfile, section: str = "mawn_dbh11"
-) -> dict:
+def get_db_config(db_name: str, filename: str = ewx_database_configfile)->dict:
     """
-    Reads database configuration credentials for mawndb from a specified ini file.
+    Fetches database configuration for a given database name fron a specified INI file
 
     Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawn_dbh11 credentials.
-
+        db_name (str): The name of the database, which should match the section in the configuration file
+        filename(str): Path to the ini file containing database configuration
+        
     Returns:
-        dict: A dictionary with database configuration credentials.
-
+        dict: The database configuration for the given db_name.
+        
     Raises:
-        Exception: If the specified section is not found in the ini file.
+        ValueError: If db_name is empty or None
+        Exception: If the specified section is not found in the ini file
+        ConfigParserError: If there is an error reading the configuration file.
+        KeyError: If the specified section is not found in the configuration file.
     """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info = {}
-
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db_info[param[0]] = param[1]
-    else:
-        my_dbfiles_logger.error(f"Section {section} not found in the {filename} file")
-        raise Exception(f"Section {section} not found in the {filename} file")
-
-    my_dbfiles_logger.debug("mawn_dbh11 login credentials returned successfully")
-    return db_info
-
-
-def config_mawn_supercell(
-    filename: str = ewx_database_configfile,
-    section: str = "mawn_supercell",
-) -> dict:
-    """
-    Reads database configuration credentials for mawndb from a specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawn_supercell credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info1 = {}
-
-    if parser.has_section(section):
-        params01 = parser.items(section)
-        for param01 in params01:
-            db_info1[param01[0]] = param01[1]
-    else:
-        my_dbfiles_logger.error(f"Section {section} not found in the {filename} file")
-        raise Exception(f"Section {section} not found in the {filename} file")
-
-    my_dbfiles_logger.debug("mawn_supercell login credentials returned successfully")
-    return db_info1
-
-
-def config_mawnqc_dbh11(
-    filename: str = ewx_database_configfile,
-    section: str = "mawnqc_dbh11",
-) -> dict:
-    """
-    Reads database configuration credentials for mawnqc_dbh11 from the specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawndbqc credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info2 = {}
-
-    if parser.has_section(section):
-        params02 = parser.items(section)
-        for param02 in params02:
-            db_info2[param02[0]] = param02[1]
-    else:
-        my_dbfiles_logger.error(
-            f"Section {section} is not found in the {filename} file"
-        )
-        raise Exception(f"Section {section} is not found in the {filename} file")
-
-    my_dbfiles_logger.info("mawnqc_dbh11 login information returned successfully")
-    return db_info2
-
-
-def config_mawnqc_supercell(
-    filename: str = ewx_database_configfile,
-    section: str = "mawnqc_supercell",
-) -> dict:
-    """
-    Reads database configuration credentials for mawnqc_supercell from a specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawndb_qcl credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info3 = {}
-
-    if parser.has_section(section):
-        params03 = parser.items(section)
-        for param03 in params03:
-            db_info3[param03[0]] = param03[1]
-    else:
-        my_dbfiles_logger.error(
-            f"Section {section} is not found in the {filename} file"
-        )
-        raise Exception(f"Section {section} is not found in the {filename} file")
-
-    my_dbfiles_logger.info("mawnqc_supercell login information returned successfully")
-    return db_info3
-
-
-def config_rtma_dbh11(
-    filename: str = ewx_database_configfile,
-    section: str = "rtma_dbh11",
-) -> dict:
-    """
-    Reads database configuration credentials for rtma_dbh11 from a specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing rtma_dbh11 credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info4 = {}
-
-    if parser.has_section(section):
-        params04 = parser.items(section)
-        for param04 in params04:
-            db_info4[param04[0]] = param04[1]
-    else:
-        my_dbfiles_logger.error(
-            f"Section {section} is not found in the {filename} file"
-        )
-        raise Exception(f"Section {section} is not found in the {filename} file")
-
-    my_dbfiles_logger.info("rtma_dbh11 login credentials returned successfully")
-    return db_info4
-
-
-def config_rtma_supercell(
-    filename: str = ewx_database_configfile,
-    section: str = "rtma_supercell",
-) -> dict:
-    """
-    Reads database configuration credentials for mawndb_rtma from a specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawndb_rtma credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info5 = {}
-
-    if parser.has_section(section):
-        params05 = parser.items(section)
-        for param05 in params05:
-            db_info5[param05[0]] = param05[1]
-    else:
-        my_dbfiles_logger.error(
-            f"Section {section} is not found in the {filename} file"
-        )
-        raise Exception(f"Section {section} is not found in the {filename} file")
-
-    my_dbfiles_logger.info("RTMA supercell login credentials returned successfully")
-    return db_info5
-
-
-def config_mawnqc_test(
-    filename: str = ewx_database_configfile,
-    section: str = "mawnqc_test",
-) -> dict:
-    """
-    Reads database configuration credentials for mawnqc_test from a specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawnqc_test credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info6 = {}
-
-    if parser.has_section(section):
-        params06 = parser.items(section)
-        for param06 in params06:
-            db_info6[param06[0]] = param06[1]
-    else:
-        my_dbfiles_logger.error(
-            f"Section {section} is not found in the {filename} file"
-        )
-        raise Exception(f"Section {section} is not found in the {filename} file")
-
-    my_dbfiles_logger.info("QCTEST login credentials returned successfully")
-    return db_info6
-
-
-def config_mawnqcl(
-    filename: str = ewx_database_configfile,
-    section: str = "mawnqcl",
-) -> dict:
-    """
-    Reads database configuration credentials for mawnqc_test from a specified ini file.
-
-    Parameters:
-        filename (str): Path to the ini file containing database configurations.
-        section (str): Section in the ini file containing mawnqc_test credentials.
-
-    Returns:
-        dict: A dictionary with database configuration credentials.
-
-    Raises:
-        Exception: If the specified section is not found in the ini file.
-    """
-    parser = ConfigParser()
-    parser.read(filename)
-    db_info7 = {}
-
-    if parser.has_section(section):
-        params07 = parser.items(section)
-        for param07 in params07:
-            db_info7[param07[0]] = param07[1]
-    else:
-        my_dbfiles_logger.error(
-            f"Section {section} is not found in the {filename} file"
-        )
-        raise Exception(f"Section {section} is not found in the {filename} file")
-
-    my_dbfiles_logger.info("QCL login credentials returned successfully")
-    return db_info7
-
-
-def main():
-    """
-    Main function to demonstrate configuration retrieval.
-    """
+    if not db_name:
+        my_dbfiles_logger.error("Database name cannot be empty or None")
+        raise ValueError("Database name cannot be empty or None")
     try:
-        mawn_dbh11_config = config_mawn_dbh11()
-        my_dbfiles_logger.info(f"mawn_dbh11_config: {mawn_dbh11_config}")
+        # Modified this line to include interpolation=None
+        parser = ConfigParser(interpolation=None)
+        parser.read(filename)
 
-        mawn_supercell_config = config_mawn_supercell()
-        my_dbfiles_logger.info(f"mawn_supercell_config: {mawn_supercell_config}")
-
-        mawnqc_dbh11_config = config_mawnqc_dbh11()
-        my_dbfiles_logger.info(f"mawnqc_dbh11_config: {mawnqc_dbh11_config}")
-
-        mawnqc_supercell_config = config_mawnqc_supercell()
-        my_dbfiles_logger.info(f"mawnqc_supercell_config: {mawnqc_supercell_config}")
-
-        rtma_dbh11_config = config_rtma_dbh11()
-        my_dbfiles_logger.info(f"rtma_dbh11_config: {rtma_dbh11_config}")
-
-        rtma_supercell_config = config_rtma_supercell()
-        my_dbfiles_logger.info(f"rtma_supercell_config: {rtma_supercell_config}")
-
-        qcl_config = config_mawnqcl()
-        my_dbfiles_logger.info(f"qcl_config: {qcl_config}")
-
-        qctest_config = config_mawnqc_test()
-        my_dbfiles_logger.info(f"qctest_config: {qctest_config}")
-
+        if parser.has_section(db_name):
+            db_info = {param[0]: param[1] for param in parser.items(db_name)}
+            my_dbfiles_logger.debug(f"{db_name} login credentials returned")
+            return db_info
+        else:
+            my_dbfiles_logger.error(f"Section {db_name} not found in the {filename} file")
+            raise Exception(f"Section {db_name} not found in the {filename} file")
+        
+    except ConfigParserError as e:
+        my_dbfiles_logger.error(f"Configuration file error for {db_name}: {str(e)}")
+        raise
+    except KeyError as e:
+        my_dbfiles_logger.error(f"Section {db_name} not found in configuration file: {str(e)}")
+        raise
     except Exception as e:
-        my_dbfiles_logger.error(f"Error in main function: {e}")
+        my_dbfiles_logger.error(f"Unexpected error fetching configuration for {db_name}: {str(e)}")
+        raise
+    
+def get_ini_section_info(ini_file_path: str) -> str:
+    """
+    Retrieve both the section names and their corresponding host name from the INI file.
 
+    Parameters:
+    ini_file_path (str): The path to the INI file
 
-if __name__ == "__main__":
-    main()
+    Returns:
+    str: A string that lists all the sections and their host names (if available) for use in the help description.
+    """
+    # Already had interpolation=None
+    config = configparser.ConfigParser(interpolation=None)
+    section_info = []
+
+    try:
+        config.read(ini_file_path)
+
+        # Get station names
+        sections = config.sections()
+        section_info.append(f"Valid sections in the INI file: {' ,'.join(sections)} ")
+
+        # Get host names for each section
+        host_names = {section: config[section].get('host', 'Not specified') for section in sections}
+        host_info = "\n".join([f"{section}: {host}" for section, host in host_names.items()])
+        section_info.append(f"Host names in sections:\n{host_info}")
+
+        return "\n".join(section_info)
+    
+    except Exception as e:
+        raise FileNotFoundError(f"Error reading the INI file: {str(e)}")
