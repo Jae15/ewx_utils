@@ -19,82 +19,21 @@
 pip install -r requirements.txt
 ```
 
-### Configuration
-
-Configuration values for the scripts are in the file `.env` which uses the 
-format defined by the package `python-dotenv`.  For details about this file, 
-see https://pypi.org/project/python-dotenv/#getting-started.    An example `.env`
-file is in the main direction, called `example-dot-env.txt`   Copy this file to 
-a new file name `.env` and edit the values.   
-
-The `.env` file contains three variables: 
-
-- `EWX_BASE_PATH`=the absolute path to the top folder of this project. 
-- `DATABASE_CONFIG_FILE`=the absolute path to the file containing the database 
-   connection information (database name, use, and passwords)
-- `EWX_LOG_FILE`=the absolute path to a folder that will contain log files. the
-   folder must exist on your system
-
-There are no restrictions on these files but they must be defined for the 
-scripts to run properly and this program must read access to all of them, 
-and write-access to the file path in `EWX_LOG_FILE`
-
-Note that these environment variables can be set prior to running the python
-scripts and the `load_dotenv()` function will use the currently set values. 
-
-### Database configuration
-
-- It requires a postgres database and uses pyscopg2 to connect python with the database
-- It requires a database connection configuration file, using the file path 
-  indicated by the configuration value `DATABASE_CONFIG_FILE` in .env
-  There is no default value so you must set this, but typically set to `database.ini` 
-- The database connection configuration file follows the syntax outline in the 
-  [ConfigParser](https://docs.python.org/3/library/configparser.html) python
-  library, or "ini" format (and usually has an 'ini' extension). 
-- This file is to have a section as defined in each function in the file
-  `ewx_utils/db_files/dbs_configfile.py` which is based on which databases are 
-  currently available from Enviroweather servers.  When the names and servers of
-  the main Enviroweather databases change, you must edit both the file 
-  `ewx_utils/db_files/dbs_configfile.py` and the database ini file in
-   `DATABASE_CONFIG_FILE` (often `database.ini` but not necessarily)
-- An example section would look like:
-
-
-```
-[mawnqc_dbh11]
-host = 12.34.56.78
-port = 5432
-dbname = mawndb_qc
-user = mydbusername
-password = mydbpassword
-```
-
-> When running on your own computer, you may use ssh-tunnel to connect to the 
-> Enviroweather database server, and the host may be `127.0.0.1` and port the one
-> used by the tunnel.   See the Enviroweather system administrator for connection
-> details
-
-- Two of the database entries are required for testing.  You can run either create
-  these on an remote server, or run a Postgresql server 
-  on your local computer.  Create an empty databases using the schema file for the 
-  `mawn_qc` database. 
-
 ## How to run the hourly_main.py script (project entry script)
-
-The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
-
-The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
-
-
+- The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
+- The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
+- The sample sections refer to the sections in the database.ini file which stores database configurations such as the sample_database.ini that is stored in this project repository.
 ```
 cd ewx_utils/main_hourly_scripts
 
-python hourly_main.py -a -x
-python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x
-python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
+hourly_main [-h] [-b BEGIN] [-e END] (-x | -d) [-s [STATIONS ...] | -a] --read-from READ_FROM [READ_FROM ...] --write-to WRITE_TO
 
-hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
-[-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]
+python hourly_main.py -x -s aetna --read-from sample_section01 sample_section02 --write-to sample_section03
+
+python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_section sample_section01 --write-to sample_section02
+
+python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
+
 ```
 
 ## How to run the hourly_utility.py script
