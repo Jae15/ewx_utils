@@ -16,15 +16,20 @@ pip install -r requirements.txt
 ```
 
 ## How to run the hourly_main.py script (project entry script)
-- The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder..
+- The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
 - The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
+- The sample sections refer to the sections in the database.ini file which stores database configurations such as the sample_database.ini that is stored in this project repository.
 ```
-python hourly_main.py -a -x
-python hourly_main.py --begin 2024-02-03 --end 2024-02-08 -a -x
-python hourly_main.py --begin 2023-02-01 --end 2023-02-02 --station aetna -x
+cd ewx_utils/main_hourly_scripts
 
-hourly_main [-h] [-b BEGIN] [-e END] [-f] [-c] (-x | -d) [-l] [-s [STATIONS ...] | -a]
-[-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}] [--mawn {mawn:dbh11}] [--rtma {rtma:dbh11}]
+hourly_main [-h] [-b BEGIN] [-e END] (-x | -d) [-s [STATIONS ...] | -a] --read-from READ_FROM [READ_FROM ...] --write-to WRITE_TO
+
+python hourly_main.py -x -s aetna --read-from sample_section01 sample_section02 --write-to sample_section03
+
+python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_section sample_section01 --write-to sample_section02
+
+python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
+
 ```
 ## How to run the hourly_utility.py script
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
