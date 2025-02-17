@@ -1,15 +1,19 @@
 # ewx_utils Project
 
-# The process of running this ewx_utils project in another machine
-- The first step needed to run this project is to create an SSH key through a tool such as PuTTYgen.
-- This project requires a key to set up sftp.geo.msu.edu SSH tunnel.
-- Use the sftp tunnel to connect to the databases of choice eg supercell and dbh11.
-- To set up/configure the ports, databases and the SSH tunnel, one could use a tool such as PuTTy.
+## The process of running this ewx_utils project in another machine
 
-## How to install packages for the project
-- The project packages are located in the requirements.txt file.
-- This project works with python 3.12.
-- It requires a postgres database and uses pyscopg2 to connect python with the databases.
+- The first step needed to run this project is to create an SSH key through a tool such as PuTTYgen
+- This project requires a key to set up sftp.geo.msu.edu SSH tunnel
+- Use the sftp tunnel to connect to the databases of choice eg supercell and dbh11
+- To set up/configure the ports, databases and the SSH tunnel, one could use a tool such as PuTTy
+
+## Setup
+
+### How to install packages for the project
+- This project is tested and known to work with Python version 3.12
+
+- The project requires external python packages, listed in located in the requirements.txt file
+   To install them, run 
 
 ```
 pip install -r requirements.txt
@@ -31,6 +35,7 @@ python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_secti
 python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
 
 ```
+
 ## How to run the hourly_utility.py script
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
 - This script is used to compare records in the source database to the records in the destination database.
