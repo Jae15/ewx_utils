@@ -175,7 +175,7 @@ def get_qcwrite_cursor(connection: psycopg2.extensions.connection,
     except Exception as error:
         my_dbfiles_logger.error(f"Unexpected error establishing {db_name} cursor connection: {str(error)}")
         raise
-
+    
 def create_db_connections(args: Namespace) -> Dict[str, Any]:
     """
     Create and return necessary database connections based on user-specified arguments.
@@ -196,34 +196,82 @@ def create_db_connections(args: Namespace) -> Dict[str, Any]:
     Exception
         For any unexpected errors that occur during the connection process.
     """
-    my_dbfiles_logger.info("Creating necessary database connections based on user input.")
+
+    my_dbfiles_logger.info("Starting database connection process")
+    my_dbfiles_logger.debug(f"Processing command: read from {args.read_from}, write to {args.write_to}")
     connections = {}
 
-    # Handling read connections
+    # Debug sections being accessed
+    my_dbfiles_logger.debug("Validating section names:")
+    my_dbfiles_logger.debug(f"- Read sections: mawn_dbh11, rtma_dbh11")
+    my_dbfiles_logger.debug(f"- Write section: mawnqc_test")
+
+    # Handling read connections (mawn_dbh11 and rtma_dbh11)
     for section in args.read_from:
         try:
-            my_dbfiles_logger.info(f"Connecting to read database from section {section}.")
+            my_dbfiles_logger.info(f"Processing read section: {section}")
+            
+            # Getting and validating read-from configuration
             db_config = get_db_config(section)
-            connections[f"{section}_connection"] = connect_to_db(db_config)
-        except OperationalError as e:
-            my_dbfiles_logger.error(f"OperationalError connecting to {section}: {e}")
-            raise
+            if not db_config:
+                my_dbfiles_logger.error(f"No configuration found for section: {section}")
+                raise ValueError(f"Missing configuration for {section}")
+
+            # Logging configuration (excluding password)
+            safe_config = {k: v for k, v in db_config.items() if k != 'password'}
+            my_dbfiles_logger.debug(f"Configuration for {section}: {safe_config}")
+
+            # Creating connection with specific key based on section
+            if "mawn" in section:
+                connection_key = "mawn_connection"
+            elif "rtma" in section:
+                connection_key = "rtma_connection"
+            else:
+                connection_key = f"{section}_connection"
+            
+            my_dbfiles_logger.debug(f"Attempting connection for {connection_key}")
+            connections[connection_key] = connect_to_db(db_config)
+            
+            # Verifying connection
+            if connections[connection_key].closed:
+                raise ConnectionError(f"Connection {connection_key} closed immediately after creation")
+                
+            my_dbfiles_logger.info(f"Successfully created {connection_key}")
+
         except Exception as e:
-            my_dbfiles_logger.error(f"Unexpected error connecting to {section}: {e}")
+            my_dbfiles_logger.error(f"Failed to create {section} connection: {str(e)}")
             raise
 
-    # Handling write connections
+    # Handling write-to connection (mawnqc_test)
     try:
-        my_dbfiles_logger.info(f"Connecting to write database from section {args.write_to}.")
-        db_config = get_db_config(args.write_to)
-        connections["write_connection"] = connect_to_db(db_config)
-    except OperationalError as e:
-        my_dbfiles_logger.error(f"OperationalError connecting to write database: {e}")
-        raise
+        my_dbfiles_logger.info(f"Processing write section: {args.write_to}")
+        
+        # Getting and validating write-to configuration
+        write_config = get_db_config(args.write_to)
+        if not write_config:
+            my_dbfiles_logger.error(f"No configuration found for write section: {args.write_to}")
+            raise ValueError(f"Missing configuration for {args.write_to}")
+
+        # Log write configuration (excluding password)
+        safe_write_config = {k: v for k, v in write_config.items() if k != 'password'}
+        my_dbfiles_logger.debug(f"Write configuration: {safe_write_config}")
+
+        # Creating write connection
+        connections["qcwrite_connection"] = connect_to_db(write_config)
+        
+        # Verifying write connection
+        if connections["qcwrite_connection"].closed:
+            raise ConnectionError("Write connection closed immediately after creation")
+            
+        my_dbfiles_logger.info("Successfully created write connection")
+
     except Exception as e:
-        my_dbfiles_logger.error(f"Unexpected error connecting to write database: {e}")
+        my_dbfiles_logger.error(f"Failed to create write connection: {str(e)}")
         raise
 
-    my_dbfiles_logger.info("Database connections created successfully.")
-    return connections
+    # Final verification of all connections
+    my_dbfiles_logger.debug("Verifying all connections:")
+    for name, conn in connections.items():
+        my_dbfiles_logger.debug(f"- {name}: {'Open' if not conn.closed else 'Closed'}")
 
+    return connections

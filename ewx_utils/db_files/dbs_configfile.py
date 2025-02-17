@@ -40,6 +40,7 @@ def get_db_config(db_name: str, filename: str = ewx_database_configfile)->dict:
         if parser.has_section(db_name):
             db_info = {param[0]: param[1] for param in parser.items(db_name)}
             my_dbfiles_logger.debug(f"{db_name} login credentials returned")
+            print(f"db_info: {db_info}")
             return db_info
         else:
             my_dbfiles_logger.error(f"Section {db_name} not found in the {filename} file")
