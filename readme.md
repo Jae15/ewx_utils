@@ -23,6 +23,7 @@ pip install -r requirements.txt
 - The entry script to the project is the hourly_main.py located in the main_hourly_scripts folder.
 - The following commands are be used to run the hourly_main.py entry file that fetches data from one databases and inserts/updates into another.
 - The sample sections refer to the sections in the database.ini file which stores database configurations such as the sample_database.ini that is stored in this project repository.
+
 ```
 cd ewx_utils/main_hourly_scripts
 
@@ -35,6 +36,31 @@ python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_secti
 python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
 
 ```
+# Database Configuration Requirements:
+
+1. MAWN Database Section:
+   - The section name in database.ini MUST contain the characters 'mawn' (lowercase)
+   - This is a strict requirement - the code specifically checks for 'mawn' in the section name
+   - Examples of valid section names:
+     * [mawn]
+     * [mawn_database]
+     * [mawn_prod]
+   - Examples of invalid section names:
+     * [MAWN]
+     * [Mawn_db]
+     * [weather_station]
+
+2. RTMA Database Section:
+   - The section name in database.ini MUST contain the characters 'rtma' (lowercase)
+   - This is a strict requirement - the code specifically checks for 'rtma' in the section name
+   - Examples of valid section names:
+     * [rtma]
+     * [rtma_database]
+     * [rtma_prod]
+   - Examples of invalid section names:
+     * [RTMA]
+     * [Rtma_db]
+     * [weather_grid]
 
 ## How to run the hourly_utility.py script
 - The main utility script for the ewx_utils project is the hourly_utility.py script.
