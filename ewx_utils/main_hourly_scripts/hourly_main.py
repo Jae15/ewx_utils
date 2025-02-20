@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from datetime import date
 from psycopg2 import OperationalError
 from dotenv import load_dotenv
-
+load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
@@ -25,7 +25,7 @@ from ewx_utils.hourly_validation_checks.hourly_validation_utils import process_r
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any, Tuple
 
-load_dotenv()
+
 # Initialize the logger
 my_logger = ewx_utils_logger(log_path=ewx_log_file)
 
