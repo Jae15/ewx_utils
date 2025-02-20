@@ -19,4 +19,6 @@ ewx_logs.log/
 *.csv*
 main_daily_scripts
 daily_validation_checks
+*.pyc
+
 
