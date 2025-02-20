@@ -661,4 +661,6 @@ python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_secti
 
 python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
 
+python hourly_main.py -x -a --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
+
 """
