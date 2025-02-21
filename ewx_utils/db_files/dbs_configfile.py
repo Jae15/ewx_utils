@@ -33,14 +33,13 @@ def get_db_config(db_name: str, filename: str = ewx_database_configfile)->dict:
         my_dbfiles_logger.error("Database name cannot be empty or None")
         raise ValueError("Database name cannot be empty or None")
     try:
-        # Modified this line to include interpolation=None
         parser = ConfigParser(interpolation=None)
         parser.read(filename)
 
         if parser.has_section(db_name):
             db_info = {param[0]: param[1] for param in parser.items(db_name)}
             my_dbfiles_logger.debug(f"{db_name} login credentials returned")
-            print(f"db_info: {db_info}")
+            #print(f"db_info: {db_info}")
             return db_info
         else:
             my_dbfiles_logger.error(f"Section {db_name} not found in the {filename} file")
@@ -66,7 +65,6 @@ def get_ini_section_info(ini_file_path: str) -> str:
     Returns:
     str: A string that lists all the sections and their host names (if available) for use in the help description.
     """
-    # Already had interpolation=None
     config = configparser.ConfigParser(interpolation=None)
     section_info = []
 

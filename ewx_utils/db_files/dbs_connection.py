@@ -201,7 +201,7 @@ def create_db_connections(args: Namespace) -> Dict[str, Any]:
     my_dbfiles_logger.debug(f"Processing command: read from {args.read_from}, write to {args.write_to}")
     connections = {}
 
-    # Debug sections being accessed
+    # Debugging sections being accessed
     my_dbfiles_logger.debug("Validating section names:")
     my_dbfiles_logger.debug(f"- Read sections: mawn_dbh11, rtma_dbh11")
     my_dbfiles_logger.debug(f"- Write section: mawnqc_test")
