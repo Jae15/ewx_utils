@@ -631,7 +631,7 @@ def main() -> None:
 
             # Process and clean the records
             cleaned_records = process_records(
-                qc_columns, mawn_records, rtma_records, begin_date, end_date
+                qc_columns, mawn_records, rtma_records, runtime_begin_dates[station], runtime_end_dates[station]
             )
 
             # If execution is requested and QC cursor is available, insert or update records in the QC database
