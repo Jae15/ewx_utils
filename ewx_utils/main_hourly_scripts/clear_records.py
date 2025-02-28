@@ -8,13 +8,11 @@ from datetime import date
 from psycopg2 import OperationalError
 from pprint import pprint
 from dotenv import load_dotenv
-
 load_dotenv()
-
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.db_files.dbs_configfile import get_ini_section_info
+from ewx_utils.db_files.dbs_configfile import get_db_config, get_ini_section_info
 from ewx_utils.db_files.dbs_connection import(
     connect_to_db,
     get_mawn_cursor,
@@ -55,7 +53,7 @@ def get_all_stations_list(cursor: Any) -> List[str]:
 
         # Creating a list of station names and logging them
         stations_list = [dict(row)["table_name"] for row in stations]
-        my_logger.info(f"Fetched stations: {stations_list}")
+        my_logger.error(f"Fetched stations: {stations_list}")
 
         # Exclude the station named 'variables_hourly'
         filtered_stations_list = [
@@ -107,15 +105,15 @@ def close_connections(connections):
     Raises:
         Exception: If an error occurs while closing any connection or cursor.
     """
-    my_logger.info("Closing database connections.")
+    my_logger.error("Closing database connections.")
     for name, conn in connections.items():
         try:
             if "cursor" in name:
                 conn.close()
-                my_logger.info(f"{name} cursor closed.")
+                my_logger.error(f"{name} cursor closed.")
             elif "connection" in name:
                 conn.close()
-                my_logger.info(f"{name} connection closed.")
+                my_logger.error(f"{name} connection closed.")
         except Exception as e:
             my_logger.error(f"Error closing {name}: {e}")
 
@@ -135,106 +133,119 @@ def clear_and_commit(connection, station):
         with connection.cursor() as cursor:
             clear_records(cursor, station)
             connection.commit()  # Commit after successful execution
-            my_logger.info("Successfully committed transaction")
+            my_logger.error("Successfully committed transaction")
     except Exception as e:
         connection.rollback()  # Rollback in case of error
         my_logger.error(f"Transaction failed and rolled back: {e}")
 
-def main():
+def confirm_deletion(station_count, stations):
     """
-    Main function to clear records from specified stations in the QC database.
+    Ask user for confirmation before deleting records.
     
+    Parameters:
+    station_count: int or str - Number of stations or "all"
+    stations: list - List of station names
+    
+    Returns:
+    bool - True if user confirms, False otherwise
+    """
+    if station_count == "all":
+        prompt = "Are you sure you want to proceed with deleting records from all stations? (yes/no): "
+    elif station_count == 1:
+        prompt = f"Are you sure you want to delete records from station '{stations[0]}'? (yes/no): "
+    else:
+        prompt = f"Are you sure you want to proceed with deleting records from {station_count} stations ({', '.join(stations)})? (yes/no): "
+    
+    confirmation = input(prompt)
+    return confirmation.lower() in ["yes", "y"]
+
+
+def main() -> None:
+    """
+    Main function to clear records from stations in the QC database.
+
     Command-line arguments:
-    -x, --execute: Execute SQL and clear data in QC database
-    -d, --dryrun: Do not execute SQL, just log the actions
-    -s, --stations: Run for specific stations (list station names)
-    -a, --all: Run for all stations
-    --write-to: Section name in INI file for the QC database to write to
+    -s, --stations: Clear specific stations (list station names)
+    -a, --all: Clear all stations
+    --write-to: Section name in INI file for the QC database
     """
-    section_info_help = get_ini_section_info("config.ini")
+    ini_file_path = "path_to_ini_file.ini"
+    section_info_help = get_ini_section_info(ini_file_path)
     
+    # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="clear_records",
-        description="Clear records from specified stations in the QC database.",
-        epilog=section_info_help
+        description="Clears data from stations in the QC database",
+        epilog="Use with caution - this will delete all records from specified stations",
     )
 
-    # Execution mode group
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "-x",
-        "--execute",
-        action="store_true",
-        help="Execute SQL and clear data in QC database",
-    )
-    group.add_argument(
-        "-d",
-        "--dryrun",
-        action="store_true",
-        help="Do not execute SQL, just log the actions",
-    )
-
-    # Station selection group
-    group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "-s",
         "--stations",
         nargs="*",
         type=str,
-        help="Run for specific stations (list station names)",
+        help="Clear specific stations (list station names)",
     )
     group.add_argument(
         "-a", 
         "--all", 
         action="store_true", 
         default=False, 
-        help="Run for all stations"
+        help="Clear all stations"
     )
 
-    # Database section argument
     parser.add_argument(
         "--write-to",
         type=str,
         required=True,
-        help="Section name in INI file for the QC database to write to",
+        help="Section name in INI file for the QC database",
     )
 
     args = parser.parse_args()
-    my_logger.info(f"Parsed Arguments: {args}")
 
-    # Establish database connections based on args
+    # Create database connection
     db_connections = create_db_connections(args)
-    my_logger.info(f"Database Connections: {db_connections}")
-
+    
     try:
-        # Use the necessary cursor for the QC database
-        write_cursor = db_connections.get("write_connection").cursor()
-        my_logger.info(f"Write cursor obtained: {write_cursor}")
-        
+        # Get QC database cursor
+        qcwrite_cursor = get_qcwrite_cursor(db_connections['qcwrite_connection'], 'qcwrite')
+        my_logger.info("Successfully connected to QC database")
+
+        # Get list of stations to clear
         if args.all:
-            stations = get_all_stations_list(write_cursor)
-            my_logger.info(f"Clearing all stations: {stations}")
+            stations = get_all_stations_list(qcwrite_cursor)
+            station_count = "all"
+            my_logger.info("Preparing to clear all stations")
         else:
             stations = args.stations
-            my_logger.info(f"Clearing specific stations: {stations}")
+            station_count = len(stations)
+            my_logger.info(f"Preparing to clear specified stations: {', '.join(stations)}")
 
-        # Clear records for specified stations
+        # User confirmation
+        if not confirm_deletion(station_count, stations):
+            my_logger.info("Deletion canceled by user")
+            return
+
+        # Clear records for each station
         for station in stations:
-            my_logger.info(f"Processing station: {station}")
-            if args.execute:
-                clear_and_commit(db_connections["write_connection"], station)
-                my_logger.info(f"Cleared records for station {station}")
-            else:
-                my_logger.info(f"Dry run: Would clear records for station {station}")
+            try:
+                clear_records(qcwrite_cursor, station)
+                db_connections['qcwrite_connection'].commit()
+                my_logger.info(f"Successfully cleared records from {station}")
+            except Exception as e:
+                my_logger.error(f"Failed to clear {station}: {e}")
+                db_connections['qcwrite_connection'].rollback()
 
     except Exception as e:
         my_logger.error(f"An error occurred: {e}")
         raise
+
     finally:
         # Close all database connections
         close_connections(db_connections)
         my_logger.info("Database connections closed")
-
+        my_logger.info("Deletion process completed")
 
 if __name__ == "__main__":
     main()
@@ -242,7 +253,6 @@ if __name__ == "__main__":
 
 """
 usage: clear_records [-h] (-x | -d) [-s [STATIONS ...] | -a] --write-to WRITE_TO
-
 
 python clear_records.py -x -s arlene -q mawnqc_test:local
 usage: clear_records [-h] (-x | -d) [-s [STATIONS ...] | -a] [-q {mawnqc_test:local,mawnqcl:local,mawnqc:dbh11,mawnqc:supercell}]
