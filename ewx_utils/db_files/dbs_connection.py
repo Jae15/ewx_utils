@@ -176,6 +176,7 @@ def get_qcwrite_cursor(connection: psycopg2.extensions.connection,
         my_dbfiles_logger.error(f"Unexpected error establishing {db_name} cursor connection: {str(error)}")
         raise
     
+
 def create_db_connections(args: Namespace) -> Dict[str, Any]:
     """
     Create and return necessary database connections based on user-specified arguments.
@@ -183,7 +184,7 @@ def create_db_connections(args: Namespace) -> Dict[str, Any]:
     Parameters:
     args : Namespace
         An object containing user-specified arguments for database connections.
-        Including 'read_from' (list of sections) and 'write_to' (section name).
+        Including optional 'read_from' (list of sections) and required 'write_to' (section name).
     
     Returns:
     Dict[str, Any]
@@ -198,51 +199,48 @@ def create_db_connections(args: Namespace) -> Dict[str, Any]:
     """
 
     my_dbfiles_logger.info("Starting database connection process")
-    my_dbfiles_logger.debug(f"Processing command: read from {args.read_from}, write to {args.write_to}")
     connections = {}
 
-    # Debugging sections being accessed
-    my_dbfiles_logger.debug("Validating section names:")
-    my_dbfiles_logger.debug(f"- Read sections: mawn_dbh11, rtma_dbh11")
-    my_dbfiles_logger.debug(f"- Write section: mawnqc_test")
-
-    # Handling read connections (mawn_dbh11 and rtma_dbh11)
-    for section in args.read_from:
-        try:
-            my_dbfiles_logger.info(f"Processing read section: {section}")
-            
-            # Getting and validating read-from configuration
-            db_config = get_db_config(section)
-            if not db_config:
-                my_dbfiles_logger.error(f"No configuration found for section: {section}")
-                raise ValueError(f"Missing configuration for {section}")
-
-            # Logging configuration (excluding password)
-            safe_config = {k: v for k, v in db_config.items() if k != 'password'}
-            my_dbfiles_logger.debug(f"Configuration for {section}: {safe_config}")
-
-            # Creating connection with specific key based on section
-            if "mawn" in section:
-                connection_key = "mawn_connection"
-            elif "rtma" in section:
-                connection_key = "rtma_connection"
-            else:
-                connection_key = f"{section}_connection"
-            
-            my_dbfiles_logger.debug(f"Attempting connection for {connection_key}")
-            connections[connection_key] = connect_to_db(db_config)
-            
-            # Verifying connection
-            if connections[connection_key].closed:
-                raise ConnectionError(f"Connection {connection_key} closed immediately after creation")
+    # Handling optional read connections
+    if hasattr(args, 'read_from') and args.read_from:
+        my_dbfiles_logger.debug(f"Processing read command from sections: {args.read_from}")
+        
+        for section in args.read_from:
+            try:
+                my_dbfiles_logger.info(f"Processing read section: {section}")
                 
-            my_dbfiles_logger.info(f"Successfully created {connection_key}")
+                # Getting and validating read-from configuration
+                db_config = get_db_config(section)
+                if not db_config:
+                    my_dbfiles_logger.error(f"No configuration found for section: {section}")
+                    raise ValueError(f"Missing configuration for {section}")
 
-        except Exception as e:
-            my_dbfiles_logger.error(f"Failed to create {section} connection: {str(e)}")
-            raise
+                # Logging configuration (excluding password)
+                safe_config = {k: v for k, v in db_config.items() if k != 'password'}
+                my_dbfiles_logger.debug(f"Configuration for {section}: {safe_config}")
 
-    # Handling write-to connection (mawnqc_test)
+                # Creating connection with specific key based on section
+                if "mawn" in section:
+                    connection_key = "mawn_connection"
+                elif "rtma" in section:
+                    connection_key = "rtma_connection"
+                else:
+                    connection_key = f"{section}_connection"
+                
+                my_dbfiles_logger.debug(f"Attempting connection for {connection_key}")
+                connections[connection_key] = connect_to_db(db_config)
+                
+                # Verifying connection
+                if connections[connection_key].closed:
+                    raise ConnectionError(f"Connection {connection_key} closed immediately after creation")
+                    
+                my_dbfiles_logger.info(f"Successfully created {connection_key}")
+
+            except Exception as e:
+                my_dbfiles_logger.error(f"Failed to create {section} connection: {str(e)}")
+                raise
+
+    # Handle required write-to connection
     try:
         my_dbfiles_logger.info(f"Processing write section: {args.write_to}")
         
@@ -269,9 +267,6 @@ def create_db_connections(args: Namespace) -> Dict[str, Any]:
         my_dbfiles_logger.error(f"Failed to create write connection: {str(e)}")
         raise
 
-    # Final verification of all connections
-    my_dbfiles_logger.debug("Verifying all connections:")
-    for name, conn in connections.items():
-        my_dbfiles_logger.debug(f"- {name}: {'Open' if not conn.closed else 'Closed'}")
-
+    my_dbfiles_logger.info("Database connection process completed")
     return connections
+
