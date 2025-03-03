@@ -1,3 +1,0 @@
-EWX_BASE_PATH="C:/path/to/your/directory/ewx_utils"
-DATABASE_CONFIG_FILE="C:/path/to/your/directory/ewx_utils/database.ini"
-EWX_LOG_FILE="C:/path/to/your/directory/ewx_utils/logs"
