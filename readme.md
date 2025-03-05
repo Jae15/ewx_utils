@@ -18,15 +18,48 @@
 pip install -r requirements.txt
 ```
 
+### Installation
+
+```
+pip install python-dotenv
+```
+1. Clone the repository:
+```
+git clone <repository-url>
+cd ewx_utils
+```
+2. Run the setup script `env_setup.py`:
+### Setup Options
+
+The setup script supports several installation methods:
+
+1. **Default Installation**
+python db_files/setup_env.py
+- Automatically detects and suggests a path
+- Creates necessary directory structure
+- Generates configuration files
+
+2. **Custom Path Installation**
+python db_file/setup_env.py --path /custom/path
+- Installs in specified custom location
+- Maintains standard directory structure
+
+3. **Force Installation**
+python db_file/setup_env.py --force
+- Skips confirmation prompts
+
 ### Configuration
+On running the env_setup.py file, a `.env` and `.env.example` files are automatically created. These files will contain the automatically generated paths and will be located at the base of the project. 
 
-Configuration values for the scripts are in the file `.env`, which uses the format defined by the package `python-dotenv`. For details about this file, see python-dotenv. An example `.env` file is in the main directory, called `example-dot-env.txt`. Copy this file to a new file named `.env` and edit the values.
+Configuration values for the scripts are in the file `.env`, which uses the format defined by the package `python-dotenv`. For details about this file, see python-dotenv. An example `.env` file is in the main directory, called `.env.example`. 
 
-The `.env` file contains three variables:
+### Environment Variables
 
-- `EWX_BASE_PATH` = the absolute path to the top folder of this project.
-- `DATABASE_CONFIG_FILE` = the absolute path to the file containing the database connection information (database name, user, and passwords).
-- `EWX_LOG_FILE` = the absolute path to a folder that will contain log files. The folder must exist on your system.
+The setup configures the following environment variables:
+
+- `EWX_BASE_PATH`: Base directory path - The absolute path to the top folder of this project.
+- `DATABASE_CONFIG_FILE`: Database configuration file location - The absolute path to the file containing the database connection information (database name, user, and passwords).
+- `EWX_LOG_FILE`: Log file directory - the absolute path to a folder that will contain log files. The folder must exist on your system..
 
 There are no restrictions on these files, but they must be defined for the scripts to run properly, and this program must have read access to all of them and write access to the file path in `EWX_LOG_FILE`.
 
