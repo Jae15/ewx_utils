@@ -62,30 +62,8 @@ def get_base_dir(custom_path=None):
         except ValueError:
             print("Please enter a valid number")
 
-def create_env_template(base_dir):
-    """Create template .env file with default configurations."""
-    template_path = base_dir / '.env.example'
-    
-    template_content = """# EWX Utils Environment Configuration
-# Generated for {os_name}
-
-EWX_BASE_PATH="{base_dir}"
-DATABASE_CONFIG_FILE="{base_dir}/ewx_utils/database.ini"
-EWX_LOG_FILE="{base_dir}/ewx_utils/logs"
-"""
-    
-    with open(template_path, 'w') as f:
-        f.write(template_content.format(
-            os_name=platform.system(),
-            base_dir=base_dir
-        ))
-    
-    print(f"Template created at: {template_path}")
-
-def initialize_env(base_dir):
+def initialize_env(base_dir, force=False):
     """Initialize environment with directories and configuration files."""
-    print(f"Initializing environment in: {base_dir}")
-    
     project_dir = base_dir / 'ewx_utils'
     env_path = base_dir / '.env'
     
@@ -93,12 +71,12 @@ def initialize_env(base_dir):
     project_dir.mkdir(parents=True, exist_ok=True)
     (project_dir / 'logs').mkdir(parents=True, exist_ok=True)
     
-    if not env_path.exists():
-        with open(env_path, 'w') as f:
-            f.write(f'EWX_BASE_PATH="{base_dir}"\n')
-            f.write(f'DATABASE_CONFIG_FILE="{project_dir}/database.ini"\n')
-            f.write(f'EWX_LOG_FILE="{project_dir}/logs"\n')
-        print(f".env file created at {env_path}")
+    # Create or overwrite .env file
+    with open(env_path, 'w') as f:
+        f.write(f'EWX_BASE_PATH="{base_dir}"\n')
+        f.write(f'DATABASE_CONFIG_FILE="{project_dir}/database.ini"\n')
+        f.write(f'EWX_LOG_FILE="{project_dir}/logs"\n')
+    print(f".env file created at {env_path}")
     
     load_dotenv(env_path)
     
@@ -120,16 +98,33 @@ def main():
                        help='Force setup without confirmation')
     args = parser.parse_args()
 
+    if not args.force:
+        # Initial prompt for .env file creation
+        create_env = input("Would you like to create a .env file? (y/n): ")
+        if create_env.lower() != 'y':
+            print("Setup cancelled.")
+            return
+
+    # Get the base directory first to check for existing .env
     base_dir = get_base_dir(args.path)
-    
+    env_path = base_dir / '.env'
+
+    # Check for existing .env file
+    if env_path.exists() and not args.force:
+        overwrite = input("An existing .env file was found. Would you like to overwrite it? (y/n): ")
+        if overwrite.lower() != 'y':
+            print("Setup cancelled.")
+            return
+
+    # Confirm directory setup
     if not args.force and base_dir.exists():
         confirm = input(f"\nDirectory exists: {base_dir}\nProceed with setup? (y/n) [n]: ")
         if confirm.lower() != 'y':
             print("Setup cancelled.")
             return
 
-    create_env_template(base_dir)
-    initialize_env(base_dir)
+    print(f"\nInitializing environment in: {base_dir}")
+    initialize_env(base_dir, args.force)
 
 if __name__ == "__main__":
     main()
