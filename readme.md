@@ -49,13 +49,23 @@ python db_file/setup_env.py --force
 - Skips confirmation prompts
 
 ### Configuration
-On running the env_setup.py file, a `.env` and `.env.example` files are automatically created. These files will contain the automatically generated paths and will be located at the base of the project. 
+On running the `env_setup.py` file, it will guide you through several steps:
+1. Initial confirmation to create `.env` file
+2. Selection of installation path:
+   - Detected project root
+   - Home directory
+   - Documents folder
+   - Custom path
+3. Confirmation for existing `.env` file overwrite (if applicable)
+4. Directory structure setup confirmation 
 
-Configuration values for the scripts are in the file `.env`, which uses the format defined by the package `python-dotenv`. For details about this file, see python-dotenv. An example `.env` file is in the main directory, called `.env.example`. 
+If you choose to use the `env_setup.py` to create your `.env` file, the configuration values for the scripts will be populated into the `.env` file. The format of the file is defined by the package `python-dotenv`. For details about this file, see [`python-dotenv` documentation](https://pypi.org/project/python-dotenv/#getting-started). 
+
+An example `.env` file is in the main direction, called `example-dot-env.txt`.   
+If you choose to manually create your own `.env` file, copy the example file to a new file, name it as `.env` and edit the values.  
 
 ### Environment Variables
-
-The setup configures the following environment variables:
+The `env_setup.py`configures the following environment variables:
 
 - `EWX_BASE_PATH`: Base directory path - The absolute path to the top folder of this project.
 - `DATABASE_CONFIG_FILE`: Database configuration file location - The absolute path to the file containing the database connection information (database name, user, and passwords).
@@ -114,6 +124,9 @@ python hourly_main.py -x -b 2025-02-08 -e 2025-02-14 -a --read-from sample_secti
 
 python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to mawnqc_test
 ```
+- When dates are not specified, the default is to return data over the last 7 days for a specific station or for all stations depending on user specifications.
+
+- If the date is specified as the current day or today's date, the program will return data from the start of the day to the current hour or the last hour when data was received. If the current hour's data has not been loaded, the record will be returned as null and the sources as empty.
 
 ### Database Configuration Requirements
 
