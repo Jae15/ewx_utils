@@ -6,10 +6,8 @@ import argparse
 import csv
 import dotenv
 from datetime import date
-
 dotenv.load_dotenv()
 from dotenv import load_dotenv
-
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -17,13 +15,14 @@ from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any, Tuple, Optional, Union
-from ewx_utils.db_files.dbs_connections import (
-    connect_to_mawnqc_test,
-    connect_to_mawnqc_supercell,
-    mawnqc_test_cursor_connection,
-    mawn_supercell_cursor_connection,
+from ewx_utils.db_files.dbs_configfile import get_ini_section_info
+from ewx_utils.db_files.dbs_connection import(
+    connect_to_db,
+    get_mawn_cursor,
+    get_rtma_cursor,
+    get_qcwrite_cursor,
+    create_db_connections
 )
-
 my_logger = ewx_utils_logger(log_path=ewx_log_file)
 
 

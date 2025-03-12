@@ -20,5 +20,6 @@ ewx_logs.log/
 main_daily_scripts
 daily_validation_checks
 *.pyc
+bash_test.sh
 
 
