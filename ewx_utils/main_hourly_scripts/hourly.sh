@@ -18,7 +18,7 @@ stations=(
 # Main processing loops
 for station in "${stations[@]}"; do             # First loop: Station
     echo "Processing station $station..."
-    for year in {1996..2025}; do               # Second loop: Years for current station
+    for year in {1996..2005}; do               # Second loop: Years for current station
         echo "Processing year $year for station $station..."
         python3 hourly_main.py -x \
             -b "${year}-01-01" \

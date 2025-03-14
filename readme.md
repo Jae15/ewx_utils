@@ -153,6 +153,29 @@ python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to m
      * `[RTMA]`
      * `[Rtma_db]`
      * `[weather_grid]`
+  
+## How to run the hourly_main script using the hourly.sh bash script
+The hourly.sh bash script automates the processing of data from MAWN stations over a specified period of time such as annually, 5 yearly, 10 yearly and so on e.g (1996-2000). The script processes data in yearly chunks using a the project entry script `hourly_main.py`.It processes annual data for a station, and it only moves on to the next station after completing the whole period specified. If say the period specified is 5 years it will process 5 chunks for a station say aetna before moving to another station.
+
+### Processing Logic
+1. Outer loop: Iterates through each station
+2. Inner loop: Processes data year by year (1996-2005)
+3. Calls `hourly_main.py` with specific parameters for each iteration
+
+### Command Parameters
+- `-x`: Execute mode
+- `-b`: Beginning date (January 1st of each year)
+- `-e`: End date (December 31st of each year)
+- `-s`: Station identifier
+- `--read-from`: Data sources (MAWN and RTMA)
+- `--write-to`: Output destination (MAWNQC)
+
+## Performance Note
+Processing 5-year chunks of data typically requires approximately 2 hours on a remote Linux server. This timing can vary based on:
+- Server specifications
+- Network connectivity
+- Data availability
+- Current server load
 
 ## How to run the hourly_utility.py script
 
