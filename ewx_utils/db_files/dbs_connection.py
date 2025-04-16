@@ -65,7 +65,7 @@ def get_mawn_cursor(connection: psycopg2.extensions.connection,
     Parameters:
         connection (psycopg2.extensions.connection): Database connection object
         db_name (str): Name of the database for logging
-        cursor_factory (Any, Optional): Cursor factoey to use. Defaults to RealDictCursor
+        cursor_factory (Any, Optional): Cursor factory to use. Defaults to RealDictCursor
     
     Returns:
         psycopg2.extensions.cursor: Cursor object for database
@@ -127,6 +127,47 @@ def get_rtma_cursor(connection: psycopg2.extensions.connection,
         rtma_cursor = connection.cursor(cursor_factory=cursor_factory)
         my_dbfiles_logger.info(f"{db_name} cursor connection successfully established")
         return rtma_cursor
+    
+    except psycopg2.DatabaseError as error:
+        my_dbfiles_logger.error(f"Database error establishing {db_name} cursor connection: {str(error)}")
+        raise
+
+    except Exception as error:
+        my_dbfiles_logger.error(f"Unexpected error establishing {db_name} cursor connection: {str(error)}")
+        raise
+
+
+def get_mawnqc_cursor(connection: psycopg2.extensions.connection,
+                  db_name: str,
+                  cursor_factory: Any = extras.RealDictCursor) -> psycopg2.extensions.cursor:
+    """
+    Establishes a cursor connection for a given database connection.
+
+    Parameters:
+        connection (psycopg2.extensions.connection): Database connection object
+        db_name (str): Name of the database for logging
+        cursor_factory (Any, Optional): Cursor factoey to use. Defaults to RealDictCursor
+    
+    Returns:
+        psycopg2.extensions.cursor: Cursor object for database
+
+    Returns:
+        ValueError: If connection is None or db_name is empty
+        psycopg2.DatabaseError: If cursor creation fails
+        Exception: For any other unexpected errors
+    """
+    if not connection:
+        my_dbfiles_logger.error("Database connection cannot be None")
+        raise ValueError("Database connection cannot be None")
+    
+    if not db_name:
+        my_dbfiles_logger.error("Database name cannot be empty")
+        raise ValueError("Database name cannot be empty")
+    
+    try:
+        mawnqc_cursor = connection.cursor(cursor_factory=cursor_factory)
+        my_dbfiles_logger.info(f"{db_name} cursor connection successfully established")
+        return mawnqc_cursor
     
     except psycopg2.DatabaseError as error:
         my_dbfiles_logger.error(f"Database error establishing {db_name} cursor connection: {str(error)}")
@@ -219,22 +260,28 @@ def create_db_connections(args: Namespace) -> Dict[str, Any]:
                 safe_config = {k: v for k, v in db_config.items() if k != 'password'}
                 my_dbfiles_logger.debug(f"Configuration for {section}: {safe_config}")
 
-                # Creating connection with specific key based on section
-                if "mawn" in section:
+                # Determine connection type based on section prefix
+                if section.startswith('mawn') and not section.startswith('mawnqc'):
                     connection_key = "mawn_connection"
-                elif "rtma" in section:
+                elif section.startswith('mawnqc'):
+                    connection_key = "mawnqc_connection"
+                elif section.startswith('rtma'):
                     connection_key = "rtma_connection"
                 else:
                     connection_key = f"{section}_connection"
                 
-                my_dbfiles_logger.debug(f"Attempting connection for {connection_key}")
-                connections[connection_key] = connect_to_db(db_config)
-                
-                # Verifying connection
-                if connections[connection_key].closed:
-                    raise ConnectionError(f"Connection {connection_key} closed immediately after creation")
+                # Only create the connection if it doesn't already exist
+                if connection_key not in connections:
+                    my_dbfiles_logger.debug(f"Attempting connection for {connection_key}")
+                    connections[connection_key] = connect_to_db(db_config)
                     
-                my_dbfiles_logger.info(f"Successfully created {connection_key}")
+                    # Verifying connection
+                    if connections[connection_key].closed:
+                        raise ConnectionError(f"Connection {connection_key} closed immediately after creation")
+                        
+                    my_dbfiles_logger.info(f"Successfully created {connection_key}")
+                else:
+                    my_dbfiles_logger.info(f"Connection {connection_key} already exists, skipping")
 
             except Exception as e:
                 my_dbfiles_logger.error(f"Failed to create {section} connection: {str(e)}")

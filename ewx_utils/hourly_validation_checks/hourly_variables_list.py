@@ -198,4 +198,18 @@ wstdv_vars = [
     "wstdv_20m"
 ]
 
+albedo_vars = [
+    "albd", "albd_max", "albd_min"
+]
 
+longwave_vars = [
+    "lwin", "lwin_max", "lwin_min",
+    "lwout", "lwout_max", "lwout_min",
+    "lwnet", "lwnet_max", "lwnet_min"
+]
+
+shortwave_vars = [
+    "swin", "swin_max", "swin_min",
+    "swout", "swout_max", "swout_min",
+    "swnet", "swnet_max", "swnet_min"
+]

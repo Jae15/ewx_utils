@@ -2,7 +2,6 @@
 import os
 import sys
 from dotenv import load_dotenv
-
 load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
@@ -75,7 +74,7 @@ def check_value(k: str, v: float, d: datetime) -> bool:
         return tp.is_valid()
     if k in wspd_vars:
         ws = WindSpeed(v, "MPS", d)
-        # print(k, v, d, tp.is_valid())
+        #print(k, v, d, ws.is_valid())
         return ws.is_valid()
     if k in wdir_vars:
         wd = WindDirection(v, "DEGREES", d)

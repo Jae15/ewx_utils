@@ -527,7 +527,6 @@ def main() -> None:
     """
     ini_file_path = "path_to_ini_file.ini"
     section_info_help = get_ini_section_info(ini_file_path)
-    print(section_info_help)
     # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="hourly_main",
@@ -536,8 +535,6 @@ def main() -> None:
     )
     parser.add_argument("-b", "--begin", type=str, help="Start date (no time accepted)")
     parser.add_argument("-e", "--end", type=str, help="End date (no time accepted)")
-
-
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
@@ -590,7 +587,6 @@ def main() -> None:
 
     # Establish only necessary database connections based on args
     db_connections = create_db_connections(args)
-    print(f"db_connections: {db_connections}")
 
     try:
         # Use the necessary connections and cursors based on what is required
