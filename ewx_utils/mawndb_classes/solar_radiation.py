@@ -7,55 +7,72 @@ sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
 from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+
 class SolarRadiation:
     """
-    The Solar Radiation class defines the valid hourly default range for solar radiation
+    The Solar Radiation class defines the valid ranges for solar radiation
     It is used to validate solar radiation data retrieved from mawndb.
     """
 
+    # Valid solar radiation ranges for hourly and daily tables
     valid_srad_hourly_default = (0, 4500)
+    valid_srad_daily_default = (0, 32000)
 
-    def __init__(self, srad, record_date=None):
+    def __init__(self, srad, table: str, record_date=None):
         """
         Initializes the Solar Radiation object.
 
         Parameters:
-        nrad(float): Net radiation value.
+        srad(float): Solar radiation value.
+        table(str): The type of table('HOURLY', or 'DAILY')
         record_date(datetime, optional): The date of the record.
-
         """
         self.logger = ewx_utils_logger(log_path = ewx_log_file)
-        self.logger.debug("Initializing Solar Radiation object with srad: %s, record_date: %s", srad, record_date)
+        self.logger.debug("Initializing Solar Radiation object with srad: %s, table: %s, record_date: %s", 
+                          srad, table, record_date)
         self.record_date = record_date
-        self.srad = srad
-
+        self.src = None
+        self.tableU = table.upper()
+        
+        if srad is None:
+            srad = -9999
+        self.srad = float(srad)
+        
+        self.logger.debug("Solar Radiation object initialized with srad: %s", self.srad)
+            
+    def set_src(self, src):
         """
-        if self.srad is not None:
-            self.srad = round(srad, 5)
-        else:
-            self.srad = None
+        Sets the source of the solar radiation data.
+        
+        Parameters:
+        src(str): The source of the data
         """
+        self.logger.debug("Setting source to: %s", src)
+        self.src = src
 
     def is_valid(self):
         """
-        Checks if the net radiation value is within the valid hourly default range.
+        Checks if the solar radiation value is within the valid range for the specified table type.
 
         Returns:
-        bool: True if the net radiation value is within the valid range, False otherwise.
+        bool: True if the solar radiation value is within the valid range, False otherwise.
         """
-        self.logger.debug("Validating net radiation value: %s", self.srad)
-
-        # Check if nrad is None
-        if self.srad is None:
-            self.logger.debug("Net radiation value is None, returning False.")
+        self.logger.debug("Validating solar radiation value: %s for table: %s",
+                          self.srad, self.tableU)
+        
+        # Check if srad is None or invalid
+        if self.srad == -9999:
+            self.logger.debug("Solar radiation value is invalid (-9999), returning False.")
             return False
-
-        is_valid = self.valid_srad_hourly_default[0] <= self.srad <= self.valid_srad_hourly_default[1]
-        self.logger.debug("Net radiation value: %s is valid: %s", self.srad, is_valid)
+        
+        if self.tableU == "HOURLY":
+            validation_range = self.valid_srad_hourly_default
+        elif self.tableU == "DAILY":
+            validation_range = self.valid_srad_daily_default
+        else:
+            self.logger.error("Invalid table type: %s", self.tableU)
+            return False
+            
+        is_valid = validation_range[0] <= self.srad <= validation_range[1]
+        self.logger.debug("Solar radiation value: %s is valid: %s", self.srad, is_valid)
         return is_valid
-
-
-
-""" Solar radiation variables list - if the k - key - is in this list, treat the variable as 'srad_vars' """
-
-# srad_vars = ["srad"]
