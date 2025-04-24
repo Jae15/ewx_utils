@@ -96,7 +96,7 @@ def check_value(k: str, v: float, d: datetime) -> bool:
         nr = NetRadiation(v, d)
         return nr.is_valid()
     if k in srad_vars:
-        sr = SolarRadiation(v, d)
+        sr = SolarRadiation(v, "hourly", d)
         return sr.is_valid()
     if k in sflux_vars:
         sf = SoilHeatFlux(v, d)
