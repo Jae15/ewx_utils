@@ -206,7 +206,7 @@ def update_records(cursor: Any, station: str, records: List[Dict[str, Any]]) -> 
         return
 
     try:
-        record_keys = [key for key in records[0].keys() if key not in ["date", "time"]]
+        record_keys = [key for key in records[0].keys() if key not in ["date", "time", "id"]]
         if not record_keys:
             my_logger.error(f"No updatable keys found in the records for {station}.")
             return
