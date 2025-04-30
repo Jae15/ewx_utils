@@ -649,7 +649,7 @@ def main() -> None:
             my_logger.info(f"Processing station: {station}")
             
             qc_columns = get_insert_table_columns(qcwrite_cursor, station)
-            print(f"QC Columns: {qc_columns}")
+            #print(f"QC Columns: {qc_columns}")
             
             mawndb_records = fetch_records(
                 mawn_cursor,
@@ -657,7 +657,7 @@ def main() -> None:
                 runtime_begin_dates[station],
                 runtime_end_dates[station],
             )
-            print(f"Mawndb Record: {mawndb_records}")
+            #print(f"Mawndb Record: {mawndb_records}")
             
             mawnqc_records = fetch_records(
                 qcread_cursor,
@@ -665,14 +665,14 @@ def main() -> None:
                 runtime_begin_dates[station],
                 runtime_end_dates[station],
             )
-            print(f"Mawnqc record: {mawnqc_records}")
+            #print(f"Mawnqc record: {mawnqc_records}")
 
             # Process and clean the records
             cleaned_records = process_records(
                 qc_columns, mawndb_records, mawnqc_records, 
                 runtime_begin_dates[station], runtime_end_dates[station]
             )
-            print(f"Cleaned Records: {cleaned_records}")
+            #print(f"Cleaned Records: {cleaned_records}")
 
             # If execution is requested, insert or update records in the QC database
             if args.execute and qcwrite_cursor:
@@ -701,5 +701,8 @@ usage: daily_main [-h] [-b BEGIN] [-e END] (-x EXECUTE | -d) [-s [STATIONS ...] 
 python daily_main.py --begin 2024-01-01 --end 2024-01-02 --station aetna --read-from mawn_dbh11 mawnqc_supercell --write-to mawnqc_test -x --execute
 
 python daily_main.py --begin 2024-01-01 --end 2024-01-02 --station aetna --read-from mawn_dbh11 mawnqc_supercell --write-to mawnqc_test --execute
+
+python daily_main.py --begin 2019-05-08 --end 2019-05-10 --station aetna --read-from mawn_dbh11 mawnqc_dbh11
+ --write-to mawnqc_test -x
 
 """

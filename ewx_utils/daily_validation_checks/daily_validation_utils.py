@@ -298,36 +298,43 @@ def replace_none_with_manwqc_record(
     qc_columns: List[str]
 ) -> Dict[str, Any]:
     """
-    Replace None values in the MAWN source record with estimated values
-    from MAWNQC daily record computed from 24 hourly values.
-    Only updates fields that are missing in the original MAWN record.
+    Replace missing or invalid values in MAWN record using MAWNQC estimates,
+    and correctly tag them as MAWNQC. Adds logging to confirm actions taken.
     """
     my_validation_logger.info("Starting MAWNQC value replacement")
 
     clean_record = mawnsrc_record.copy()
-    my_validation_logger.debug("Created copy of MAWN record for updating")
+    replacements_made = 0
+    missing_estimates = []
 
     for key in qc_columns:
         if key.endswith("_src"):
-            data_key = key[:-4]  # strip off _src
+            data_key = key[:-4]
+            current_value = clean_record.get(data_key)
+            current_src = clean_record.get(key)
 
-            # Skip if MAWN already has a value
-            if data_key in clean_record and clean_record.get(data_key) is not None:
-                continue
+            if current_value is None or current_src in [None, "EMPTY", "OOR"]:
+                estimated_value = mawnqc_record.get(data_key)
+                if estimated_value is not None:
+                    clean_record[data_key] = estimated_value
+                    clean_record[key] = "MAWNQC"
+                    replacements_made += 1
+                    my_validation_logger.info(
+                        f"[REPLACED] {data_key}: {estimated_value} (source set to MAWNQC)"
+                    )
+                else:
+                    clean_record[key] = "EMPTY"
+                    missing_estimates.append(data_key)
+                    my_validation_logger.warning(
+                        f"[MISSING_ESTIMATE] No MAWNQC estimate found for {data_key}"
+                    )
 
-            # Try to replace missing value with estimate from MAWNQC
-            estimated_value = mawnqc_record.get(data_key)
+    my_validation_logger.info(f"MAWNQC replacements completed: {replacements_made}")
+    if missing_estimates:
+        my_validation_logger.warning(f"Keys with no MAWNQC data: {missing_estimates}")
 
-            if estimated_value is not None:
-                clean_record[data_key] = estimated_value
-                clean_record[key] = "MAWNQC"
-                my_validation_logger.debug(f"Replaced {data_key} with value from MAWNQC")
-            else:
-                clean_record[key] = "EMPTY"
-                my_validation_logger.warning(f"MAWNQC estimate not found for {data_key}")
-
-    my_validation_logger.info("Completed MAWNQC value replacement")
     return clean_record
+
 
 
 def filter_clean_record(clean_record: Dict[str, Any], qc_columns: List[str]) -> Dict[str, Any]:
@@ -385,8 +392,8 @@ def estimate_daily_values(
 ) -> Dict[str, Any]:
     """
     Estimate daily values from 24 hourly records.
-    Only uses keys present in qc_columns (excluding *_src).
-    Returns a dict with *_min, *_max, or sum fields.
+    Returns a dict with estimated values and their source marked as MAWNQC.
+    Logs details for both success and skipped estimates.
     """
     my_validation_logger.info("Estimating daily values from MAWNQC hourly records")
 
@@ -395,40 +402,44 @@ def estimate_daily_values(
         return {}
 
     daily_estimates = {}
+    successful = 0
+    skipped = []
 
-    # Only estimate variables that are in qc_columns and not *_src
     target_keys = [key for key in qc_columns if not key.endswith("_src")]
 
     for key in target_keys:
-        # Skip ID and time/date fields
         if key in ["year", "day", "date", "time", "id", "rpt_time"]:
             continue
 
-        # Special case for fields that are not min/max (like pcpn, rpet, etc.)
+        # Sum-based
         if key in ["pcpn", "rpet", "srad"]:
             values = [rec.get(key) for rec in hourly_records if rec.get(key) is not None]
-
             if len(values) == 24:
                 daily_estimates[key] = sum(values)
-                my_validation_logger.debug(f"Estimated {key} as sum: {daily_estimates[key]}")
+                daily_estimates[key + "_src"] = "MAWNQC"
+                successful += 1
+                my_validation_logger.info(f"[ESTIMATED SUM] {key} = {daily_estimates[key]}")
             else:
-                my_validation_logger.warning(f"Missing hourly values for {key} — skipping estimation")
-        else:
-            # Try to derive base name from *_min or *_max target fields
-            if key.endswith("_min") or key.endswith("_max"):
-                base_var = key.rsplit("_", 1)[0]
-                values = [rec.get(base_var) for rec in hourly_records if rec.get(base_var) is not None]
+                skipped.append(key)
+                my_validation_logger.warning(f"[SKIPPED] Incomplete hourly values for {key}")
 
-                if len(values) == 24:
-                    if key.endswith("_min"):
-                        daily_estimates[key] = min(values)
-                    else:
-                        daily_estimates[key] = max(values)
-                    my_validation_logger.debug(f"Estimated {key} from hourly values")
-                else:
-                    my_validation_logger.warning(f"Missing hourly values for {key} — skipping estimation")
+        # Min/Max
+        elif key.endswith("_min") or key.endswith("_max"):
+            base_var = key.rsplit("_", 1)[0]
+            values = [rec.get(base_var) for rec in hourly_records if rec.get(base_var) is not None]
+            if len(values) == 24:
+                daily_estimates[key] = min(values) if key.endswith("_min") else max(values)
+                daily_estimates[key + "_src"] = "MAWNQC"
+                successful += 1
+                my_validation_logger.info(f"[ESTIMATED {key[-3:].upper()}] {key} = {daily_estimates[key]}")
+            else:
+                skipped.append(key)
+                my_validation_logger.warning(f"[SKIPPED] Incomplete hourly values for {key}")
 
-    my_validation_logger.info("Completed estimation of daily values from hourly records")
+    my_validation_logger.info(f"Total MAWNQC estimates created: {successful}")
+    if skipped:
+        my_validation_logger.warning(f"Skipped estimates due to missing hourly values: {skipped}")
+
     return daily_estimates
 
 
