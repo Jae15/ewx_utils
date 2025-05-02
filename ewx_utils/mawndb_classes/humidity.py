@@ -15,7 +15,7 @@ class Humidity:
     """
    
     # Valid range for relative humidity measurements
-    valid_relh_hourly_default = (0, 100)
+    valid_relh_hourly_default = (5, 100)
     RELH_CAP = 105
 
     def __init__(self, relh, units, record_date=None):
