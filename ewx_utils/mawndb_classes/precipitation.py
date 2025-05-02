@@ -33,6 +33,7 @@ It also specifies the units of measurement and their respective conversions and 
         self.record_date = record_date
         self.src = None
         self.tableU = table.upper()
+        
         if pcpn is None:
             pcpn = -9999
         unitsU = units.upper()

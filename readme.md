@@ -155,7 +155,7 @@ python hourly_main.py -x -s aetna --read-from mawn_dbh11 rtma_dbh11 --write-to m
      * `[weather_grid]`
   
 ## How to run the hourly_main script using the hourly.sh bash script
-The hourly.sh bash script automates the processing of data from MAWN stations over a specified period of time such as annually, 5 yearly, 10 yearly and so on e.g (1996-2000). The script processes data in yearly chunks using a the project entry script `hourly_main.py`.It processes annual data for a station, and it only moves on to the next station after completing the whole period specified. If say the period specified is 5 years it will process 5 chunks for a station say aetna before moving to another station.
+The hourly.sh bash script automates the processing of data from MAWN stations over a specified period of time such as annually, 5 yearly, 10 yearly and so on e.g (1996-2000). The script processes data in yearly chunks using a the project entry script `hourly_main.py`. It processes annual data for a station, and it only moves on to the next station after completing the whole period specified. If say the period specified is 5 years, it will process 5 chunks for a station say aetna before moving to another station.
 
 ### Processing Logic
 1. Outer loop: Iterates through each station

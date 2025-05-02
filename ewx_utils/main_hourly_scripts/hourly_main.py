@@ -541,8 +541,6 @@ def main() -> None:
     parser.add_argument("-b", "--begin", type=str, help="Start date (no time accepted)")
     parser.add_argument("-e", "--end", type=str, help="End date (no time accepted)")
 
-
-
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-x",
