@@ -68,13 +68,13 @@ def fetch_records(cursor: Any, station: str, begin_date: str, end_date: str) -> 
     Raises:
         Exception: If the query fails or another error occurs.
     """
-    
     query = f"SELECT * FROM {station}_hourly WHERE date BETWEEN %s AND %s"
     my_logger.error(
         f"Executing query: {query} with parameters: {begin_date}, {end_date}"
     )
     try:
         cursor.execute(query, (begin_date, end_date))
+        my_logger.error(f"Executed fetch records {query}")
         records = cursor.fetchall()
         my_logger.error(
             f"Fetched {len(records)} records from {station} using {cursor}."
@@ -82,7 +82,7 @@ def fetch_records(cursor: Any, station: str, begin_date: str, end_date: str) -> 
         return [dict(record) for record in records]
     except Exception as e:
         my_logger.error(f"Error fetching records from {station}: {e}")
-        raise
+        return []
 
 
 def get_insert_table_columns(cursor: Any, station: str) -> List[str]:
@@ -121,7 +121,7 @@ def get_insert_table_columns(cursor: Any, station: str) -> List[str]:
 
         return columns
     except Exception as e:
-        my_logger.error(f"An error occurred: {e}")
+        my_logger.error(f"An error occurred when getting the insert table columns: {e}")
         return []
 
 
@@ -186,7 +186,7 @@ def get_all_stations_list(cursor: Any) -> List[str]:
         return cleaned_stations_list
 
     except Exception as e:
-        my_logger.error(f"An error occurred: {e}")
+        my_logger.error(f"An error occurred when getting the stations list: {e}")
         return []
 
 def update_records(cursor: Any, station: str, records: List[Dict[str, Any]]) -> None:
@@ -424,9 +424,9 @@ def time_defaults(user_begin_date: str, user_end_date: str) -> Tuple[str, str]:
         return user_begin_date, user_end_date
 
     except ValueError as ve:
-        my_logger.error(f"ValueError occurred: {ve}")
+        my_logger.error(f"ValueError occurred when executing the time_defaults function: {ve}")
     except Exception as e:
-        my_logger.error(f"An error occurred: {e}")
+        my_logger.error(f"An error occurred when executing the time_defaults function: {e}")
     finally:
         my_logger.info("time_defaults function execution completed.")
 
@@ -462,6 +462,8 @@ def get_runtime_begin_date(process_begin_date: str, station_info: Dict[str, Dict
             my_logger.debug(
                 f"Station: {station_name}, Runtime Begin Date: {runtime_begin_date[station_name]}"
             )
+        else:
+            runtime_begin_date[station_name] = None
 
     my_logger.info("Runtime begin dates calculation completed.")
     return runtime_begin_date
@@ -503,6 +505,8 @@ def get_runtime_end_date(process_end_date: str, station_info: Dict[str, Dict[str
             my_logger.debug(
                 f"Station: {station_name}, Runtime End Date: {runtime_end_date[station_name]}"
             )
+        else:
+            runtime_end_date[station_name] = None
 
     my_logger.info("Runtime end dates calculation completed.")
     return runtime_end_date
@@ -527,7 +531,7 @@ def main() -> None:
     """
     ini_file_path = "path_to_ini_file.ini"
     section_info_help = get_ini_section_info(ini_file_path)
-    print(section_info_help)
+    
     # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="hourly_main",
@@ -590,7 +594,6 @@ def main() -> None:
 
     # Establish only necessary database connections based on args
     db_connections = create_db_connections(args)
-    print(f"db_connections: {db_connections}")
 
     try:
         # Use the necessary connections and cursors based on what is required
@@ -616,34 +619,41 @@ def main() -> None:
         runtime_end_dates = get_runtime_end_date(end_date, station_info)
 
         for station in stations:
-            qc_columns = get_insert_table_columns(qcwrite_cursor, station)
-            mawn_records = fetch_records(
-                mawn_cursor,
-                station,
-                runtime_begin_dates[station],
-                runtime_end_dates[station],
-            )
-            rtma_records = fetch_records(
-                rtma_cursor,
-                station,
-                runtime_begin_dates[station],
-                runtime_end_dates[station],
-            )
-
-            # Process and clean the records
-            cleaned_records = process_records(
-                qc_columns, mawn_records, rtma_records, runtime_begin_dates[station], runtime_end_dates[station]
-            )
-
-            # If execution is requested and QC cursor is available, insert or update records in the QC database
-            if args.execute and qcwrite_cursor:
-                # Call commit_and_rollback with the operations
-                commit_and_rollback(
-                    db_connections["qcwrite_connection"], station, cleaned_records
+            try: 
+                qc_columns = get_insert_table_columns(qcwrite_cursor, station)
+                my_logger.error("Success fetching qc_columns")
+                mawn_records = fetch_records(
+                    mawn_cursor,
+                    station,
+                    runtime_begin_dates[station],
+                    runtime_end_dates[station],
                 )
+                rtma_records = fetch_records(
+                    rtma_cursor,
+                    station,
+                    runtime_begin_dates[station],
+                    runtime_end_dates[station],
+                )
+                my_logger.error("Start process records")
+
+                # Process and clean the records
+                cleaned_records = process_records(
+                    qc_columns, mawn_records, rtma_records, runtime_begin_dates[station], runtime_end_dates[station]
+                )
+                my_logger.error("Finish process records")
+
+                # If execution is requested and QC cursor is available, insert or update records in the QC database
+                if args.execute and qcwrite_cursor:
+                    # Call commit_and_rollback with the operations
+                    commit_and_rollback(
+                        db_connections["qcwrite_connection"], station, cleaned_records
+                    )
+            except Exception as e:
+                my_logger.error(f"An error occurred when processing {station}")
+                print(f"An error occurred when processing {station}")
 
     except Exception as e:
-        my_logger.error(f"An error occurred: {e}")
+        my_logger.error(f"An error occurred in main: {e}")
     finally:
         # Close all database connections
         close_connections(db_connections)
