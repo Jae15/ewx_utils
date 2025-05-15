@@ -635,7 +635,10 @@ def process_records(
     Raises:
         ValueError: If required parameters are invalid or missing.
     """
-    my_validation_logger.info(f"Starting record processing for period: {begin_date} to {end_date}")
+    if begin_date == None or end_date == None:
+        my_validation_logger.error(f"begin_date or end_date is None. Check station_info table")
+        raise ValueError
+    my_validation_logger.error(f"Starting record processing for period: {begin_date} to {end_date}")
 
     clean_records = []
     datetime_list = generate_list_of_hours(begin_date, end_date)
