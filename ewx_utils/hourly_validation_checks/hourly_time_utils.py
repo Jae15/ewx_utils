@@ -13,10 +13,11 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil import tz
 
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
 # Initialize the logger
-my_validation_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_validation_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 
 def generate_list_of_hours(begin_date: str, end_date: str) -> list:

@@ -21,10 +21,11 @@ from ewx_utils.db_files.dbs_connection import(
     get_qcwrite_cursor,
     create_db_connections
 )
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 from typing import List, Dict, Any, Tuple, Optional
 
-my_logger = ewx_utils_logger(log_path=ewx_utils_logger)
+my_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 def close_connections(connections: Dict[str, Any])->None:
     """
@@ -538,7 +539,7 @@ def get_runtime_end_date(process_end_date: str, station_info: Dict[str, Dict[str
 
 def main() -> None:
     """
-    Main function to check and update data from hourly_main in mawndb_qc.
+    Main function to check and update data from daily_main in mawndb_qc.
 
     Initializes an argument parser for date ranges, execution modes, and database connections. 
     Processes records for specified stations and updates the QC database if execution is requested.
@@ -548,7 +549,7 @@ def main() -> None:
     # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="daily_main",
-        description="Checks data from hourly_main in mawndb_qc and adds estimates from RTMA or fivemin data as needed",
+        description="Checks data from daily_main in mawndb_qc and adds estimates from RTMA or fivemin data as needed",
         epilog="Check missing data and ask python scripts for help",
     )
     parser.add_argument("-b", "--begin", type=str, help="Start date (no time accepted)")
