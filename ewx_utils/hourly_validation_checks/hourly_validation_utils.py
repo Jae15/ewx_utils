@@ -44,10 +44,11 @@ from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
 from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
 from typing import List, Dict, Any, Optional, Tuple
 from .hourly_time_utils import generate_list_of_hours
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
 # Initialize the logger
-my_validation_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_validation_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 
 def check_value(k: str, v: float, d: datetime) -> bool:

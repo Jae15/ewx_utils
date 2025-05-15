@@ -8,9 +8,10 @@ sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
 from datetime import datetime
 import ewx_utils.ewx_config as ewx_config
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from ewx_utils.mawndb_classes.humidity import Humidity
 from ewx_utils.mawndb_classes.temperature import Temperature
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
 class DewPoint:
     """
@@ -18,7 +19,7 @@ class DewPoint:
     It relies on the validity of the Humidity and Temperature classes.
     """
     def __init__(self, temp, relh, record_date=None) -> None:
-        self.logger = ewx_utils_logger(log_path=ewx_log_file)
+        self.logger = EWXStructuredLogger(log_path=ewx_log_file)
         self.logger.debug("Initializing DewPoint object with temp: %s and relh: %s", temp, relh)
         if not isinstance(temp, Temperature) or not isinstance(relh, Humidity):
             self.logger.error("Invalid temperature or humidity object passed.")

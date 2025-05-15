@@ -13,7 +13,6 @@ ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Any, Tuple, Optional, Union
 from ewx_utils.db_files.dbs_configfile import get_ini_section_info
 from ewx_utils.db_files.dbs_connection import(
@@ -23,7 +22,10 @@ from ewx_utils.db_files.dbs_connection import(
     get_qcwrite_cursor,
     create_db_connections
 )
-my_logger = ewx_utils_logger(log_path=ewx_log_file)
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
+
+my_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 
 def fetch_records_by_date(cursor: Any, station: str, start_date: str, end_date: str) -> List[dict]:

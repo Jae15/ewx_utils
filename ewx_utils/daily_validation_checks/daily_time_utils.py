@@ -10,12 +10,12 @@ from ewx_utils.ewx_config import ewx_log_file
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from zoneinfo import ZoneInfo
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import List, Dict, Tuple, Any
 
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
-# initialize the logger
-my_validation_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_validation_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 def generate_list_of_dates(begin_date: str, end_date: str) -> List:
     """

@@ -6,7 +6,8 @@ ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
 class NetRadiation:
     """
@@ -26,7 +27,7 @@ class NetRadiation:
         record_date(datetime, optional): The date of the record.
         
         """
-        self.logger = ewx_utils_logger(log_path = ewx_log_file)
+        self.logger = EWXStructuredLogger(log_path = ewx_log_file)
         self.logger.debug("Initializing NetRadiation object with nrad: %s, record_date: %s", nrad, record_date)
         self.record_date = record_date
         self.nrad = nrad
