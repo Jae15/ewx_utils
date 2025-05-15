@@ -6,7 +6,8 @@ ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
 class Humidity:
     """
@@ -27,7 +28,7 @@ class Humidity:
         units (str): The unit of measurement ('PCT' or 'DEC').
         record_date (datetime, optional): The date of the record.
         """
-        self.logger = ewx_utils_logger(log_path = ewx_log_file)
+        self.logger = EWXStructuredLogger(log_path = ewx_log_file)
         self.logger.debug("Initializing Humidity object with relh: %s, units: %s, record_date: %s",
                           relh, units, record_date)
        
@@ -88,8 +89,8 @@ class Humidity:
 
         # Checking if the humidity value is within the capped range
         elif 100 < self.relhPCT <= self.RELH_CAP:
-            self.logger.debug("relhPCT value: %s is within the range, returning (100, 'RELH_CAP')",
-                            self.relhPCT, self.RELH_CAP)
+            self.logger.debug("relhPCT value: %s is within the range, returning (100,'RELH_CAP')",
+                            self.relhPCT)
             return (100, "RELH_CAP") # Cap relh values above 100 but below 105 to 100 and set source to "RELH_CAP"
 
         # Checking if the humidity value is above the maximum threshold
@@ -98,7 +99,7 @@ class Humidity:
             return (None, "OOR") # Return None for values above RELH_CAP and the source as "OOR"
 
         # Return the actual value for valid humidity below 100
-        else: self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'MAWN')", self.relhPCT)
+        else: self.logger.debug("relhPCT value: %s is below 100, returning (%s, 'MAWN')", self.relhPCT, self.relhPCT)
         return (self.relhPCT, "MAWN") # Return the relh values that are within the valid range and setting their source to "MAWN"
 
    

@@ -22,12 +22,11 @@ from ewx_utils.db_files.dbs_connection import(
 )
 from ewx_utils.db_files.dbs_configfile import get_db_config
 from ewx_utils.hourly_validation_checks.hourly_validation_utils import process_records
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
-from typing import List, Dict, Any, Tuple
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
+from typing import List, Dict, Any, Tuple, Optional
 
-
-# Initialize the logger
-my_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 
 def close_connections(connections: Dict[str, Any]) -> None:

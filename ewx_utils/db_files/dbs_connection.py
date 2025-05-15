@@ -10,12 +10,13 @@ load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
-from typing import List, Dict, Any, Tuple
 from ewx_utils.db_files.dbs_configfile import get_db_config
+from typing import List, Dict, Any, Tuple
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
 # Initialize custom logger
-my_dbfiles_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_dbfiles_logger = EWXStructuredLogger(log_path=ewx_log_file)
 
 def connect_to_db(db_info: dict, autocommit: bool = False) -> psycopg2.extensions.connection:
     """

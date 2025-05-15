@@ -10,7 +10,6 @@ load_dotenv()
 ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
 from typing import Dict, Optional, Tuple, Any, List
 from .daily_time_utils import generate_list_of_dates
 from .daily_variables_list import (
@@ -47,11 +46,10 @@ from ewx_utils.mawndb_classes.solar_radiation import SolarRadiation
 from ewx_utils.mawndb_classes.evapotranspiration import Evapotranspiration
 from ewx_utils.mawndb_classes.std_dev_wind_direction import StdDevWindDirection
 from ewx_utils.mawndb_classes.solar_flux import SolarFlux
-from typing import List, Dict, Any, Optional, Tuple
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 
-# Initialize logger
-my_validation_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_validation_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 def check_value(k: str, v: float, d: date) -> bool:
     """
@@ -108,7 +106,7 @@ def check_value(k: str, v: float, d: date) -> bool:
         #print(k, v, d, nr.is_valid())
         return nr.is_valid()
     if k in srad_vars:
-        sr = SolarRadiation(v, d)
+        sr = SolarRadiation(v, "daily", d)
         #print(k, v, d, sr.is_valid())
         return sr.is_valid()
     if k in sflux_vars:
@@ -185,15 +183,15 @@ def get_year(record: Dict[str, Any]) -> Optional[int]:
         my_validation_logger.error(f"Error extracting year: {e}")
         return None
 
-
 def creating_mawnsrc_record(
-        record: Dict[str, Any],
-        id_col_list: List[str],
-        date_of_record: Optional[date],
-        default_source: str,
+    record: Dict[str, Any],
+    id_col_list: List[str],
+    date_of_record: Optional[date],
+    default_source: str,
 ) -> Dict[str, Any]:
     """
     Create a MAWN source record with appropriate source indicators.
+    Handles time-related fields (e.g., rpt_time, time) separately from QC validation.
     """
     if not record or not id_col_list:
         my_validation_logger.error("Missing required record or id_col_list")
@@ -209,28 +207,34 @@ def creating_mawnsrc_record(
     mawnsrc_record = record.copy()
     my_validation_logger.debug("Created copy of original record")
 
-    for key in record.keys():
-        if key not in id_col_list and not key.endswith("_src"):
-            my_validation_logger.debug(f"Processing key: {key}")
+    # Fields that are passed through but not validated (time-related)
+    time_vars = ["rpt_time", "time"]
 
-            if mawnsrc_record[key] is None:
-                mawnsrc_record[key + "_src"] = "EMPTY"
+    for field in time_vars:
+        mawnsrc_record[field] = record.get(field)
+
+    for key in record.keys():
+        if key in id_col_list or key in time_vars or key.endswith("_src"):
+            continue
+
+        value = mawnsrc_record.get(key)
+
+        if value is None:
+            mawnsrc_record[key + "_src"] = "EMPTY"
+        elif value == -7999:
+            mawnsrc_record[key] = None
+            mawnsrc_record[key + "_src"] = "OOR"
+        else:
+            is_valid = check_value(key, value, date_of_record)
+            if is_valid:
+                mawnsrc_record[key + "_src"] = default_source
+            elif key in relh_vars:
+                mawnsrc_record[key + "_src"] = "OOR"
             else:
-                if mawnsrc_record[key] == -7999:
-                    mawnsrc_record[key] = None
-                    mawnsrc_record[key + "_src"] = "OOR"
-                else:
-                    is_valid = check_value(key, mawnsrc_record[key], date_of_record)
-                    if is_valid:
-                        mawnsrc_record[key + "_src"] = default_source
-                    elif key in relh_vars:
-                        mawnsrc_record[key + "_src"] = "OOR"
-                    else:
-                        mawnsrc_record[key] = None
-                        mawnsrc_record[key + "_src"] = "OOR"
+                mawnsrc_record[key] = None
+                mawnsrc_record[key + "_src"] = "OOR"
 
     return mawnsrc_record
-
 
 
 def relh_cap(mawnsrc_record: Dict[str, Any], relh_vars: List[str]) -> Dict[str, Any]:
@@ -286,100 +290,70 @@ def relh_cap(mawnsrc_record: Dict[str, Any], relh_vars: List[str]) -> Dict[str, 
     my_validation_logger.info("Completed relative humidity processing")
     return mawnsrc_record
 
-
 def replace_none_with_manwqc_record(
         mawnsrc_record: Dict[str, Any],
-        mawnqc_record: Dict[str, Any],
+        hourly_records: List[Dict[str, Any]],
         qc_columns: List[str]
 ) -> Dict[str, Any]:
     """
-    Replace None values in the MAWN source record with calculated min/max or sum values from
-    the MAWNQC record. Handles the special case for 'pcpn' (precipitation) and 'rpet' (evapotranspiration).
+    Replace None values in the MAWN source record with values estimated from MAWNQC hourly data.
+    If any of the hourly sources are RTMA, mark the source in the daily record as EMPTYQC.
 
     Parameters:
-        mawnsrc_record (Dict[str, Any]): MAWN source record.
-        mawnqc_record (Dict[str, Any]): MAWNQC record with hourly data for value replacement.
-        qc_columns (List[str]): Keys for quality control checks
-   
+        mawnsrc_record (Dict[str, Any]): Existing daily record with potential missing data.
+        hourly_records (List[Dict[str, Any]]): List of 24 hourly records for the day.
+        qc_columns (List[str]): List of *_src fields indicating source attribution.
+
     Returns:
-        Dict[str, Any]: Updated MAWN source record with min/max or sum values where applicable.
+        Dict[str, Any]: Updated daily record with filled values and appropriate source tagging.
     """
     my_validation_logger.info(f"Starting MAWNQC replacement")
 
     clean_record = mawnsrc_record.copy()
-    my_validation_logger.debug("Created copy of MAWNQC record")
+    my_validation_logger.debug("Created copy of MAWN record")
 
-    # Adding any missing keys from qc_columns
+    # Ensure all expected keys exist
     for key in qc_columns:
         if key not in clean_record:
-            if key.endswith("_src"):
-                clean_record[key] = "EMPTY"
-                my_validation_logger.debug(f"Added missing source key {key} as EMPTY")
-            else:
-                clean_record[key] = None
-                my_validation_logger.debug(f"Added missing data key {key} as None")
-   
-    # Performing MAWNQC value replacement
-    for key in qc_columns:
-        if key.endswith("_src"):
-            data_key = key[:-4]  # Removing '_src' to get the data column name
+            clean_record[key] = "EMPTY" if key.endswith("_src") else None
+            my_validation_logger.debug(f"Initialized missing key {key} as {'EMPTY' if key.endswith('_src') else 'None'}")
 
-            # Special case for 'pcpn' or 'rpet': calculate sum of hourly values
-            if data_key == "pcpn" or data_key == "rpet":
-                # Collect hourly precipitation values for the specific day
-                hourly_values = [
-                    mawnqc_record.get("pcpn") or mawnqc_record.get("rpet") for i in range(1, 25)
-                    if mawnqc_record.get("hour") == i  # Ensure the hour matches
-                ]
-                if len(hourly_values) == 24:  # Ensure all hourly values are present
-                    # Calculate the sum of all 24 hourly values for precipitation
-                    sum_pcpn = sum(hourly_values)
-                    clean_record[data_key] = sum_pcpn
-                    clean_record[key + "_src"] = "MAWNQC"
-                    my_validation_logger.debug(f"Replaced {data_key} with sum of hourly values from MAWNQC")
-                else:
-                    clean_record[key + "_src"] = "EMPTY"
-                    my_validation_logger.warning(f"Missing hourly values for {data_key} in MAWNQC record")
+    # check if any hourly source is RTMA
+    has_rtma = any(
+        any(str(v).upper() == "RTMA" for k, v in record.items() if k.endswith("_src"))
+        for record in hourly_records
+    )
 
-            else:
-                # General case for other variables
-                hourly_values = [
-                    mawnqc_record.get(data_key) for i in range(1, 25)
-                    if mawnqc_record.get("hour") == i  # Matching the hours
-                ]
-                if len(hourly_values) == 24:  # Ensuring all hourly values are present
-                    # Calculate min and max from the 24 hourly values
-                    min_value = min(hourly_values)
-                    max_value = max(hourly_values)
+    # Estimate daily values from hourly data
+    daily_estimates = estimate_daily_values(hourly_records, qc_columns)
 
-                    # Update the min and max values in the clean_records
-                    if f"{data_key}_min" in clean_record:
-                        clean_record[f"{data_key}_min"] = min_value  # Replace with min value
-                        clean_record[key + "_src"] = "MAWNQC"  # Set source to MAWNQC
-                        my_validation_logger.debug(f"Replaced {data_key}_min with min value from MAWNQC")
-
-                    if f"{data_key}_max" in clean_record:
-                        clean_record[f"{data_key}_max"] = max_value
-                        clean_record[key + "_src"] = "MAWNQC"
-                        my_validation_logger.debug(f"Replaced {data_key}_max with max value from MAWNQC")
-                else:
-                    my_validation_logger.warning(f"Hourly values not found for {data_key} in MAWNQC record")
-                    clean_record[key + "_src"] = "EMPTY"  # Mark source as EMPTY
-
-    # Final pass to ensure all _src keys are marked correctly
     for key in qc_columns:
         if key.endswith("_src"):
             data_key = key[:-4]
-            if clean_record.get(key) is None:
-                clean_record[key + "_src"] = "EMPTY"
-                my_validation_logger.debug(f"Marked missing source {key} as EMPTY")
-            if data_key not in clean_record or clean_record[data_key] is None:
-                clean_record[key] = None
-                my_validation_logger.debug(f"Ensured {data_key} remains None")
-                           
+
+            if data_key in ["pcpn", "rpet"]:
+                if daily_estimates.get(data_key) is not None:
+                    clean_record[data_key] = daily_estimates[data_key]
+                    clean_record[key] = "EMPTYQC" if has_rtma else "MAWNQC"
+                    my_validation_logger.debug(f"Set {data_key} from sum, source: {clean_record[key]}")
+            else:
+                min_key = f"{data_key}_min"
+                max_key = f"{data_key}_max"
+
+                if daily_estimates.get(min_key) is not None:
+                    clean_record[min_key] = daily_estimates[min_key]
+                    clean_record[key] = "EMPTYQC" if has_rtma else "MAWNQC"
+                    my_validation_logger.debug(f"Set {min_key} from hourly data, source: {clean_record[key]}")
+
+                if daily_estimates.get(max_key) is not None:
+                    clean_record[max_key] = daily_estimates[max_key]
+                    # Avoid overwriting if already marked EMPTYQC
+                    if clean_record.get(key) != "EMPTYQC":
+                        clean_record[key] = "EMPTYQC" if has_rtma else "MAWNQC"
+                    my_validation_logger.debug(f"Set {max_key} from hourly data, source: {clean_record[key]}")
+
     my_validation_logger.info("Completed MAWNQC value replacement")
     return clean_record
-
 
 
 def filter_clean_record(clean_record: Dict[str, Any], qc_columns: List[str]) -> Dict[str, Any]:
@@ -431,39 +405,62 @@ def inserting_empty_records(
     return empty_record
 
 
-
-def estimate_daily_values(hourly_records: List[Dict[str, Any]], qc_columns: List[str]) -> Dict[str, Any]:
+def estimate_daily_values(
+    hourly_records: List[Dict[str, Any]],
+    qc_columns: List[str]
+) -> Dict[str, Any]:
     """
     Estimate daily values from 24 hourly records.
-
-    Parameters:
-        hourly_records (List[Dict[str, Any]]): List of 24 hourly records.
-        qc_columns (List[str]): List of quality control column names.
-
-    Returns:
-        Dict[str, Any]: Estimated daily record.
+    Returns a dict with estimated values and their source marked as MAWNQC.
+    Logs details for both success and skipped estimates.
     """
+    my_validation_logger.info("Estimating daily values from MAWNQC hourly records")
+
+    if not hourly_records:
+        my_validation_logger.warning("No hourly records provided")
+        return {}
+
     daily_estimates = {}
+    successful = 0
+    skipped = []
 
-    # Extract numeric variables from records
-    for key in hourly_records[0].keys():
-        if key in qc_columns:
-            continue  # Skip QC columns
+    target_keys = [key for key in qc_columns if not key.endswith("_src")]
 
-        values = [rec[key] for rec in hourly_records if rec.get(key) is not None]
-
-        if not values:
-            daily_estimates[key] = None  # No data available
+    for key in target_keys:
+        if key in ["year", "day", "date", "time", "id", "rpt_time"]:
             continue
 
-        # Special handling for PCPN and RPET (sum instead of min/max)
-        if key in ["pcpn", "rpet"]:
-            daily_estimates[key] = sum(values)
-        else:
-            daily_estimates[f"{key}_min"] = min(values)
-            daily_estimates[f"{key}_max"] = max(values)
+        # Sum-based
+        if key in ["pcpn", "rpet", "srad"]:
+            values = [rec.get(key) for rec in hourly_records if rec.get(key) is not None]
+            if len(values) == 24:
+                daily_estimates[key] = sum(values)
+                daily_estimates[key + "_src"] = "MAWNQC"
+                successful += 1
+                my_validation_logger.info(f"[ESTIMATED SUM] {key} = {daily_estimates[key]}")
+            else:
+                skipped.append(key)
+                my_validation_logger.warning(f"[SKIPPED] Incomplete hourly values for {key}")
+
+        # Min/Max
+        elif key.endswith("_min") or key.endswith("_max"):
+            base_var = key.rsplit("_", 1)[0]
+            values = [rec.get(base_var) for rec in hourly_records if rec.get(base_var) is not None]
+            if len(values) == 24:
+                daily_estimates[key] = min(values) if key.endswith("_min") else max(values)
+                daily_estimates[key + "_src"] = "MAWNQC"
+                successful += 1
+                my_validation_logger.info(f"[ESTIMATED {key[-3:].upper()}] {key} = {daily_estimates[key]}")
+            else:
+                skipped.append(key)
+                my_validation_logger.warning(f"[SKIPPED] Incomplete hourly values for {key}")
+
+    my_validation_logger.info(f"Total MAWNQC estimates created: {successful}")
+    if skipped:
+        my_validation_logger.warning(f"Skipped estimates due to missing hourly values: {skipped}")
 
     return daily_estimates
+
 
 def one_mawndb_record(mawndb_records: list) -> list:
     """
@@ -475,7 +472,6 @@ def one_mawndb_record(mawndb_records: list) -> list:
     """
     # Use dictionary comprehension to create new dictionaries
     return [{k: v for k, v in record.items()} for record in mawndb_records]
-
 
 def process_records(
     qc_columns: List[str],
@@ -516,15 +512,19 @@ def process_records(
             mawnsrc_record = creating_mawnsrc_record(matching_mawn_record, id_col_list, dt.date(), "MAWN")
             mawnsrc_record = relh_cap(mawnsrc_record, relh_vars)
 
-            if matching_mawnqc_records:
-                estimated_record = estimate_daily_values(matching_mawnqc_records, qc_columns)
-                mawnsrc_record = replace_none_with_manwqc_record(mawnsrc_record, estimated_record, qc_columns)
+            if len(matching_mawnqc_records) == 24:
+                # Replaces missing values in the daily record using full hourly set
+                mawnsrc_record = replace_none_with_manwqc_record(
+                    mawnsrc_record,
+                    matching_mawnqc_records,
+                    qc_columns
+                )
 
             clean_record = filter_clean_record(mawnsrc_record, qc_columns)
             clean_records.append(clean_record)
             my_validation_logger.debug("Processed MAWN + MAWNQC record")
 
-        elif matching_mawnqc_records:
+        elif len(matching_mawnqc_records) == 24:
             my_validation_logger.debug("No MAWN record, estimating from MAWNQC")
 
             estimated_record = estimate_daily_values(matching_mawnqc_records, qc_columns)
@@ -537,12 +537,9 @@ def process_records(
 
         else:
             # No data at all — insert empty record
-            my_validation_logger.warning("No MAWN or MAWNQC data, inserting empty record")
+            my_validation_logger.warning("No MAWN or complete MAWNQC data, inserting empty record")
             empty_record = inserting_empty_records({}, {}, dt.date(), qc_columns, id_col_list)
             clean_records.append(empty_record)
 
     my_validation_logger.info(f"Completed processing {len(clean_records)} records")
     return clean_records
-
-
-

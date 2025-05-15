@@ -114,12 +114,16 @@ temp_vars = [
 
 """ Windspeed variables list - if the k - key - is in this list, treat the variable as 'wspd_vars' """
 
-wspd_vars = ["wspd", 
-             "wspd_10m", 
-             "wspd_20m", 
+wspd_vars = ["wspd",
+             "wspd_min",
              "wspd_max", 
-             "wspd_10m_max", 
-             "wspd_20m_max"]
+             "wspd_10m",
+             "wspd_10m_min",
+             "wspd_10m_mx", 
+             "wspd_20m",
+             "wspd_20m_min",
+             "wspd_20m_max" 
+]
 
 """ Leaf wetness variables List - if the k - key - is in this list, treat the variable as 'leafwt_vars' """
 
@@ -152,15 +156,25 @@ volt_vars = ["volt",
 """ Soil Moisture variables list - if the k - key - is in this list, treat the variable as mstr_vars """
 
 mstr_vars = [
-    "mstr0",
-    "mstr1",
-    "mstr_90cm",
-    "mstr_120cm",
-    "smst_05cm",
-    "smst_10cm",
-    "smst_20cm",
-    "smst_50cm" ,
-    "smst_100cm"]
+    "mstr0_min",
+    "mstr0_max",
+    "mstr1_min",
+    "mstr1_max",
+    "mstr_90cm_min",
+    "mstr_90cm_max",
+    "mstr_120cm_min",
+    "mstr_120cm_max",
+    "smst_05cm_min",
+    "smst_05cm_max",
+    "smst_10cm_min",
+    "smst_10cm_max",
+    "smst_20cm_min",
+    "smst_20cm_max",
+    "smst_50cm_min",
+    "smst_50cm_max",
+    "smst_100cm_min",
+    "smst_100cm_max",
+    ]
 
 dwpt_vars =  [ "dwpt",
     "dwpt_min",
@@ -174,14 +188,9 @@ dwpt_vars =  [ "dwpt",
 ]
 
 vapr_vars = [
-    "vapr",
-    "vapr_min",
-    "vapr_max",
-    "vapr_3m",
-    "vapr_3m_min",
-    "vapr_45cm",
-    "vapr_45cm_min",
-    "vapr_45m_max"
+    "vapr", "vapr_min", "vapr_max",
+    "vapr_3m", "vapr_3m_min", "vapr_3m_max",
+    "vapr_45cm", "vapr_45cm_min", "vapr_45m_max"
 ]
 
 sflux_vars = [
@@ -191,21 +200,19 @@ sflux_vars = [
 ]
 
 wstdv_vars = [
-    "wstdv",
-    "wstdv_min",
-    "wstdv_max",
+    "wstdv", "wstdv_min", "wstdv_max",
     "wstdv_10m",
     "wstdv_20m"
 ]
 
 sden_vars = [
-    "sden_max",
-    'sden_maxt',
-    'sden_mint'
+    "sden_max"
 ]
 
 albedo_vars = [
-    "albd", "albd_max", "albd_min"
+    "albd", 
+    "albd_max",
+    "albd_min"
 ]
 
 longwave_vars = [

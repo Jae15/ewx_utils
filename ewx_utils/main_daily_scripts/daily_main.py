@@ -21,10 +21,11 @@ from ewx_utils.db_files.dbs_connection import(
     get_qcwrite_cursor,
     create_db_connections
 )
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 from typing import List, Dict, Any, Tuple, Optional
 
-my_logger = ewx_utils_logger(log_path=ewx_utils_logger)
+my_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 def close_connections(connections: Dict[str, Any])->None:
     """
@@ -207,88 +208,95 @@ def update_records(cursor: Any, station: str, records: List[Dict[str, Any]])->No
                record["time"], 
             ]
             cursor.execute(update_query, update_values)
+        my_logger.error(
+            f"Updated {len(records)} from {station} using {cursor}."
+        )
         
         my_logger.info(f"Updated {len(records)} records in {station}.")
     except Exception as e:
         my_logger.error(f"Error updating records in {station}: {e}")
         raise 
 
-def insert_records(cursor: Any, station: str, records: List[Dict[str, Any]])->None:
+def insert_records(cursor, table: str, records: List[Dict[str, Any]], record_keys: List[str]) -> None:
     """
-    Insert records into the specified station's table.
-
-    Parameters:
-    cursor: Any
-        Database cursor for executing queries.
-    station: str
-        Specified weather station.
-    records: List[Dict[str, Any]]
-        List of records to insert, where each record is a dictionary with string keys and values of any type.
+    Insert records into the given table using the specified cursor.
+    Adds validation to prevent mismatched inserts and handles rollback.
     """
-    if not records:
-        my_logger.error(f"No records to insert into {station}.")
-        return
-    
-    try:
-        # Use the first record to get column names
-        record_keys = list(records[0].keys())
-        my_logger.info(f"Record Keys: {record_keys}")
-        # Skip the "id" column if it exists
-        if "id" in record_keys:
-            record_keys.remove("id")
-        
-        if not record_keys:
-            my_logger.error(f"No keys found in the records for {station}. ")
-            return
-        
-    except (IndexError, AttributeError, KeyError) as e:
-        my_logger.error(f"Error accessing record keys: {e}")
-        return
-    
-    # Prepare the INSERT query using only the available columns
-    db_columns = ", ".join(record_keys)
-    values_placeholder = ", ". join(["%s"] * len(record_keys))
-    query = f"INSERT INTO {station}_daily ({db_columns}) VALUES ({values_placeholder})"
-
-    my_logger.info(f"Constructed INSERT query: {query}")
-
-    try:
-        for record in records:
-            record_vals = [record[key] for key in record_keys]
-            cursor.execute(query, record_vals)
-
-    except Exception as e:
-        if query:
-            print(f"query: {query}")
-        if "record_vals" in locals():
-            print(f"record_vals: {record_vals}")
-        my_logger.error(f"Error inserting records into {station}: {e}")
-        raise
-
-def insert_or_update_records(cursor: Any, station: str, records: List[Dict[str, Any]])-> None:
+    insert_template = f"""
+        INSERT INTO {table}_daily ({", ".join(record_keys)})
+        VALUES ({", ".join(["%s"] * len(record_keys))})
     """
-    Insert of update records in the specified station's table.
 
-    Parameters:
-    cursor: Any
-        Database cursor for executing queries.
-    station: str
-        Specfied weather station.
-    records: List[Dict[str, Any]]
-        List of records to insert or update, where each record is a dictionary with string keys and values of any type.
+    for record in records:
+        # Check for missing keys
+        for key in record_keys:
+            if key not in record:
+                print(f" Missing key in record: {key}")
+
+        record_vals = [record.get(key) for key in record_keys]
+        print("*********************************")
+        print(f"Columns (len{len(record_keys)}): {record_keys}")
+        print(f"Values (len{len(record_vals)}): {record_vals}")
+        print("*********************************")
+
+        # check: field count matches
+        if len(record_keys) != len(record_vals):
+            print("Mismatch in column/value count!")
+            print(f"Columns ({len(record_keys)}): {record_keys}")
+            print(f"Values  ({len(record_vals)}): {record_vals}")
+            raise ValueError("Column count does not match value count")
+
+        try:
+            cursor.execute(insert_template, record_vals)
+            my_logger.error(
+            f"Inserted {len(records)} from {table} using {cursor}."
+        )
+        except Exception as e:
+            print(f"INSERT failed for table {table}: {e}")
+            cursor.connection.rollback()
+            continue  # Skip to next record
+
+
+def insert_or_update_records(cursor, table: str, records: List[Dict[str, Any]], record_keys: List[str], unique_keys: List[str]) -> None:
     """
-    try:
-        for record in records:
-            if record_exists(cursor, station, record):
-                update_records(cursor, station, [record])
-            else:
-                insert_records(cursor, station, [record])
+    Insert or update records into the table.
+    Performs UPSERT logic based on unique constraints.
+    """
+    update_cols = [f"{key} = EXCLUDED.{key}" for key in record_keys if key not in unique_keys]
 
-    except Exception as e:
-        my_logger.error(f"Error in insert_or_update operation for {station}: {e}")
-        raise
+    insert_template = f"""
+        INSERT INTO {table}_daily ({", ".join(record_keys)})
+        VALUES ({", ".join(["%s"] * len(record_keys))})
+        ON CONFLICT ({", ".join(unique_keys)})
+        DO UPDATE SET {", ".join(update_cols)}
+    """
 
-def commit_and_rollback(connection: Any, station: str, records: List[Dict[str, Any]])->None:
+    for record in records:
+        # Check for missing keys
+        for key in record_keys:
+            if key not in record:
+                print(f" Missing key in record: {key}")
+
+        record_vals = [record.get(key) for key in record_keys]
+
+        if len(record_keys) != len(record_vals):
+            print(" Mismatch in column/value count!")
+            print(f"Columns ({len(record_keys)}): {record_keys}")
+            print(f"Values  ({len(record_vals)}): {record_vals}")
+            raise ValueError("Column count does not match value count")
+
+        try:
+            cursor.execute(insert_template, record_vals)
+            my_logger.error(
+            f"Inserted/updated {len(records)} from {table} using {cursor}."
+        )
+        except Exception as e:
+            print(f" UPSERT failed for table {table}_daily: {e}")
+            cursor.connection.rollback()
+            continue  # Skip to next record
+
+
+def commit_and_rollback(connection: Any, station: str, records: List[Dict[str, Any]], record_keys, unique_keys)->None:
     """
     Commit records for a station, rollback on error.
 
@@ -299,8 +307,9 @@ def commit_and_rollback(connection: Any, station: str, records: List[Dict[str, A
     """
     try:
         with connection.cursor() as cursor:
-            insert_or_update_records(cursor, station,records)
+            insert_or_update_records(cursor, station,records, record_keys, unique_keys)
             my_logger.info("Inserted or updated records successfully.")
+            connection.commit()
     except Exception as e:
         print(f"Exception as {e}")
         # Rollback the transaction in case of an error
@@ -530,7 +539,7 @@ def get_runtime_end_date(process_end_date: str, station_info: Dict[str, Dict[str
 
 def main() -> None:
     """
-    Main function to check and update data from hourly_main in mawndb_qc.
+    Main function to check and update data from daily_main in mawndb_qc.
 
     Initializes an argument parser for date ranges, execution modes, and database connections. 
     Processes records for specified stations and updates the QC database if execution is requested.
@@ -540,7 +549,7 @@ def main() -> None:
     # Initialize argument parser
     parser = argparse.ArgumentParser(
         prog="daily_main",
-        description="Checks data from hourly_main in mawndb_qc and adds estimates from RTMA or fivemin data as needed",
+        description="Checks data from daily_main in mawndb_qc and adds estimates from RTMA or fivemin data as needed",
         epilog="Check missing data and ask python scripts for help",
     )
     parser.add_argument("-b", "--begin", type=str, help="Start date (no time accepted)")
@@ -626,9 +635,9 @@ def main() -> None:
         qcread_cursor = get_mawnqc_cursor(db_connections.get('mawnqc_connection'), 'mawnqc')
         qcwrite_cursor = get_qcwrite_cursor(db_connections.get('qcwrite_connection'), 'qcwrite')
         
-        my_logger.info(f"mawn_cursor: {mawn_cursor}")
-        my_logger.info(f"qcread_cursor: {qcread_cursor}")
-        my_logger.info(f"qcwrite_cursor: {qcwrite_cursor}")
+        my_logger.error(f"mawn_cursor: {mawn_cursor}")
+        my_logger.error(f"qcread_cursor: {qcread_cursor}")
+        my_logger.error(f"qcwrite_cursor: {qcwrite_cursor}")
 
         # Process records for specified stations
         stations = get_all_stations_list(mawn_cursor) if args.all else args.stations
@@ -641,7 +650,7 @@ def main() -> None:
             my_logger.info(f"Processing station: {station}")
             
             qc_columns = get_insert_table_columns(qcwrite_cursor, station)
-            print(f"QC Columns: {qc_columns}")
+            #print(f"QC Columns: {qc_columns}")
             
             mawndb_records = fetch_records(
                 mawn_cursor,
@@ -649,7 +658,7 @@ def main() -> None:
                 runtime_begin_dates[station],
                 runtime_end_dates[station],
             )
-            print(f"Mawndb Record: {mawndb_records}")
+            #print(f"Mawndb Record: {mawndb_records}")
             
             mawnqc_records = fetch_records(
                 qcread_cursor,
@@ -657,20 +666,20 @@ def main() -> None:
                 runtime_begin_dates[station],
                 runtime_end_dates[station],
             )
-            print(f"Mawnqc records: {mawnqc_records}")
+            #print(f"Mawnqc record: {mawnqc_records}")
 
             # Process and clean the records
             cleaned_records = process_records(
                 qc_columns, mawndb_records, mawnqc_records, 
                 runtime_begin_dates[station], runtime_end_dates[station]
             )
-            print(f"Cleaned Records: {cleaned_records}")
+            #print(f"Cleaned Records: {cleaned_records}")
 
             # If execution is requested, insert or update records in the QC database
-            if args.execute:
+            if args.execute and qcwrite_cursor:
                 my_logger.info(f"Executing updates for station {station}")
                 commit_and_rollback(
-                    db_connections["qcwrite_connection"], station, cleaned_records
+                    db_connections["qcwrite_connection"], station, cleaned_records, qc_columns, unique_keys=["date", "time"]
                 )
 
     except Exception as e:
@@ -693,5 +702,8 @@ usage: daily_main [-h] [-b BEGIN] [-e END] (-x EXECUTE | -d) [-s [STATIONS ...] 
 python daily_main.py --begin 2024-01-01 --end 2024-01-02 --station aetna --read-from mawn_dbh11 mawnqc_supercell --write-to mawnqc_test -x --execute
 
 python daily_main.py --begin 2024-01-01 --end 2024-01-02 --station aetna --read-from mawn_dbh11 mawnqc_supercell --write-to mawnqc_test --execute
+
+python daily_main.py --begin 2019-05-08 --end 2019-05-10 --station aetna --read-from mawn_dbh11 mawnqc_dbh11
+ --write-to mawnqc_test -x
 
 """

@@ -21,12 +21,11 @@ from ewx_utils.db_files.dbs_connection import(
     create_db_connections
 )
 from ewx_utils.hourly_validation_checks.hourly_validation_utils import process_records
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
-from typing import List, Dict, Any
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
+from typing import List, Dict, Any, Tuple, Optional
 
-load_dotenv()
-# Initialize the logger
-my_logger = ewx_utils_logger(log_path=ewx_log_file)
+my_logger = EWXStructuredLogger(log_path=EWXStructuredLogger)
 
 
 def get_all_stations_list(cursor: Any) -> List[str]:

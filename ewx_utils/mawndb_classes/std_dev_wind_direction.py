@@ -6,7 +6,8 @@ ewx_base_path = os.getenv("EWX_BASE_PATH")
 sys.path.append(ewx_base_path)
 from datetime import datetime
 from ewx_utils.ewx_config import ewx_log_file
-from ewx_utils.logs.ewx_utils_logs_config import ewx_utils_logger
+from ewx_utils.logs.ewx_utils_logs_config import ewx_unstructured_logger
+from ewx_utils.logs.ewx_utils_logs_config import EWXStructuredLogger
 class StdDevWindDirection:
     """
     The StdDevWindDirection class defines the valid hourly default range for standard deviation of wind direction.
@@ -24,7 +25,7 @@ class StdDevWindDirection:
         record_date(datetime, optional): The date of the record.
 
         """
-        self.logger = ewx_utils_logger(log_path = ewx_log_file)
+        self.logger = EWXStructuredLogger(log_path = ewx_log_file)
         self.logger.debug("Initializing StdDevWindDirection object with wstdv: %s, units: %s, record_date: %s",
                           wstdv, units, record_date)
         
